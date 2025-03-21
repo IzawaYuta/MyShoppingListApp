@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5A92D25F196D3B84C2A6302C /* Pods_MyShoppingListApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 919942BB48894B3A6BA973CE /* Pods_MyShoppingListApp.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		86EFDB3A30D7B6D13B7B04D9 /* Pods-MyShoppingListApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyShoppingListApp.debug.xcconfig"; path = "Target Support Files/Pods-MyShoppingListApp/Pods-MyShoppingListApp.debug.xcconfig"; sourceTree = "<group>"; };
+		919942BB48894B3A6BA973CE /* Pods_MyShoppingListApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyShoppingListApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62531DF2D8D4B4C0031E4CA /* MyShoppingListApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyShoppingListApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA2FFC1E0F83937E5BCF3EF3 /* Pods-MyShoppingListApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyShoppingListApp.release.xcconfig"; path = "Target Support Files/Pods-MyShoppingListApp/Pods-MyShoppingListApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,17 +30,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A92D25F196D3B84C2A6302C /* Pods_MyShoppingListApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		92BECFE3A2DC24FD7B33D313 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				919942BB48894B3A6BA973CE /* Pods_MyShoppingListApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9D75D715967135CC8F159892 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				86EFDB3A30D7B6D13B7B04D9 /* Pods-MyShoppingListApp.debug.xcconfig */,
+				AA2FFC1E0F83937E5BCF3EF3 /* Pods-MyShoppingListApp.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A62531D62D8D4B4C0031E4CA = {
 			isa = PBXGroup;
 			children = (
 				A62531E12D8D4B4C0031E4CA /* MyShoppingListApp */,
 				A62531E02D8D4B4C0031E4CA /* Products */,
+				9D75D715967135CC8F159892 /* Pods */,
+				92BECFE3A2DC24FD7B33D313 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -52,9 +79,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A62531ED2D8D4B4E0031E4CA /* Build configuration list for PBXNativeTarget "MyShoppingListApp" */;
 			buildPhases = (
+				3E465361234738B42E1641C9 /* [CP] Check Pods Manifest.lock */,
 				A62531DB2D8D4B4C0031E4CA /* Sources */,
 				A62531DC2D8D4B4C0031E4CA /* Frameworks */,
 				A62531DD2D8D4B4C0031E4CA /* Resources */,
+				FC2D136F92F5372C07513282 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -64,8 +93,6 @@
 				A62531E12D8D4B4C0031E4CA /* MyShoppingListApp */,
 			);
 			name = MyShoppingListApp;
-			packageProductDependencies = (
-			);
 			productName = MyShoppingListApp;
 			productReference = A62531DF2D8D4B4C0031E4CA /* MyShoppingListApp.app */;
 			productType = "com.apple.product-type.application";
@@ -113,6 +140,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3E465361234738B42E1641C9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MyShoppingListApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FC2D136F92F5372C07513282 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MyShoppingListApp/Pods-MyShoppingListApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MyShoppingListApp/Pods-MyShoppingListApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MyShoppingListApp/Pods-MyShoppingListApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A62531DB2D8D4B4C0031E4CA /* Sources */ = {
@@ -246,6 +315,7 @@
 		};
 		A62531EE2D8D4B4E0031E4CA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 86EFDB3A30D7B6D13B7B04D9 /* Pods-MyShoppingListApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -254,12 +324,13 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MyShoppingListApp/Preview Content\"";
 				DEVELOPMENT_TEAM = MWZL7CC4LD;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -275,6 +346,7 @@
 		};
 		A62531EF2D8D4B4E0031E4CA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA2FFC1E0F83937E5BCF3EF3 /* Pods-MyShoppingListApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -283,12 +355,13 @@
 				DEVELOPMENT_ASSET_PATHS = "\"MyShoppingListApp/Preview Content\"";
 				DEVELOPMENT_TEAM = MWZL7CC4LD;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
