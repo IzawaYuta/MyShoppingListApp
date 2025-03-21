@@ -8,7 +8,8 @@
 import SwiftUI
 import RealmSwift
 
-class RegularListViewModel: Object, Identifiable {
+// MARK: RegularListViewModel
+class RegularItemViewModel: Object, Identifiable {
     @Persisted var id = UUID()
     @Persisted var regularName: String
     
@@ -18,17 +19,27 @@ class RegularListViewModel: Object, Identifiable {
     }
 }
 
-struct RegularListView: View {
+struct RegularCategoryListView: View {
+    @ObservedResults(CategoryListModel.self) var categoryListModel
+    var body: some View {
+        List(categoryListModel) { list in
+            Text(list.name)
+        }
+    }
+}
+
+// MARK: RegularListView
+struct RegularItemView: View {
     
-    @State private var regularListViewModel: [RegularListViewModel] = [RegularListViewModel(regularName: "あ")]
+    @State private var regularItemViewModel: [RegularItemViewModel] = [RegularItemViewModel(regularName: "あ")]
     
     var body: some View {
-        List(regularListViewModel) { list in
+        List(regularItemViewModel) { list in
             Text(list.regularName)
         }
     }
 }
 
 #Preview {
-    RegularListView()
+    RegularCategoryListView()
 }

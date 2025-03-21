@@ -14,7 +14,7 @@ struct MainTabView: View {
                 .tabItem {
                     Label("", systemImage: "checklist")
                 }
-            RegularListView()
+            RegularCategoryListView()
                 .tabItem {
                     Label("", systemImage: "tray")
                 }
