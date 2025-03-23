@@ -8,17 +8,23 @@
 import SwiftUI
 
 struct MainTabView: View {
+    
+    @State private var selection = 1
+    
     var body: some View {
-        TabView {
+        TabView(selection: $selection) {
             CategoryListView()
                 .tabItem {
-                    Label("", systemImage: "checklist")
+                    Image(systemName: "checklist")
                 }
+                .tag(1)
             RegularCategoryListView()
                 .tabItem {
-                    Label("", systemImage: "tray")
+                    Image(systemName: "tray")
                 }
+                .tag(2)
         }
+        .accentColor(.blue)
     }
 }
 
