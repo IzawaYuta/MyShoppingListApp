@@ -84,12 +84,17 @@ struct CategoryListView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {
-                        Button(action: {
-                            
-                        }) {
-                            Text("リストを共有")
-                            Image(systemName: "square.and.arrow.up")
-                        } // 共有
+//                        Button(action: {
+//                        }) {
+//                            Text("リストを共有")
+//                            Image(systemName: "square.and.arrow.up")
+//                        } // 共有
+                        HStack {
+                            // TODO: Imageを変更する
+                            ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
+                                Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
+                            }
+                        }
                         EditButton()
                     }
                 }
