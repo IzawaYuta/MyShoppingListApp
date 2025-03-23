@@ -46,14 +46,38 @@ class CategoryListModel: Object, Identifiable {
 // MARK: CategoryListView
 struct CategoryListView: View {
     
-    @State private var isCategoryAdditionAlert = false
-    @State private var newCategoryTextField = ""
+    @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
+    @State private var newCategoryTextField = "" // NEWカテゴリーTextField
+    @State private var sortOption: SortOption = .default // 並び替え
     @ObservedResults(CategoryListModel.self) var categories
+    
+    enum SortOption: String, CaseIterable {
+        case `default` = "デフォルト順"
+        case nameAscending = "名前昇順"
+        case nameDescending = "名前降順"
+        case itemCountAscending = "アイテム数昇順"
+        case itemCountDescending = "アイテム数降順"
+    }
+    
+    var sortedCategories: [CategoryListModel] {
+        switch sortOption {
+        case .default:
+            return Array(categories)
+        case .nameAscending:
+            return categories.sorted(by: { $0.name < $1.name })
+        case .nameDescending:
+            return categories.sorted(by: { $0.name > $1.name })
+        case.itemCountAscending:
+            return categories.sorted(by: { $0.itemCount < $1.itemCount })
+        case .itemCountDescending:
+            return categories.sorted(by: { $0.itemCount > $1.itemCount })
+        }
+    }
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(categories) { category in
+                ForEach(sortedCategories) { category in
                     NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                         HStack {
                             Text(category.name)
@@ -84,18 +108,17 @@ struct CategoryListView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {
-//                        Button(action: {
-//                        }) {
-//                            Text("リストを共有")
-//                            Image(systemName: "square.and.arrow.up")
-//                        } // 共有
-                        HStack {
-                            // TODO: Imageを変更する
-                            ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
-                                Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
+                        Picker("並び替え", selection: $sortOption) {
+                            ForEach(SortOption.allCases, id: \.self) { option in
+                                Text(option.rawValue).tag(option)
                             }
                         }
-                        EditButton()
+                        .pickerStyle(MenuPickerStyle())
+                            // TODO: Imageを変更する
+                                ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
+                                    Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
+                                }
+                                .disabled(categories.isEmpty)
                     }
                 }
             }
