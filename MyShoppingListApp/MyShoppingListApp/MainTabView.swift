@@ -102,7 +102,7 @@ import SwiftUI
 //        .padding(.vertical)
 //}
 
-enum TabbedItems: Int, CaseIterable {
+enum TabBarItems: Int, CaseIterable {
     case shoppingList
     case regularList
     case aaa
@@ -111,9 +111,9 @@ enum TabbedItems: Int, CaseIterable {
     var title: String {
         switch self {
         case .shoppingList:
-            return "ShoppingList"
+            return "ShopList"
         case .regularList:
-            return "Regular"
+            return "RegularList"
         case .aaa:
             return "aaa"
         case .bbb:
@@ -124,18 +124,18 @@ enum TabbedItems: Int, CaseIterable {
     var iconName: String {
         switch self {
         case .shoppingList:
-            return "checklist"
+            return "ShoppingList"
         case .regularList:
-            return "star"
+            return "RegularList"
         case .aaa:
-            return "trash"
+            return ""
         case .bbb:
-            return "tray"
+            return ""
         }
     }
 }
 
-struct MainTabbedView: View {
+struct MainTabView: View {
     
     @State var selectedTab = 0 // 選択中のタブインデックス
     
@@ -151,7 +151,7 @@ struct MainTabbedView: View {
             }
             ZStack {
                 HStack {
-                    ForEach((TabbedItems.allCases), id: \.self) { item in
+                    ForEach((TabBarItems.allCases), id: \.self) { item in
                         Button{
                             selectedTab = item.rawValue
                         } label: {
@@ -169,7 +169,7 @@ struct MainTabbedView: View {
     }
 }
 
-extension MainTabbedView {
+extension MainTabView {
     func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View {
         HStack(spacing: 10) {
             Spacer()
@@ -192,5 +192,5 @@ extension MainTabbedView {
 }
 
 #Preview {
-    MainTabbedView()
+    MainTabView()
 }
