@@ -8,18 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
-        @State private var tabSelect = 0
+//        @State private var tabSelect = 0
         
         var body: some View {
-            TabView(selection: $tabSelect) {
-                CategoryListView()
-                    .tag(1)
-                RegularCategoryListView()
-                    .tag(2)
-            }
-            .overlay(alignment: .bottom) {
-                MainTabView(tabSelection: $tabSelect)
-        }
+//            TabView(selection: $tabSelect) {
+//                CategoryListView()
+//                    .tag(1)
+//                RegularCategoryListView()
+//                    .tag(2)
+//            }
+//            .overlay(alignment: .bottom) {
+//                MainTabView(tabSelection: $tabSelect)
+//        }
+            MainTabbedView()
     }
 }
 
