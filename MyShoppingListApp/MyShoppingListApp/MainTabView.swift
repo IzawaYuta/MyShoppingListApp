@@ -162,7 +162,7 @@ struct MainTabView: View {
                 .padding(6)
             }
             .frame(height: 70)
-            .background(.purple.opacity(0.2))
+            .background(.pink.opacity(0.2))
             .cornerRadius(35)
             .padding(.horizontal, 26)
         }
@@ -186,7 +186,7 @@ extension MainTabView {
             Spacer()
         }
         .frame(width: isActive ? .infinity : 60, height: 60)
-        .background(isActive ? .purple.opacity(0.4) : .clear)
+        .background(isActive ? .pink.opacity(0.4) : .clear)
         .cornerRadius(30)
     }
 }
