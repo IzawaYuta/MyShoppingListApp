@@ -52,28 +52,41 @@ struct RegularItemView: View {
                     Image(systemName: selectedItems.contains(list.id) ? "checkmark.circle.fill" : "circle")
                         .scaleEffect(selectedItems.contains(list.id) ? 1.3 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
-                        .onTapGesture {
-                                toggleSelection(for: list)
-                        }
                     Text(list.regularName)
+                    
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    toggleSelection(for: list)
                 }
             }
             .navigationTitle("\(regularItems?.name ?? "")の定期リスト")
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    isRegularItemAdditionAlert.toggle()
-                }) {
-                    Image(systemName: "plus")
-                }
-                .alert("定期品の追加", isPresented: $isRegularItemAdditionAlert) {
-                    TextField("定期品", text: $newRegularItemTextField)
-                    Button("追加") {
-                        addRegularItem()
-                        print("\(regularItemViewModel)")
+                HStack {
+                    if selectedItems == [] {
+                    } else {
+                        Button(action: {
+                            saveSelectedItems()
+                        }) {
+                            Image(systemName: "arrow.up")
+                        }
                     }
-                    Button("キャンセル", role: .cancel) {
+                    Button(action: {
+                        isRegularItemAdditionAlert.toggle()
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                    .alert("定期品の追加", isPresented: $isRegularItemAdditionAlert) {
+                        TextField("定期品", text: $newRegularItemTextField)
+                        Button("追加") {
+                            addRegularItem()
+                            print("\(regularItemViewModel)")
+                        }
+                        Button("キャンセル", role: .cancel) {
+                        }
                     }
                 }
             }
@@ -110,6 +123,27 @@ struct RegularItemView: View {
             selectedItems.remove(item.id)
         } else {
             selectedItems.insert(item.id)
+        }
+    }
+    
+    private func saveSelectedItems() {
+        guard let regularItems = regularItems else { return }
+        
+        let realm = try! Realm()
+        try! realm.write {
+            // 選択されたアイテムをフィルタリング
+            let selectedRegularItems = regularItemViewModel.filter { selectedItems.contains($0.id) }
+            
+            // 必要に応じて型を変換
+            let convertedItems = selectedRegularItems.map { regularItem in
+                let item = Item() // Item は CategoryListModel の items に対応する型
+                item.name = regularItem.regularName
+                // 必要に応じて他のプロパティも設定
+                return item
+            }
+            
+            // items に追加
+            regularItems.items.append(objectsIn: convertedItems)
         }
     }
 }
