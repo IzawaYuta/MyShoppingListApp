@@ -48,7 +48,7 @@ struct RegularItemView: View {
     
     var body: some View {
         NavigationStack {
-            List(regularItemViewModel) { list in
+            List(regularItems?.regularItems ?? List<RegularItemView>()) { list in
                 Text(list.regularName)
             }
             .navigationTitle("\(regularItems?.name ?? "")の定期リスト")

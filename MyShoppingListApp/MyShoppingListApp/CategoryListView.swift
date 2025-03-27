@@ -27,10 +27,11 @@ class CategoryListModel: Object, Identifiable {
     @Persisted var items = RealmSwift.List<Item>()
     @Persisted var regularItems = RealmSwift.List<RegularItemViewModel>()
     
-    convenience init(name: String, items: [String]) {
+    convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()
         self.name = name
         self.items.append(objectsIn: items.map { Item(name: $0) }) // 変換して追加
+        self.regularItems.append(objectsIn: regularItems.map { RegularItemViewModel(regularName: $0) })
     }
     
     // アイテム数を返すプロパティ
@@ -132,7 +133,7 @@ struct CategoryListView: View {
             return
         }
         let realm = try!Realm()
-        let newCategory = CategoryListModel(name: newCategoryTextField, items: [])
+        let newCategory = CategoryListModel(name: newCategoryTextField, items: [], regularItems: [])
         try! realm.write {
             $categories.append(newCategory)
         }
