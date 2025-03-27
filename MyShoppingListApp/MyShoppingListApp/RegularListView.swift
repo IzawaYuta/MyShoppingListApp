@@ -41,15 +41,22 @@ struct RegularItemView: View {
     @State private var newRegularItemTextField = ""
     @ObservedResults(RegularItemViewModel.self) var regularItemViewModel
     @State var regularItems: CategoryListModel?
-    
-    //    @State var item: RegularItemViewModel?
+    @State private var selectedItems = Set<UUID>() // 選択されたアイテムを追跡
     
     var regularItemId: String
     
     var body: some View {
         NavigationStack {
             List(regularItems?.regularItems ?? List<RegularItemView>()) { list in
-                Text(list.regularName)
+                HStack {
+                    Image(systemName: selectedItems.contains(list.id) ? "checkmark.circle.fill" : "circle")
+                        .scaleEffect(selectedItems.contains(list.id) ? 1.3 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
+                        .onTapGesture {
+                                toggleSelection(for: list)
+                        }
+                    Text(list.regularName)
+                }
             }
             .navigationTitle("\(regularItems?.name ?? "")の定期リスト")
         }
@@ -94,8 +101,15 @@ struct RegularItemView: View {
         let realm = try! Realm()
         if let category = realm.object(ofType: CategoryListModel.self, forPrimaryKey: regularItemId) {
             self.regularItems = category
-            // RealmSwift.List を Array に変換
-//            self.regularItemViewModel = Array(category.regularItems)  // RealmSwift.List を配列に変換
+        }
+    }
+    
+    // 選択状態を切り替える
+    private func toggleSelection(for item: RegularItemViewModel) {
+        if selectedItems.contains(item.id) {
+            selectedItems.remove(item.id)
+        } else {
+            selectedItems.insert(item.id)
         }
     }
 }
