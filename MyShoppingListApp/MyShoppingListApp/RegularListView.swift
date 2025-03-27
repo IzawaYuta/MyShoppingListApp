@@ -62,7 +62,7 @@ struct RegularItemView: View {
                 }
             }
             .navigationTitle("\(regularItems?.name ?? "")の定期リスト")
-        }
+        } // NavigationStack
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
@@ -83,7 +83,6 @@ struct RegularItemView: View {
                         TextField("定期品", text: $newRegularItemTextField)
                         Button("追加") {
                             addRegularItem()
-                            print("\(regularItemViewModel)")
                         }
                         Button("キャンセル", role: .cancel) {
                         }
@@ -94,7 +93,7 @@ struct RegularItemView: View {
         .onAppear {
             loadRegularItem()
         }
-    }
+    } // vat body: some View
     
     private func addRegularItem() {
         guard !newRegularItemTextField.isEmpty else {

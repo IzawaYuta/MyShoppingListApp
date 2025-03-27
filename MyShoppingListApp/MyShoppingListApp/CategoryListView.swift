@@ -110,10 +110,10 @@ struct CategoryListView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {
-                        Picker("並び替え", selection: $sortOption) {
-                            ForEach(SortOption.allCases, id: \.self) { option in
-                                Text(option.rawValue).tag(option)
-                            }
+                            Picker("並び替え", selection: $sortOption) {
+                                ForEach(SortOption.allCases, id: \.self) { option in
+                                    Text(option.rawValue).tag(option)
+                                } 
                         }
                         .pickerStyle(MenuPickerStyle())
                             // TODO: Imageを変更する
