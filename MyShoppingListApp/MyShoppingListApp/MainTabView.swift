@@ -181,13 +181,25 @@ extension MainTabView {
             if isActive {
                 Text(title)
                     .font(.system(size: 14))
-                    .foregroundColor(isActive ? .black : .gray)
+                    .foregroundColor(isActive ? .white : .gray)
             }
             Spacer()
         }
+//        .frame(width: isActive ? .infinity : 60, height: 60)
+//        .background(isActive ? .pink.opacity(0.4) : .clear)
+//        .cornerRadius(30)
+//    }
         .frame(width: isActive ? .infinity : 60, height: 60)
-        .background(isActive ? .pink.opacity(0.4) : .clear)
-        .cornerRadius(30)
+        .background(
+            ZStack {
+                if isActive {
+                    Color.pink.opacity(0.4) // 背景色
+                        .cornerRadius(30)
+                        .offset(x: isActive ? 0 : 60) // スライドアニメーション
+                }
+            }
+        )
+//        .animation(.easeInOut(duration: 0.2), value: isActive) // アニメーションの適用
     }
 }
 
