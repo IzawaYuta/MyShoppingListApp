@@ -51,9 +51,10 @@ struct RegularItemView: View {
             List(regularItemViewModel) { list in
                 Text(list.regularName)
             }
+            .navigationTitle("\(regularItems?.name ?? "")の定期リスト")
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
                     isRegularItemAdditionAlert.toggle()
                 }) {
