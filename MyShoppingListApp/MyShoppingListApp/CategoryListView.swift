@@ -25,6 +25,7 @@ class CategoryListModel: Object, Identifiable {
     @Persisted(primaryKey: true) var id: String = UUID().uuidString
     @Persisted var name: String = ""
     @Persisted var items = RealmSwift.List<Item>()
+    @Persisted var regularItems = RealmSwift.List<RegularItemViewModel>()
     
     convenience init(name: String, items: [String]) {
         self.init()
