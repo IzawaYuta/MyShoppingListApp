@@ -140,9 +140,10 @@ struct MainTabView: View {
             TabView(selection: $selectedTab) {
                 CategoryListView()
                     .tag(0)
-                
                 RegularCategoryListView()
                     .tag(1)
+                SettingView()
+                    .tag(2)
             }
             ZStack {
                 HStack {
@@ -181,21 +182,16 @@ extension MainTabView {
             }
             Spacer()
         }
-//        .frame(width: isActive ? .infinity : 60, height: 60)
-//        .background(isActive ? .pink.opacity(0.4) : .clear)
-//        .cornerRadius(30)
-//    }
-        .frame(width: isActive ? .infinity : 60, height: 60)
+        .frame(width: isActive ? .infinity : 75, height: 60)
         .background(
             ZStack {
                 if isActive {
-                    Color.pink.opacity(0.4) // 背景色
+                    Color.pink.opacity(0.4)
                         .cornerRadius(30)
-                        .offset(x: isActive ? 0 : 60) // スライドアニメーション
+                        .offset(x: isActive ? 0 : 60)
                 }
             }
         )
-//        .animation(.easeInOut(duration: 0.2), value: isActive) // アニメーションの適用
     }
 }
 
