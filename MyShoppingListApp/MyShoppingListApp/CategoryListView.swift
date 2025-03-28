@@ -34,14 +34,16 @@ class CategoryListModel: Object, Identifiable {
         self.regularItems.append(objectsIn: regularItems.map { RegularItemViewModel(regularName: $0) })
     }
     
-    // アイテム数を返すプロパティ
     var itemCount: Int {
         return items.count
     }
-    // 未チェックアイテムの数を返すプロパティ
     var uncheckedItemCount: Int {
         return items.filter { !$0.isChecked }.count
     }
+    
+//    var regularItemsCount: Int {
+//        return regularItems.count
+//    }
 }
 
 

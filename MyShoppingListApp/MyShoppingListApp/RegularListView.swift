@@ -42,6 +42,7 @@ struct RegularItemView: View {
     @ObservedResults(RegularItemViewModel.self) var regularItemViewModel
     @State var regularItems: CategoryListModel?
     @State private var selectedItems = Set<UUID>() // 選択されたアイテムを追跡
+    @State private var selectAllItemsBool = false
     
     var regularItemId: String
     
@@ -73,6 +74,12 @@ struct RegularItemView: View {
                         }) {
                             Image(systemName: "arrow.up")
                         }
+                    }
+                    Button(action: {
+                        selectAllItemsBool.toggle()
+                        selectAllItems()
+                    }) {
+                        Image(systemName: selectedItems.count == (regularItems?.regularItems.count ?? 0) ? "xmark.circle" : "checkmark.circle")
                     }
                     Button(action: {
                         isRegularItemAdditionAlert.toggle()
@@ -143,6 +150,18 @@ struct RegularItemView: View {
             
             // items に追加
             regularItems.items.append(objectsIn: convertedItems)
+        }
+    }
+    
+    // リストの全選択
+    private func selectAllItems() {
+        guard let regularItems = regularItems else { return }
+        if selectedItems.count == regularItems.regularItems.count {
+            // 全選択されている場合、選択解除
+            selectedItems.removeAll()
+        } else {
+            // 全選択されていない場合、全て選択
+            selectedItems = Set(regularItems.regularItems.map { $0.id })
         }
     }
 }
