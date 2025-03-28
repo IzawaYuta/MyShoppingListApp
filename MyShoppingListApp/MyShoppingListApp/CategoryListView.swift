@@ -161,27 +161,29 @@ struct ItemListView: View {
     
     var body: some View {
         VStack {
-            List(category?.items ?? List<Item>()) { item in
-                HStack {
-                    Image(systemName: item.isChecked ? "checkmark.square" : "square")
-                        .foregroundStyle(item.isChecked ? .green : .red)
-                        .scaleEffect(item.isChecked ? 1.2 : 1.0) // チェック時にアイコンが少し大きくなる
-                        .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
-                    
-                    Text(item.name)
-                        .foregroundStyle(item.isChecked ? Color.gray : Color.black)
-                        .strikethrough(item.isChecked, color: .gray) // チェック時に取り消し線
-                        .animation(.easeOut, value: item.isChecked)
-                    
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation {
-                        toggleCheckState(for: item) // アニメーションでチェック状態を切り替え
+            List {
+                ForEach(category?.items ?? List<Item>()) { item in
+                    HStack {
+                        Image(systemName: item.isChecked ? "checkmark.square" : "square")
+                            .foregroundStyle(item.isChecked ? .green : .red)
+                            .scaleEffect(item.isChecked ? 1.2 : 1.0) 
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
+                        
+                        Text(item.name)
+                            .foregroundStyle(item.isChecked ? Color.gray : Color.black)
+                            .strikethrough(item.isChecked, color: .gray)
+                            .animation(.easeOut, value: item.isChecked)
+                        
+                        Spacer()
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation {
+                            toggleCheckState(for: item)
+                        }
                     }
                 }
-            } // List
+            }
         }
         .navigationTitle(category?.name ?? "")
         .toolbar {
@@ -198,6 +200,7 @@ struct ItemListView: View {
                         }
                         Button("追加") {
                             addShoppingList()
+                            print("\(category?.items)")
                         }
                     }
                     Menu("メニュー", systemImage: "ellipsis") {
@@ -206,6 +209,10 @@ struct ItemListView: View {
                         }) {
                             Text("並び替え")
                             Image(systemName: "arrow.up.and.down.text.horizontal")
+                        }
+                        Button(action: {
+                        }) {
+                            Image(systemName: "trash")
                         }
                     }
                 }

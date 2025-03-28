@@ -105,8 +105,6 @@ import SwiftUI
 enum TabBarItems: Int, CaseIterable {
     case shoppingList
     case regularList
-    case aaa
-    case bbb
     
     var title: String {
         switch self {
@@ -114,10 +112,6 @@ enum TabBarItems: Int, CaseIterable {
             return "ShopList"
         case .regularList:
             return "RegularList"
-        case .aaa:
-            return "aaa"
-        case .bbb:
-            return "bbb"
         }
     }
     
@@ -127,10 +121,6 @@ enum TabBarItems: Int, CaseIterable {
             return "ShoppingList"
         case .regularList:
             return "RegularList"
-        case .aaa:
-            return ""
-        case .bbb:
-            return ""
         }
     }
 }
