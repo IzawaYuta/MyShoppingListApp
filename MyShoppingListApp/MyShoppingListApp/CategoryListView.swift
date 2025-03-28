@@ -162,14 +162,12 @@ struct ItemListView: View {
     var body: some View {
         VStack {
             List {
-                ForEach(category.items ?? List<Item>()) { item in
+                ForEach(category.items) { item in
                     HStack {
                         Image(systemName: item.isChecked ? "checkmark.square" : "square")
                             .foregroundStyle(item.isChecked ? .green : .red)
                             .scaleEffect(item.isChecked ? 1.2 : 1.0)
-//                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
-                            .animation(.spring(), value: item.isChecked)
-
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
                         
                         Text(item.name)
                             .foregroundStyle(item.isChecked ? Color.gray : Color.black)

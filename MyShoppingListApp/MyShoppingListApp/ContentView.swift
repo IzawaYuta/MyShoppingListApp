@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-        var body: some View {
-            MainTabView()
+    @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
+    
+    var body: some View {
+        MainTabView()
+            .preferredColorScheme(AppearanceMode(rawValue: appearanceMode)?.colorScheme)
     }
 }
 
