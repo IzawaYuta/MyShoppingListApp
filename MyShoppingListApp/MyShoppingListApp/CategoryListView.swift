@@ -51,7 +51,7 @@ struct CategoryListView: View {
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var sortOption: SortOption = .default // 並び替え
-    @ObservedResults(CategoryListModel.self) var categories
+    @ObservedResults(CategoryListModel.self) var categoryListModel
     
     enum SortOption: String, CaseIterable {
         case `default` = "デフォルト順"
@@ -64,15 +64,15 @@ struct CategoryListView: View {
     var sortedCategories: [CategoryListModel] {
         switch sortOption {
         case .default:
-            return Array(categories)
+            return Array(categoryListModel)
         case .nameAscending:
-            return categories.sorted(by: { $0.name < $1.name })
+            return categoryListModel.sorted(by: { $0.name < $1.name })
         case .nameDescending:
-            return categories.sorted(by: { $0.name > $1.name })
+            return categoryListModel.sorted(by: { $0.name > $1.name })
         case.itemCountAscending:
-            return categories.sorted(by: { $0.itemCount < $1.itemCount })
+            return categoryListModel.sorted(by: { $0.itemCount < $1.itemCount })
         case .itemCountDescending:
-            return categories.sorted(by: { $0.itemCount > $1.itemCount })
+            return categoryListModel.sorted(by: { $0.itemCount > $1.itemCount })
         }
     }
     
@@ -120,7 +120,7 @@ struct CategoryListView: View {
                                 ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
                                     Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
                                 }
-                                .disabled(categories.isEmpty)
+                                .disabled(categoryListModel.isEmpty)
                     }
                 }
             }
@@ -135,7 +135,7 @@ struct CategoryListView: View {
         let realm = try!Realm()
         let newCategory = CategoryListModel(name: newCategoryTextField, items: [], regularItems: [])
         try! realm.write {
-            $categories.append(newCategory)
+            $categoryListModel.append(newCategory)
         }
         newCategoryTextField = ""
     }
@@ -144,7 +144,7 @@ struct CategoryListView: View {
         let realm = try! Realm()
         try! realm.write {
             // 削除対象のアイテムを削除
-            $categories.remove(atOffsets: offsets)
+            $categoryListModel.remove(atOffsets: offsets)
         }
     }
 }
@@ -155,19 +155,21 @@ struct ItemListView: View {
     @State private var isShoppingListAdditionAlert = false
     @State private var newShoppingListTextField = ""
     
-    @State var category: CategoryListModel?
-    
+    @ObservedRealmObject var category: CategoryListModel
+
     var categoryId: String
     
     var body: some View {
         VStack {
             List {
-                ForEach(category?.items ?? List<Item>()) { item in
+                ForEach(category.items ?? List<Item>()) { item in
                     HStack {
                         Image(systemName: item.isChecked ? "checkmark.square" : "square")
                             .foregroundStyle(item.isChecked ? .green : .red)
-                            .scaleEffect(item.isChecked ? 1.2 : 1.0) 
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
+                            .scaleEffect(item.isChecked ? 1.2 : 1.0)
+//                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
+                            .animation(.spring(), value: item.isChecked)
+
                         
                         Text(item.name)
                             .foregroundStyle(item.isChecked ? Color.gray : Color.black)
@@ -184,8 +186,9 @@ struct ItemListView: View {
                     }
                 }
             }
+
         }
-        .navigationTitle(category?.name ?? "")
+        .navigationTitle(category.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack {
@@ -200,7 +203,7 @@ struct ItemListView: View {
                         }
                         Button("追加") {
                             addShoppingList()
-                            print("\(category?.items)")
+                            print("\(category.items)")
                         }
                     }
                     Menu("メニュー", systemImage: "ellipsis") {
@@ -211,6 +214,7 @@ struct ItemListView: View {
                             Image(systemName: "arrow.up.and.down.text.horizontal")
                         }
                         Button(action: {
+                            deleteCheckedItems()
                         }) {
                             Image(systemName: "trash")
                         }
@@ -218,33 +222,39 @@ struct ItemListView: View {
                 }
             }
         } // toolbar
-        .onAppear {
-            loadShoppingList()
-        }
     }
     
     private func addShoppingList() {
-        guard !newShoppingListTextField.isEmpty else { return }
         let realm = try! Realm()
+        guard !newShoppingListTextField.isEmpty else { return }
         let newItem = Item(name: newShoppingListTextField)
         try! realm.write {
-            category?.items.append(newItem)
+            $category.items.append(newItem)
         }
         newShoppingListTextField = ""
     }
     
-    private func loadShoppingList() {
-        // Realmからデータを取得
-        let realm = try! Realm()
-        if let category = realm.object(ofType: CategoryListModel.self, forPrimaryKey: categoryId) {
-            self.category = category
-        }
-    }
-    
     private func toggleCheckState(for item: Item) {
         let realm = try! Realm()
-        try! realm.write {
-            item.isChecked.toggle() // チェック状態を切り替え
+        // itemをthawして変更できるようにする
+        if let thawedItem = item.thaw() {
+            try! realm.write {
+                thawedItem.isChecked.toggle()
+            }
+        }
+    }
+    private func deleteCheckedItems() {
+        let realm = try! Realm()
+        
+        // category.itemsをthawして変更できるようにする
+        if let thawedCategory = category.thaw() {
+            let checkedItems = thawedCategory.items.filter { $0.isChecked }
+            
+            try! realm.write {
+                for item in checkedItems {
+                    realm.delete(item)
+                }
+            }
         }
     }
 }
