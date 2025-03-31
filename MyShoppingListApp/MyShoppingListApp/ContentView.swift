@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
+    @AppStorage(wrappedValue: 1, "appearanceMode") var appearanceMode
     
     var body: some View {
         MainTabView()
