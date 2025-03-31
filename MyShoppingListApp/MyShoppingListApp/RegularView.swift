@@ -29,137 +29,136 @@ struct RegularCategoryListView: View {
                             .padding(.vertical, 8)
                     }
                 }
+                .navigationTitle("定期品リスト")
             }
-            .navigationTitle("定期品リスト")
         }
     }
-}
-struct RegularListView: View {
-    @ObservedRealmObject var categoryListModel: CategoryListModel
-    @State private var isAddingItem = false
-    @State private var newRegularItemName = ""
-    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
-    @State private var selectAllItemsBool = false
-    
-    
-    var body: some View {
+    struct RegularListView: View {
+        @ObservedRealmObject var categoryListModel: CategoryListModel
+        @State private var isAddingItem = false
+        @State private var newRegularItemName = ""
+        @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
+        @State private var selectAllItemsBool = false
         
-        let regularItemsArray = Array(categoryListModel.regularItems)
         
-        VStack {
-            List {
-                ForEach(regularItemsArray, id: \.id) { list in
-                    HStack {
-                        Image(systemName: selectedItems.contains(list.id.uuidString) ? "checkmark.circle.fill" : "circle")
-                            .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
-                        Text(list.name)
-                        
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        toggleSelection(for: list)
-                    }
-                }
-                .onDelete(perform: deleteItem)
-            }
-            .listStyle(PlainListStyle())
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    if selectedItems == [] {
-                    } else {
-                        Button(action: {
-                            saveSelectedItems()
-                        }) {
-                            Image(systemName: "arrow.up")
-                        }
-                    }
-                    Button(action: {
-                        selectAllItemsBool.toggle()
-                        selectAllItems()
-                    }) {
-                        Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
-                    }
-                    Button(action: {
-                        isAddingItem.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                    .alert("定期品の追加", isPresented: $isAddingItem) {
-                        TextField("定期品", text: $newRegularItemName)
-                        Button("追加") {
-                            addItem()
-                        }
-                        Button("キャンセル", role: .cancel) {
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("\(categoryListModel.name) の定期品")
-    }
-    
-    // 定期品追加メソッド
-    private func addItem() {
-        guard !newRegularItemName.isEmpty else { return }
-        let newItem = RegularItem(name: newRegularItemName) // データを渡して初期化
-        let realm = try! Realm()
-        try! realm.write {
-            $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
-        }
-        newRegularItemName = ""
-        print("追加後のRegularItem: \(RegularItem())") // 正しいアイテムを表示
-        print("追加後のcategory: \($categoryListModel.regularItems)") // 正しいリストを表示
-    }
-    
-    // 定期品削除メソッド
-    private func deleteItem(at offsets: IndexSet) {
-        let realm = try! Realm()
-        try! realm.write {
-            $categoryListModel.regularItems.remove(atOffsets: offsets) // 同様に自動トランザクション
-        }
-        print("削除後のRegularItem♥️♥️\(RegularItem())")
-        print("削除後のcategory♥️\($categoryListModel.regularItems)")
-    }
-    
-    // チェック切り替え
-    private func toggleSelection(for item: RegularItem) {
-        if selectedItems.contains(item.id.uuidString) {
-            selectedItems.remove(item.id.uuidString)
-        } else {
-            selectedItems.insert(item.id.uuidString)
-        }
-    }
-    
-    // リストの全選択
-    private func selectAllItems() {
-        //        guard let regularItems = categoryListModel else { return }
-        let regularItems = categoryListModel
-        if selectedItems.count == regularItems.regularItems.count {
-            // 全選択されている場合、選択解除
-            selectedItems.removeAll()
-        } else {
-            // 全選択されていない場合、全て選択
-            selectedItems = Set(regularItems.regularItems.map { $0.id.uuidString })
-        }
-    }
-    
-    private func saveSelectedItems() {
-        let realm = try! Realm()
-        try! realm.write {
-            let selectedRegularItems = categoryListModel.regularItems.filter { selectedItems.contains($0.id.uuidString) }
+        var body: some View {
             
-            for regularItem in selectedRegularItems {
-                let item = Item()
-                item.name = regularItem.name
+            let regularItemsArray = Array(categoryListModel.regularItems)
+            
+            VStack {
+                List {
+                    ForEach(regularItemsArray, id: \.id) { list in
+                        HStack {
+                            Image(systemName: selectedItems.contains(list.id.uuidString) ? "checkmark.circle.fill" : "circle")
+                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
+                            Text(list.name)
+                            
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            toggleSelection(for: list)
+                        }
+                    }
+                    .onDelete(perform: deleteItem)
+                }
+                .listStyle(PlainListStyle())
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        if selectedItems == [] {
+                        } else {
+                            Button(action: {
+                                saveSelectedItems()
+                            }) {
+                                Image(systemName: "arrow.up")
+                            }
+                        }
+                        Button(action: {
+                            selectAllItemsBool.toggle()
+                            selectAllItems()
+                        }) {
+                            Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
+                        }
+                        Button(action: {
+                            isAddingItem.toggle()
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                        .alert("定期品の追加", isPresented: $isAddingItem) {
+                            TextField("定期品", text: $newRegularItemName)
+                            Button("追加") {
+                                addItem()
+                            }
+                            Button("キャンセル", role: .cancel) {
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("\(categoryListModel.name) の定期品")
+        }
+        
+        // 定期品追加メソッド
+        private func addItem() {
+            guard !newRegularItemName.isEmpty else { return }
+            let newItem = RegularItem(name: newRegularItemName) // データを渡して初期化
+            let realm = try! Realm()
+            try! realm.write {
+                $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
+            }
+            newRegularItemName = ""
+            print("追加後のRegularItem: \(RegularItem())") // 正しいアイテムを表示
+            print("追加後のcategory: \($categoryListModel.regularItems)") // 正しいリストを表示
+        }
+        
+        // 定期品削除メソッド
+        private func deleteItem(at offsets: IndexSet) {
+            let realm = try! Realm()
+            try! realm.write {
+                $categoryListModel.regularItems.remove(atOffsets: offsets) // 同様に自動トランザクション
+            }
+            print("削除後のRegularItem♥️♥️\(RegularItem())")
+            print("削除後のcategory♥️\($categoryListModel.regularItems)")
+        }
+        
+        // チェック切り替え
+        private func toggleSelection(for item: RegularItem) {
+            if selectedItems.contains(item.id.uuidString) {
+                selectedItems.remove(item.id.uuidString)
+            } else {
+                selectedItems.insert(item.id.uuidString)
+            }
+        }
+        
+        // リストの全選択
+        private func selectAllItems() {
+            //        guard let regularItems = categoryListModel else { return }
+            let regularItems = categoryListModel
+            if selectedItems.count == regularItems.regularItems.count {
+                // 全選択されている場合、選択解除
+                selectedItems.removeAll()
+            } else {
+                // 全選択されていない場合、全て選択
+                selectedItems = Set(regularItems.regularItems.map { $0.id.uuidString })
+            }
+        }
+        
+        private func saveSelectedItems() {
+            let realm = try! Realm()
+            try! realm.write {
+                let selectedRegularItems = categoryListModel.regularItems.filter { selectedItems.contains($0.id.uuidString) }
                 
-                $categoryListModel.items.append(item) // Listに追加 (realm.writeブロック内で行う)
-                realm.add(item) // Realmに明示的に保存
+                for regularItem in selectedRegularItems {
+                    let item = Item()
+                    item.name = regularItem.name
+                    
+                    $categoryListModel.items.append(item) // Listに追加 (realm.writeブロック内で行う)
+                    realm.add(item) // Realmに明示的に保存
+                }
             }
         }
     }
-}
-
+    

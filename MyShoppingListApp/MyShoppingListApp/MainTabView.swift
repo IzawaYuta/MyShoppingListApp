@@ -132,7 +132,7 @@ enum TabBarItems: Int, CaseIterable {
 
 struct MainTabView: View {
     
-    @State var selectedTab = 1 // 選択中のタブインデックス
+    @State var selectedTab = 0 // 選択中のタブインデックス
     
     var body: some View {
         
