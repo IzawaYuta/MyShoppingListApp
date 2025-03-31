@@ -25,13 +25,13 @@ class CategoryListModel: Object, Identifiable {
     @Persisted(primaryKey: true) var id: String = UUID().uuidString
     @Persisted var name: String = ""
     @Persisted var items = RealmSwift.List<Item>()
-    @Persisted var regularItems = RealmSwift.List<RegularItemViewModel>()
-    
+    @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
+
     convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()
         self.name = name
         self.items.append(objectsIn: items.map { Item(name: $0) }) // 変換して追加
-        self.regularItems.append(objectsIn: regularItems.map { RegularItemViewModel(regularName: $0, regularID: $0) })
+        self.items.append(objectsIn: items.map { Item(name: $0) }) // 変換して追加
     }
     
     var itemCount: Int {

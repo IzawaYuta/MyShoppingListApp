@@ -173,7 +173,7 @@ extension MainTabView {
                 .resizable()
                 .renderingMode(.template)
                 .foregroundColor(isActive ? .black : .gray)
-                .scaleEffect(isActive ? 1.5 : 1)
+                .scaleEffect(isActive ? 1.5 : 1.3)
                 .frame(width: 20, height: 20)
             if isActive {
                 Text(title)
