@@ -267,11 +267,10 @@ struct ItemListView: View {
             }
         }
     }
-}
-
-
-#Preview {
-    CategoryListView()
+    
+    
+    #Preview {
+        CategoryListView()
 }
 
 
