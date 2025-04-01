@@ -17,23 +17,37 @@ class RegularItem: Object, Identifiable {
         self.name = name
     }
 }
+
+// MARK: RegularCategoryListView
 struct RegularCategoryListView: View {
     @ObservedResults(CategoryListModel.self) var categoryListModel
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(categoryListModel) { category in
-                    NavigationLink(destination: RegularListView(categoryListModel: category)) {
-                        Text(category.name)
-                            .padding(.vertical, 8)
+            VStack {
+                // categoryListModelが空の場合
+                if categoryListModel.isEmpty {
+                    Text("カテゴリーを追加しましょう！")
+                        .foregroundColor(.gray) // 文字色を指定することも可能
+                } else {
+                    // categoryListModelにデータがある場合
+                    List {
+                        ForEach(categoryListModel) { category in
+                            NavigationLink(destination: RegularListView(categoryListModel: category)) {
+                                Text(category.name)
+                                    .padding(.vertical, 8)
+                            }
+                        }
                     }
                 }
-                .navigationTitle("定期品リスト")
             }
+            .navigationTitle("定期品リスト")
         }
     }
-    struct RegularListView: View {
+}
+
+// MARK: RegularListView
+struct RegularListView: View {
         @ObservedRealmObject var categoryListModel: CategoryListModel
         @State private var isAddingItem = false
         @State private var newRegularItemName = ""
@@ -162,3 +176,6 @@ struct RegularCategoryListView: View {
         }
     }
     
+#Preview {
+    RegularCategoryListView()
+}

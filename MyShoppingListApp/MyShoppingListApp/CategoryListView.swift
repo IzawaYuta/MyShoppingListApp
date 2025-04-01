@@ -80,18 +80,28 @@ struct CategoryListView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(sortedCategories) { category in
-                    NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
-                        HStack {
-                            Text(category.name)
-                            Spacer()
-                            Text("\(category.uncheckedItemCount)/\(category.itemCount)")
-                                .foregroundColor(.gray)
-                        } ///HStack
+            VStack {
+                // sortedCategoriesが空の場合にメッセージを表示
+                if categoryListModel.isEmpty {
+                    Text("カテゴリーを追加しましょう！")
+                        .foregroundColor(.gray) // 文字色を指定することも可能
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 中央に表示
+                } else {
+                    List {
+                        ForEach(sortedCategories) { category in
+                            NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
+                                HStack {
+                                    Text(category.name)
+                                    Spacer()
+                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
+                                        .foregroundColor(.gray)
+                                } ///HStack
+                            }
+                        }
+                        .onDelete(perform: deleteCategory)
                     }
                 }
-                .onDelete(perform: deleteCategory)
             }
             .navigationTitle("カテゴリー")
             .toolbar {
@@ -103,8 +113,7 @@ struct CategoryListView: View {
                     }
                     .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
                         TextField("カテゴリー名", text: $newCategoryTextField)
-                        Button("キャンセル", role: .cancel){
-                        }
+                        Button("キャンセル", role: .cancel) {}
                         Button("追加") {
                             addCategory()
                         }
@@ -112,22 +121,23 @@ struct CategoryListView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {
-                            Picker("並び替え", selection: $sortOption) {
-                                ForEach(SortOption.allCases, id: \.self) { option in
-                                    Text(option.rawValue).tag(option)
-                                } 
+                        Picker("並び替え", selection: $sortOption) {
+                            ForEach(SortOption.allCases, id: \.self) { option in
+                                Text(option.rawValue).tag(option)
+                            }
                         }
                         .pickerStyle(MenuPickerStyle())
-                            // TODO: Imageを変更する
-                                ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
-                                    Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
-                                }
-                                .disabled(categoryListModel.isEmpty)
+                        // TODO: Imageを変更する
+                        ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
+                            Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(categoryListModel.isEmpty)
                     }
                 }
             }
         } /// NavigationView
     }
+
     
     private func addCategory() {
         guard !newCategoryTextField.isEmpty else {
