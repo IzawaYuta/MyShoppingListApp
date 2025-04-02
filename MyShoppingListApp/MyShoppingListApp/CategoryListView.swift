@@ -26,7 +26,7 @@ class CategoryListModel: Object, Identifiable {
     @Persisted var name: String = ""
     @Persisted var items = RealmSwift.List<Item>()
     @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
-
+    
     convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()
         self.name = name
@@ -41,9 +41,9 @@ class CategoryListModel: Object, Identifiable {
         return items.filter { !$0.isChecked }.count
     }
     
-//    var regularItemsCount: Int {
-//        return regularItems.count
-//    }
+    //    var regularItemsCount: Int {
+    //        return regularItems.count
+    //    }
 }
 
 
@@ -137,7 +137,7 @@ struct CategoryListView: View {
             }
         } /// NavigationView
     }
-
+    
     
     private func addCategory() {
         guard !newCategoryTextField.isEmpty else {
@@ -168,11 +168,11 @@ struct ItemListView: View {
     @State private var newShoppingListTextField = ""
     
     @ObservedRealmObject var category: CategoryListModel
-
+    
     var categoryId: String
     
     var body: some View {
-        VStack {
+        ZStack(alignment: .bottom) {
             List {
                 ForEach(category.items) { item in
                     HStack {
@@ -196,8 +196,32 @@ struct ItemListView: View {
                     }
                 }
             }
-
-        }
+            HStack {
+                TextField("入力してください", text: $newShoppingListTextField)
+                //                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+                Button(action: {
+                    //                    if !text.isEmpty {
+                    //                        items.append(text)
+                    //                        text = ""
+                    //                    }
+                    addShoppingList()
+                }) {
+                    Text("追加")
+                        .padding()
+                    //                        .background(Color.blue)
+                        .foregroundColor(.blue)
+                        .cornerRadius(8)
+                }
+            }
+            //            .frame(height: 10)
+            .background(Color.white)
+            .frame(alignment: .bottom)
+            .cornerRadius(10)
+            .shadow(radius: 3)
+            .padding()
+        } // VStack
         .navigationTitle(category.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -267,10 +291,11 @@ struct ItemListView: View {
             }
         }
     }
-    
-    
-    #Preview {
-        CategoryListView()
+}
+
+
+#Preview {
+    CategoryListView()
 }
 
 
