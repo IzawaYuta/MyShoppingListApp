@@ -58,7 +58,7 @@ struct RegularListView: View {
         
         let regularItemsArray = Array(categoryListModel.regularItems)
         
-        VStack {
+        ZStack(alignment: .bottom) {
             List {
                 ForEach(regularItemsArray, id: \.id) { list in
                     HStack {
@@ -71,13 +71,49 @@ struct RegularListView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
+                        
                         toggleSelection(for: list)
                     }
                 }
                 .onDelete(perform: deleteItem)
             }
-            .listStyle(PlainListStyle())
+            HStack {
+                TextField("入力してください", text: $newRegularItemName)
+                    .padding()
+//                if newRegularItemName == "" {
+//                } else {
+//                    Button(action: {
+////                        if newRegularItemName == "" {
+////                        } else {
+//                            addItem()
+////                        }
+//                        print("\(RegularItem())")
+//                    }) {
+//                        Text("追加")
+//                            .padding()
+//                            .foregroundColor(.blue)
+//                    }
+//                }
+                    Button(action: {
+                        //                        if newRegularItemName == "" {
+                        //                        } else {
+                        addItem()
+                        //                        }
+                        print("\(RegularItem())")
+                    }) {
+                        Text("追加")
+                            .padding()
+                            .foregroundColor(.blue)
+                    }
+                    .disabled(newRegularItemName.isEmpty)
+            }
+            .background(Color.white)
+            .frame(alignment: .bottom)
+            .cornerRadius(10)
+            .shadow(radius: 3)
+            .padding()
         }
+        .listStyle(PlainListStyle())
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
@@ -95,19 +131,19 @@ struct RegularListView: View {
                     }) {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
                     }
-                    Button(action: {
-                        isAddingItem.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                    .alert("定期品の追加", isPresented: $isAddingItem) {
-                        TextField("定期品", text: $newRegularItemName)
-                        Button("追加") {
-                            addItem()
-                        }
-                        Button("キャンセル", role: .cancel) {
-                        }
-                    }
+//                    Button(action: {
+//                        isAddingItem.toggle()
+//                    }) {
+//                        Image(systemName: "plus")
+//                    }
+//                    .alert("定期品の追加", isPresented: $isAddingItem) {
+//                        TextField("定期品", text: $newRegularItemName)
+//                        Button("追加") {
+//                            addItem()
+//                        }
+//                        Button("キャンセル", role: .cancel) {
+//                        }
+//                    }
                 }
             }
         }

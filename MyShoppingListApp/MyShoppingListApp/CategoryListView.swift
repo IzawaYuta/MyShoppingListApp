@@ -114,9 +114,11 @@ struct CategoryListView: View {
                     .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
                         TextField("カテゴリー名", text: $newCategoryTextField)
                         Button("キャンセル", role: .cancel) {}
+                            .foregroundColor(.red)
                         Button("追加") {
                             addCategory()
                         }
+                        .disabled(newCategoryTextField.isEmpty)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -202,18 +204,13 @@ struct ItemListView: View {
                     .padding()
                 
                 Button(action: {
-                    //                    if !text.isEmpty {
-                    //                        items.append(text)
-                    //                        text = ""
-                    //                    }
                     addShoppingList()
                 }) {
                     Text("追加")
                         .padding()
-                    //                        .background(Color.blue)
-                        .foregroundColor(.blue)
                         .cornerRadius(8)
                 }
+                .disabled(newShoppingListTextField.isEmpty)
             }
             //            .frame(height: 10)
             .background(Color.white)
@@ -225,33 +222,17 @@ struct ItemListView: View {
         .navigationTitle(category.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
+                Menu("メニュー", systemImage: "ellipsis") {
                     Button(action: {
-                        isShoppingListAdditionAlert.toggle()
+                        
                     }) {
-                        Image(systemName: "plus")
+                        Text("並び替え")
+                        Image(systemName: "arrow.up.and.down.text.horizontal")
                     }
-                    .alert("リストを追加", isPresented: $isShoppingListAdditionAlert) {
-                        TextField("買うもの", text: $newShoppingListTextField)
-                        Button("キャンセル", role: .cancel) {
-                        }
-                        Button("追加") {
-                            addShoppingList()
-                            print("\(category.items)")
-                        }
-                    }
-                    Menu("メニュー", systemImage: "ellipsis") {
-                        Button(action: {
-                            
-                        }) {
-                            Text("並び替え")
-                            Image(systemName: "arrow.up.and.down.text.horizontal")
-                        }
-                        Button(action: {
-                            deleteCheckedItems()
-                        }) {
-                            Image(systemName: "trash")
-                        }
+                    Button(action: {
+                        deleteCheckedItems()
+                    }) {
+                        Image(systemName: "trash")
                     }
                 }
             }
