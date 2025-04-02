@@ -111,15 +111,20 @@ struct CategoryListView: View {
                     }) {
                         Image(systemName: "plus")
                     }
-                    .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
-                        TextField("カテゴリー名", text: $newCategoryTextField)
-                        Button("キャンセル", role: .cancel) {}
-                            .foregroundColor(.red)
-                        Button("追加") {
-                            addCategory()
-                        }
-                        .disabled(newCategoryTextField.isEmpty)
+
+                    .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
+                        CustomAlertView()
+                            .presentationBackground(.clear)
                     }
+//                    .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
+//                        TextField("カテゴリー名", text: $newCategoryTextField)
+//                        Button("キャンセル", role: .cancel) {}
+//                            .foregroundColor(.red)
+//                        Button("追加") {
+//                            addCategory()
+//                        }
+//                        .disabled(newCategoryTextField.isEmpty)
+//                    }
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {

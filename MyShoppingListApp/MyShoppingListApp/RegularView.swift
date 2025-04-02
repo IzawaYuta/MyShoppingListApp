@@ -51,7 +51,8 @@ struct RegularListView: View {
     @State private var isAddingItem = false
     @State private var newRegularItemName = ""
     @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
-    @State private var selectAllItemsBool = false
+    @State private var selectedAllItems = false
+    @State private var isDone = false
     
     
     var body: some View {
@@ -121,12 +122,33 @@ struct RegularListView: View {
                     } else {
                         Button(action: {
                             saveSelectedItems()
+                            isDone = true
                         }) {
                             Image(systemName: "arrow.up")
                         }
+//                        .fullScreenCover(isPresented: $isDone) {
+//                            SuccessAlertView()
+//                                .presentationBackground(.clear)
+//                        }
+                        .sheet(isPresented: $isDone) {
+                            SuccessAlertView()
+                                .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
+                                .presentationBackground(.clear)
+                                .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
+                        }
+                        .onChange(of: isDone) { newValue in
+                            if newValue {
+                                // 3秒後に非表示にする処理
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    withAnimation {
+                                        isDone = false
+                                    }
+                                }
+                            }
+                        }
                     }
                     Button(action: {
-                        selectAllItemsBool.toggle()
+                        selectedAllItems.toggle()
                         selectAllItems()
                     }) {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
