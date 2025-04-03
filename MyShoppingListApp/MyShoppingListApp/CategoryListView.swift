@@ -116,6 +116,22 @@ struct CategoryListView: View {
                         CustomAlertView()
                             .presentationBackground(.clear)
                     }
+//                    .sheet(isPresented: $isCategoryAdditionAlert) {
+//                        CustomAlertView()
+//                            .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
+//                            .presentationBackground(.clear)
+//                            .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
+//                    }
+//                    .onChange(of: isCategoryAdditionAlert) { newValue in
+//                        if newValue {
+//                            // 3秒後に非表示にする処理
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                withAnimation {
+//                                    isCategoryAdditionAlert = false
+//                                }
+//                            }
+//                        }
+//                    }
 //                    .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
 //                        TextField("カテゴリー名", text: $newCategoryTextField)
 //                        Button("キャンセル", role: .cancel) {}
