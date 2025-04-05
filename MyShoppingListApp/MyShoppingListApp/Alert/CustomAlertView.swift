@@ -20,26 +20,30 @@ struct CustomAlertView: View {
                     .foregroundColor(.white)
                     .shadow(radius: 10)
                 Divider()
-                    .frame(width: 220, height: 2)
+                    .frame(width: 220, height: 1)
                     .background(Color.gray)
                     .offset(y: -45)
-                // 縦の赤い線（Rectangle の中央）
                 Rectangle()
-                    .frame(width: 2, height: 45) // 幅2、高さ45
+                    .frame(width: 0.5, height: 45) // 幅2、高さ45
                     .foregroundColor(.gray)
-                    .offset(y: 0) // HStack の高さの半分上にずらす
+                    .offset(y: 0)
                 HStack {
                     Button("キャンセル", role: .cancel) {}
                         .foregroundColor(.black)
+                        .offset(x: -16,y: 2)
                         .padding()
                     Button("追加") {}
                         .foregroundColor(.black)
+                        .offset(x: -4,y: 2)
                         .padding()
                 }
             }
-            TextField("テキスト", text: $newText)
+            TextField("アイテム", text: $newText)
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 200)
+            Text("カテゴリー")
+                .foregroundColor(Color.black.opacity(0.5))
+                .offset(y: -35)
             ZStack {
                 Circle()
                     .frame(width: 100, height: 100)

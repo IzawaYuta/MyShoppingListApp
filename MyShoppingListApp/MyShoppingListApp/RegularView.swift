@@ -104,12 +104,11 @@ struct RegularListView: View {
                     }) {
                         Text("追加")
                             .padding()
-                            .foregroundColor(.blue)
                     }
                     .disabled(newRegularItemName.isEmpty)
             }
             .background(Color.white)
-            .frame(alignment: .bottom)
+            .frame(height: 80)
             .cornerRadius(10)
             .shadow(radius: 3)
             .padding()

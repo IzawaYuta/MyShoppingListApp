@@ -41,9 +41,9 @@ class CategoryListModel: Object, Identifiable {
         return items.filter { !$0.isChecked }.count
     }
     
-    //    var regularItemsCount: Int {
-    //        return regularItems.count
-    //    }
+//        var regularItemsCount: Int {
+//            return regularItems.count
+//        }
 }
 
 
@@ -233,10 +233,8 @@ struct ItemListView: View {
                 }
                 .disabled(newShoppingListTextField.isEmpty)
             }
-            //            .frame(height: 10)
             .background(Color.white)
-            .frame(alignment: .bottom)
-            .cornerRadius(10)
+            .frame(height: 80)
             .shadow(radius: 3)
             .padding()
         } // VStack

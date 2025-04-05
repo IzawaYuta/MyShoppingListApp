@@ -6,7 +6,6 @@
 //
 
 import SwiftUICore
-
 import SwiftUI
 //
 //enum TabBarItem: Int, CaseIterable {
@@ -133,6 +132,7 @@ enum TabBarItems: Int, CaseIterable {
 struct MainTabView: View {
     
     @State var selectedTab = 0 // 選択中のタブインデックス
+    @StateObject private var keyboard = KeyboardResponder() // 👈 追加
     
     var body: some View {
         
@@ -145,22 +145,24 @@ struct MainTabView: View {
                 SettingView()
                     .tag(2)
             }
-            ZStack {
-                HStack {
-                    ForEach((TabBarItems.allCases), id: \.self) { item in
-                        Button{
-                            selectedTab = item.rawValue
-                        } label: {
-                            CustomTabItem(imageName: item.iconName, title: item.title, isActive: (selectedTab == item.rawValue))
+            if !keyboard.isVisible {
+                ZStack {
+                    HStack {
+                        ForEach((TabBarItems.allCases), id: \.self) { item in
+                            Button{
+                                selectedTab = item.rawValue
+                            } label: {
+                                CustomTabItem(imageName: item.iconName, title: item.title, isActive: (selectedTab == item.rawValue))
+                            }
                         }
                     }
+                    .padding(6)
                 }
-                .padding(6)
+                .frame(height: 70)
+                .background(.pink.opacity(0.2))
+                .cornerRadius(35)
+                .padding(.horizontal, 26)
             }
-            .frame(height: 70)
-            .background(.pink.opacity(0.2))
-            .cornerRadius(35)
-            .padding(.horizontal, 26)
         }
     }
 }
