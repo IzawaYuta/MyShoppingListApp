@@ -47,7 +47,7 @@ struct CustomAlertView: View {
                     .padding()
                 }
             }
-            TextField("アイテム", text: $newText)
+            TextField("アイテム...", text: $newText)
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 200)
             Text("カテゴリー")

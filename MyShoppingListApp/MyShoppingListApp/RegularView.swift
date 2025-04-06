@@ -81,31 +81,13 @@ struct RegularListView: View {
             HStack {
                 TextField("入力してください", text: $newRegularItemName)
                     .padding()
-//                if newRegularItemName == "" {
-//                } else {
-//                    Button(action: {
-////                        if newRegularItemName == "" {
-////                        } else {
-//                            addItem()
-////                        }
-//                        print("\(RegularItem())")
-//                    }) {
-//                        Text("追加")
-//                            .padding()
-//                            .foregroundColor(.blue)
-//                    }
-//                }
-                    Button(action: {
-                        //                        if newRegularItemName == "" {
-                        //                        } else {
-                        addItem()
-                        //                        }
-                        print("\(RegularItem())")
-                    }) {
-                        Text("追加")
-                            .padding()
-                    }
-                    .disabled(newRegularItemName.isEmpty)
+                Button(action: {
+                    addItem()
+                }) {
+                    Text("追加")
+                        .padding()
+                }
+                .disabled(newRegularItemName.isEmpty)
             }
             .background(Color.white)
             .frame(height: 80)
@@ -125,10 +107,10 @@ struct RegularListView: View {
                         }) {
                             Image(systemName: "arrow.up")
                         }
-//                        .fullScreenCover(isPresented: $isDone) {
-//                            SuccessAlertView()
-//                                .presentationBackground(.clear)
-//                        }
+                        //                        .fullScreenCover(isPresented: $isDone) {
+                        //                            SuccessAlertView()
+                        //                                .presentationBackground(.clear)
+                        //                        }
                         .sheet(isPresented: $isDone) {
                             SuccessAlertView()
                                 .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
@@ -152,19 +134,19 @@ struct RegularListView: View {
                     }) {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
                     }
-//                    Button(action: {
-//                        isAddingItem.toggle()
-//                    }) {
-//                        Image(systemName: "plus")
-//                    }
-//                    .alert("定期品の追加", isPresented: $isAddingItem) {
-//                        TextField("定期品", text: $newRegularItemName)
-//                        Button("追加") {
-//                            addItem()
-//                        }
-//                        Button("キャンセル", role: .cancel) {
-//                        }
-//                    }
+                    //                    Button(action: {
+                    //                        isAddingItem.toggle()
+                    //                    }) {
+                    //                        Image(systemName: "plus")
+                    //                    }
+                    //                    .alert("定期品の追加", isPresented: $isAddingItem) {
+                    //                        TextField("定期品", text: $newRegularItemName)
+                    //                        Button("追加") {
+                    //                            addItem()
+                    //                        }
+                    //                        Button("キャンセル", role: .cancel) {
+                    //                        }
+                    //                    }
                 }
             }
         }

@@ -203,9 +203,9 @@ struct ItemListView: View {
                     }
                 }
             }
+            .listStyle(PlainListStyle())
             HStack {
                 TextField("入力してください", text: $newShoppingListTextField)
-                //                    .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
                 Button(action: {
