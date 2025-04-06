@@ -113,34 +113,18 @@ struct CategoryListView: View {
                     }
 
                     .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
-                        CustomAlertView()
-                            .presentationBackground(.clear)
+                        CustomAlertView(
+                            newText: $newCategoryTextField,
+                            onAdd: {
+                                addCategory()
+                                isCategoryAdditionAlert = false
+                            },
+                            onCancel: {
+                                isCategoryAdditionAlert = false
+                            }
+                        )
+                        .presentationBackground(Color.red)
                     }
-//                    .sheet(isPresented: $isCategoryAdditionAlert) {
-//                        CustomAlertView()
-//                            .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
-//                            .presentationBackground(.clear)
-//                            .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
-//                    }
-//                    .onChange(of: isCategoryAdditionAlert) { newValue in
-//                        if newValue {
-//                            // 3秒後に非表示にする処理
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                withAnimation {
-//                                    isCategoryAdditionAlert = false
-//                                }
-//                            }
-//                        }
-//                    }
-//                    .alert("カテゴリーを追加", isPresented: $isCategoryAdditionAlert) {
-//                        TextField("カテゴリー名", text: $newCategoryTextField)
-//                        Button("キャンセル", role: .cancel) {}
-//                            .foregroundColor(.red)
-//                        Button("追加") {
-//                            addCategory()
-//                        }
-//                        .disabled(newCategoryTextField.isEmpty)
-//                    }
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Menu("メニュー", systemImage: "ellipsis") {

@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct CustomAlertView: View {
-    @State var newText = ""
+    
+    @Binding var newText: String
+    var onAdd: () -> Void
+    var onCancel: () -> Void
+    
     var body: some View {
         
         ZStack {
@@ -28,14 +32,19 @@ struct CustomAlertView: View {
                     .foregroundColor(.gray)
                     .offset(y: 0)
                 HStack {
-                    Button("キャンセル", role: .cancel) {}
-                        .foregroundColor(.black)
-                        .offset(x: -16,y: 2)
-                        .padding()
-                    Button("追加") {}
-                        .foregroundColor(.black)
-                        .offset(x: -4,y: 2)
-                        .padding()
+                    Button("キャンセル", role: .cancel) {
+                        onCancel()
+                    }
+                    .foregroundColor(.black)
+                    .offset(x: -16,y: 2)
+                    .padding()
+                    Button("追加") {
+                        onAdd()
+                    }
+                    .disabled(newText.isEmpty)
+                    .foregroundColor(newText.isEmpty ? .gray.opacity(0.5) : .black)
+                    .offset(x: -4,y: 2)
+                    .padding()
                 }
             }
             TextField("アイテム", text: $newText)
@@ -64,5 +73,7 @@ struct CustomAlertView: View {
 }
 
 #Preview {
-    CustomAlertView()
+    CustomAlertView(newText: .constant("プレビュー用の文字列"),
+                    onAdd: {},
+                    onCancel: {})
 }
