@@ -1,8 +1,8 @@
 //
-//  SettingView.swift
+//  AppearanceModeView.swift
 //  MyShoppingListApp
 //
-//  Created by Engineer MacBook Air on 2025/03/28.
+//  Created by Engineer MacBook Air on 2025/04/07.
 //
 
 import SwiftUI
@@ -24,7 +24,7 @@ enum AppearanceMode: Int {
     }
 }
 
-struct SettingView: View {
+struct AppearanceModeView: View {
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
     
     var body: some View {
@@ -46,5 +46,5 @@ struct SettingView: View {
 }
 
 #Preview {
-    SettingView()
+    AppearanceModeView()
 }

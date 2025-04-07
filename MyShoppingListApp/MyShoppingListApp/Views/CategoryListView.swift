@@ -121,6 +121,7 @@ struct CategoryListView: View {
                             },
                             onCancel: {
                                 isCategoryAdditionAlert = false
+                                newCategoryTextField = ""
                             }
                         )
                         .presentationBackground(Color.clear)
