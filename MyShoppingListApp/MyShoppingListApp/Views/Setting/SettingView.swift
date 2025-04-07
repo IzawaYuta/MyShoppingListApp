@@ -27,6 +27,7 @@ struct SettingView: View {
                     }
                     .pickerStyle(.menu)
                 }
+                Text("共有設定")
             }
             Section("サポート") {
                 Link("リンク", destination: URL(string: "https://www.google.com")!)
