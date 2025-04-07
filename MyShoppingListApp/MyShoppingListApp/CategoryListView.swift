@@ -123,7 +123,7 @@ struct CategoryListView: View {
                                 isCategoryAdditionAlert = false
                             }
                         )
-                        .presentationBackground(Color.red)
+                        .presentationBackground(Color.clear)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {

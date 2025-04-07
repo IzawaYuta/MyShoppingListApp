@@ -11,15 +11,15 @@ struct SuccessAlertView: View {
     var body: some View {
         ZStack {
             Circle()
-                .foregroundStyle(.white)
-                .overlay(
-                    Circle().stroke(Color.black, lineWidth: 3)
-                    )
+                .fill(LinearGradient(colors: [.pink, .yellow], startPoint: .topTrailing, endPoint: .bottomLeading))
                 .frame(width: 100, height: 100)
-            Image("checkmark")
-                .resizable() // 画像をリサイズ可能にする
-                .frame(width: 80, height: 80) // サイズを指定
-                .offset(y: -3)
+//            Image("checkmark")
+//                .resizable() // 画像をリサイズ可能にする
+//                .frame(width: 80, height: 80) // サイズを指定
+//                .offset(y: -3)
+            Image(systemName: "checkmark")
+                .font(.system(size: 50))
+                .foregroundColor(.white)
         }
     }
 }

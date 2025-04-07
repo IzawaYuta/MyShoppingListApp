@@ -120,7 +120,7 @@ struct RegularListView: View {
                         .onChange(of: isDone) { newValue in
                             if newValue {
                                 // 3秒後に非表示にする処理
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                     withAnimation {
                                         isDone = false
                                     }
