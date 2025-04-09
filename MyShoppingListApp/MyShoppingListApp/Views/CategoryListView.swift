@@ -26,6 +26,8 @@ class CategoryListModel: Object, Identifiable {
     @Persisted var name: String = ""
     @Persisted var items = RealmSwift.List<Item>()
     @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
+    @Persisted var isOn: Bool = false
+    @Persisted var isJointEdit = true
     
     convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()

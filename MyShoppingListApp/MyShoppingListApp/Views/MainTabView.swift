@@ -142,7 +142,7 @@ struct MainTabView: View {
                     .tag(0)
                 RegularCategoryListView()
                     .tag(1)
-                SettingView()
+                ShareView()
                     .tag(2)
             }
             if !keyboard.isVisible {
