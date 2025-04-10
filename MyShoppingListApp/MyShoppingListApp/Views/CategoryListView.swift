@@ -27,7 +27,6 @@ class CategoryListModel: Object, Identifiable {
     @Persisted var items = RealmSwift.List<Item>()
     @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
     @Persisted var isOn: Bool = false
-    @Persisted var isJointEdit = true
     
     convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()
@@ -94,7 +93,14 @@ struct CategoryListView: View {
                         ForEach(sortedCategories) { category in
                             NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                                 HStack {
-                                    Text(category.name)
+//                                    VStack {
+                                        Text(category.name)
+                                        if category.isOn {
+                                            Image(systemName: "person.2.fill")
+                                                .font(.system(size: 15))
+                                                .foregroundColor(.gray)
+//                                        }
+                                    }
                                     Spacer()
                                     Text("\(category.uncheckedItemCount)/\(category.itemCount)")
                                         .foregroundColor(.gray)
