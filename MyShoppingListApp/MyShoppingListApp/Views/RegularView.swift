@@ -109,14 +109,13 @@ struct RegularListView: View {
                         }
                         .sheet(isPresented: $isDone) {
                             SuccessAlertView()
-                                .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
+                                .presentationDetents([.fraction(0.3)])
                                 .presentationBackground(.clear)
-                                .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
+                                .transition(.move(edge: .bottom))
                         }
                         .onChange(of: isDone) { newValue in
                             if newValue {
-                                // 3秒後に非表示にする処理
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                     withAnimation {
                                         isDone = false
                                     }

@@ -182,6 +182,7 @@ struct ItemListView: View {
     
     @State private var isShoppingListAdditionAlert = false
     @State private var newShoppingListTextField = ""
+    @State private var isTrash = false
     @Environment(\.presentationMode) var presentationMode
     
     
@@ -240,10 +241,26 @@ struct ItemListView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     deleteCheckedItems()
+                    isTrash = true
                 }) {
                     Image(systemName: "trash")
                 }
                 .disabled(category.items.filter{ $0.isChecked}.isEmpty)
+                .sheet(isPresented: $isTrash) {
+                    TrashSuccessAlertView()
+                        .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
+                        .presentationBackground(.clear)
+                        .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
+                }
+                .onChange(of: isTrash) { newValue in
+                    if newValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            withAnimation {
+                                isTrash = false
+                            }
+                        }
+                    }
+                }
             }
             ToolbarItem(placement: .principal) {
                 HStack {

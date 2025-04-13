@@ -11,14 +11,11 @@ struct SuccessAlertView: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(LinearGradient(colors: [.pink, .yellow], startPoint: .topTrailing, endPoint: .bottomLeading))
+                .fill(LinearGradient(colors: [.indigo, .cyan], startPoint: .topTrailing, endPoint: .bottomLeading))
+                .shadow(color: .white, radius: 10)
                 .frame(width: 100, height: 100)
-//            Image("checkmark")
-//                .resizable() // 画像をリサイズ可能にする
-//                .frame(width: 80, height: 80) // サイズを指定
-//                .offset(y: -3)
             Image(systemName: "checkmark")
-                .font(.system(size: 50))
+                .font(.system(size: 30))
                 .foregroundColor(.white)
         }
     }
