@@ -107,10 +107,6 @@ struct RegularListView: View {
                         }) {
                             Image(systemName: "arrow.up")
                         }
-                        //                        .fullScreenCover(isPresented: $isDone) {
-                        //                            SuccessAlertView()
-                        //                                .presentationBackground(.clear)
-                        //                        }
                         .sheet(isPresented: $isDone) {
                             SuccessAlertView()
                                 .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
@@ -134,19 +130,6 @@ struct RegularListView: View {
                     }) {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
                     }
-                    //                    Button(action: {
-                    //                        isAddingItem.toggle()
-                    //                    }) {
-                    //                        Image(systemName: "plus")
-                    //                    }
-                    //                    .alert("定期品の追加", isPresented: $isAddingItem) {
-                    //                        TextField("定期品", text: $newRegularItemName)
-                    //                        Button("追加") {
-                    //                            addItem()
-                    //                        }
-                    //                        Button("キャンセル", role: .cancel) {
-                    //                        }
-                    //                    }
                 }
             }
         }

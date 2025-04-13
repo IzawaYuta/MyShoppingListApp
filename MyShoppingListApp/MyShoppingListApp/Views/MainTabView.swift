@@ -7,99 +7,6 @@
 
 import SwiftUICore
 import SwiftUI
-//
-//enum TabBarItem: Int, CaseIterable {
-//    case shoppingList
-//    case regularList
-//    case aaa
-//    case bbb
-//    
-//    var title: String? {
-//        switch self {
-//        case .shoppingList:
-//            return "List"
-//        case .regularList:
-//            return "Regular"
-//        case .aaa:
-//            return "aaa"
-//        case .bbb:
-//            return "bbb"
-//        }
-//    }
-//    
-//    var iconName: String {
-//        switch self {
-//        case .shoppingList:
-//            return "checklist"
-//        case .regularList:
-//            return "tray"
-//        case .aaa:
-//            return "star"
-//        case .bbb:
-//            return "eraser.fill"
-//        }
-//    }
-//}
-//
-//struct MainTabView: View {
-//    @Binding var tabSelection: Int
-//    @Namespace private var animationNamespace
-//    
-//    let tabBarItems: [TabBarItem] = TabBarItem.allCases
-//    
-//    var body: some View {
-//        ZStack {
-//            Capsule()
-//                .frame(height: 50)
-//                .foregroundColor(Color.purple.opacity(0.2))
-//                .shadow(radius: 2)
-//
-//            HStack {
-//                ForEach(tabBarItems.indices, id: \.self) { index in
-//                    Button {
-//                        tabSelection = tabBarItems[index].rawValue
-//                    } label: {
-//                        tabItemView(tabBarItem: tabBarItems[index], isActive: tabSelection == tabBarItems[index].rawValue)
-//                    }
-//                    .frame(maxWidth: .infinity) // ボタンを均等に配置
-//                }
-//            }
-//            .frame(height: 70)
-//        }
-//        .padding(.horizontal)
-//    }
-//    
-//    func tabItemView(tabBarItem: TabBarItem, isActive: Bool) -> some View {
-//        HStack {
-//            Spacer()
-//            Image(systemName: tabBarItem.iconName)
-//                .resizable()
-//                .renderingMode(.template)
-//                .foregroundColor(isActive ? .black : .gray)
-//                .frame(width: 20, height: 20)
-//            
-//            // 選択されているときだけタイトルを表示
-//            if isActive, let title = tabBarItem.title {
-//                Text(title)
-//                    .lineLimit(1)
-//                    .font(.system(size: 14))
-//                    .foregroundColor(.black)
-//            }
-//            
-//            Spacer()
-//        }
-//        .frame(width: isActive ? .infinity : 80, height: 40)
-//        .background(isActive ? .purple.opacity(0.4) : .clear)
-//        .cornerRadius(30)
-//    }
-//}
-//
-//
-//#Preview {
-//    MainTabView(tabSelection: .constant(0))
-//        .previewLayout(.sizeThatFits)
-//        .padding(.vertical)
-//}
 
 enum TabBarItems: Int, CaseIterable {
     case shoppingList
@@ -131,8 +38,8 @@ enum TabBarItems: Int, CaseIterable {
 
 struct MainTabView: View {
     
-    @State var selectedTab = 0 // 選択中のタブインデックス
-    @StateObject private var keyboard = KeyboardResponder() // 👈 追加
+    @State var selectedTab = 0
+    @StateObject private var keyboard = KeyboardResponder()
     
     var body: some View {
         
