@@ -18,7 +18,7 @@ struct CustomAlertView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color.white)
+                .fill(LinearGradient(gradient: Gradient(colors: [.red.opacity(0.2), .blue.opacity(0.2)]), startPoint: .topLeading, endPoint: .bottomTrailing))
                 .shadow(radius: 5)
                 .frame(height: 180)
             VStack(alignment: .leading, spacing: 13) {

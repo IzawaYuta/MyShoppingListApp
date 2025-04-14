@@ -220,12 +220,14 @@ struct ItemListView: View {
             HStack {
                 TextField("入力してください", text: $newShoppingListTextField)
                     .padding()
+                    .foregroundColor(Color.primary)
                 
                 Button(action: {
                     addShoppingList()
                 }) {
                     Text("追加")
                         .padding()
+                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
                         .cornerRadius(8)
                 }
                 .disabled(newShoppingListTextField.isEmpty)
