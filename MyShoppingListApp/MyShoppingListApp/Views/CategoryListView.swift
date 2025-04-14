@@ -93,13 +93,13 @@ struct CategoryListView: View {
                         ForEach(sortedCategories) { category in
                             NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                                 HStack {
-//                                    VStack {
-                                        Text(category.name)
-                                        if category.isOn {
-                                            Image(systemName: "person.2.fill")
-                                                .font(.system(size: 15))
-                                                .foregroundColor(.gray)
-//                                        }
+                                    //                                    VStack {
+                                    Text(category.name)
+                                    if category.isOn {
+                                        Image(systemName: "person.2.fill")
+                                            .font(.system(size: 15))
+                                            .foregroundColor(.gray)
+                                        //                                        }
                                     }
                                     Spacer()
                                     Text("\(category.uncheckedItemCount)/\(category.itemCount)")
@@ -112,6 +112,7 @@ struct CategoryListView: View {
                 }
             }
             .navigationTitle("カテゴリー")
+//            .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
@@ -119,7 +120,7 @@ struct CategoryListView: View {
                     }) {
                         Image(systemName: "plus")
                     }
-
+                    
                     .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
                         CustomAlertView(
                             newText: $newCategoryTextField,
@@ -132,6 +133,7 @@ struct CategoryListView: View {
                                 newCategoryTextField = ""
                             }
                         )
+                        .offset(y: 120)
                         .presentationBackground(Color.clear)
                     }
                 }
@@ -185,7 +187,6 @@ struct ItemListView: View {
     @State private var isTrash = false
     @Environment(\.presentationMode) var presentationMode
     
-    
     @ObservedRealmObject var category: CategoryListModel
     
     var categoryId: String
@@ -201,7 +202,7 @@ struct ItemListView: View {
                             .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
                         
                         Text(item.name)
-                            .foregroundStyle(item.isChecked ? Color.gray : Color.black)
+//                            .foregroundStyle(item.isChecked ? Color.gray : Color.black)
                             .strikethrough(item.isChecked, color: .gray)
                             .animation(.easeOut, value: item.isChecked)
                         
@@ -236,7 +237,8 @@ struct ItemListView: View {
             .padding()
         } // VStack
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
@@ -248,13 +250,13 @@ struct ItemListView: View {
                 .disabled(category.items.filter{ $0.isChecked}.isEmpty)
                 .sheet(isPresented: $isTrash) {
                     TrashSuccessAlertView()
-                        .presentationDetents([.fraction(0.3)]) // sheetの高さを指定
+                        .presentationDetents([.fraction(0.3)])
                         .presentationBackground(.clear)
-                        .transition(.move(edge: .bottom)) // 上からスライドインするアニメーション
+                        .transition(.move(edge: .bottom))
                 }
                 .onChange(of: isTrash) { newValue in
                     if newValue {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             withAnimation {
                                 isTrash = false
                             }

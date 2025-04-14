@@ -41,6 +41,7 @@ struct RegularCategoryListView: View {
                 }
             }
             .navigationTitle("定期品リスト")
+//            .toolbar(.visible, for: .tabBar)
         }
     }
 }
@@ -96,6 +97,7 @@ struct RegularListView: View {
             .padding()
         }
         .listStyle(PlainListStyle())
+        .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
