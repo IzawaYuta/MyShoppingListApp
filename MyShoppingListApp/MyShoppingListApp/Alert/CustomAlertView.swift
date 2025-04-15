@@ -42,10 +42,10 @@ struct CustomAlertView: View {
                         .focused($isFocused) // フォーカス状態を設定
                 }
                 HStack(spacing: 10) {
-                    HStack(spacing: 3) {
-                        Image(systemName: "xmark.circle")
+                    HStack(spacing: -3) {
+                        Image("xmark")
                             .resizable()
-                            .frame(width: 13, height: 13)
+                            .frame(width: 25, height: 25)
                         Button("キャンセル", role: .cancel) {
                             onCancel()
                         }
@@ -56,10 +56,10 @@ struct CustomAlertView: View {
                     .foregroundColor(Color.black)
                     .cornerRadius(15)
                     Spacer()
-                    HStack(spacing: 3) {
-                        Image(systemName: "checkmark.circle")
+                    HStack(spacing: 5) {
+                        Image(systemName: "checkmark")
                             .resizable()
-                            .frame(width: 13, height: 13)
+                            .frame(width: 10, height: 10)
                         Button("追加") {
                             onAdd()
                         }
