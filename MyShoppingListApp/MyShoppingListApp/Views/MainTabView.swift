@@ -21,7 +21,7 @@ enum TabBarItems: Int, CaseIterable {
         case .regularList:
             return "RegularList"
         case .delete:
-            return ""
+            return "Trash"
         case .setting:
             return "Setting"
         }
@@ -34,7 +34,7 @@ enum TabBarItems: Int, CaseIterable {
         case .regularList:
             return "RegularList"
         case .delete:
-            return "delete"
+            return "Trash"
         case .setting:
             return "Setting"
         }

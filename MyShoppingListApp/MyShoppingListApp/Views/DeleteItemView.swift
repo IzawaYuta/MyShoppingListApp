@@ -25,14 +25,21 @@ struct DeleteItemView: View {
     }
     
     var body: some View {
-        List {
-            ForEach(deleteItemViewModel) { list in
-                HStack {
-                    Text(list.name)
-                    Spacer()
-                    Text(dateFormatter.string(from: list.date))
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+        if deleteItemViewModel.isEmpty {
+            Text("買ったものはありません")
+        } else {
+            List {
+                ForEach(deleteItemViewModel) { list in
+                    HStack {
+                        Image(systemName:  "checkmark.square")
+                            .foregroundStyle(.green)
+                            .scaleEffect(1.2)
+                        Text(list.name)
+                        Spacer()
+                        Text(dateFormatter.string(from: list.date))
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
                 }
             }
         }
