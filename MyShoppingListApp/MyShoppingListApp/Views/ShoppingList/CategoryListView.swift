@@ -234,7 +234,7 @@ struct ItemListView: View {
             }
             .background(Color.white)
             .cornerRadius(10)
-            .frame(height: 80)
+            .frame(height: 130)
             .shadow(radius: 3)
             .padding()
         } // VStack
@@ -314,7 +314,13 @@ struct ItemListView: View {
             
             try! realm.write {
                 for item in checkedItems {
+                    let deleteItem = DeleteItemViewModel()
+                    deleteItem.id = item.id.uuidString
+                    deleteItem.name = item.name
+                    deleteItem.date = Date()
+                    realm.add(deleteItem)
                     realm.delete(item)
+                    print("\(DeleteItemViewModel())")
                 }
             }
         }

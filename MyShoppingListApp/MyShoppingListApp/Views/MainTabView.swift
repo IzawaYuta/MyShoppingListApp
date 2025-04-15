@@ -11,6 +11,7 @@ import SwiftUI
 enum TabBarItems: Int, CaseIterable {
     case shoppingList
     case regularList
+    case delete
     case setting
     
     var title: String {
@@ -19,6 +20,8 @@ enum TabBarItems: Int, CaseIterable {
             return "ShopList"
         case .regularList:
             return "RegularList"
+        case .delete:
+            return ""
         case .setting:
             return "Setting"
         }
@@ -30,6 +33,8 @@ enum TabBarItems: Int, CaseIterable {
             return "ShoppingList"
         case .regularList:
             return "RegularList"
+        case .delete:
+            return "delete"
         case .setting:
             return "Setting"
         }
@@ -49,8 +54,10 @@ struct MainTabView: View {
                     .tag(0)
                 RegularCategoryListView()
                     .tag(1)
-                ShareView()
+                DeleteItemView()
                     .tag(2)
+                SettingView()
+                    .tag(3)
             }
             if !keyboard.isVisible {
                 ZStack {

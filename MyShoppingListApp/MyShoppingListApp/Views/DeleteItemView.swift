@@ -9,17 +9,45 @@ import SwiftUI
 import RealmSwift
 
 class DeleteItemViewModel: Object, Identifiable {
-    @Persisted var id = UUID()
+    @Persisted var id: String = UUID().uuidString 
     @Persisted var name = ""
+    @Persisted var date = Date()
 }
 
 struct DeleteItemView: View {
     @ObservedResults(DeleteItemViewModel.self) var deleteItemViewModel
     
+    // Dateをフォーマットするヘルパー
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        return formatter
+    }
+    
     var body: some View {
         List {
             ForEach(deleteItemViewModel) { list in
-                Text(list.name)
+                HStack {
+                    Text(list.name)
+                    Spacer()
+                    Text(dateFormatter.string(from: list.date))
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            }
+        }
+    }
+    
+    private func deleteExpiredItems() {
+        let realm = try! Realm()
+        let currentDate = Date()
+        let expiredItems = deleteItemViewModel.filter {
+            let timeInterval = currentDate.timeIntervalSince($0.date)
+            return timeInterval > (24 * 60 * 60)
+        }
+        try! realm.write {
+            for item in expiredItems {
+                realm.delete(item)
             }
         }
     }
