@@ -54,6 +54,7 @@ struct CategoryListView: View {
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var sortOption: SortOption = .default // 並び替え
+    @State private var isModalPresented = false
     @ObservedResults(CategoryListModel.self) var categoryListModel
     
     enum SortOption: String, CaseIterable {
@@ -112,7 +113,7 @@ struct CategoryListView: View {
                 }
             }
             .navigationTitle("カテゴリー")
-//            .toolbar(.visible, for:.tabBar)
+            .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
@@ -138,20 +139,23 @@ struct CategoryListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Menu("メニュー", systemImage: "ellipsis") {
-                        Picker("並び替え", selection: $sortOption) {
-                            ForEach(SortOption.allCases, id: \.self) { option in
-                                Text(option.rawValue).tag(option)
-                            }
+                    //                    Menu("メニュー", systemImage: "ellipsis") {
+                    Picker("並び替え", selection: $sortOption) {
+                        ForEach(SortOption.allCases, id: \.self) { option in
+                            Text(option.rawValue).tag(option)
                         }
-                        .pickerStyle(MenuPickerStyle())
-                        // TODO: Imageを変更する
-                        ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
-                            Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
-                        }
-                        .disabled(categoryListModel.isEmpty)
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    Button(action: {
+                        isModalPresented = true
+                    }) {
+                        Text("リストを共有")
+                    }
+                    .sheet(isPresented: $isModalPresented) {
+                        ShareView()
                     }
                 }
+                //                }
             }
         } /// NavigationView
     }

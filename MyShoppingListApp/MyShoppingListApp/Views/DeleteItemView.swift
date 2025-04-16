@@ -42,7 +42,11 @@ struct DeleteItemView: View {
                             .foregroundColor(.gray)
                     }
                 }
-            }
+            } // List
+//            .scrollContentBackground(.hidden)
+//            .background(
+//                LinearGradient(gradient: Gradient(colors: [.pink, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
+//            )
         }
     }
     
