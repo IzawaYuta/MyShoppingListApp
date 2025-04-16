@@ -17,11 +17,11 @@ enum TabBarItems: Int, CaseIterable {
     var title: String {
         switch self {
         case .shoppingList:
-            return "ShopList"
+            return "Sopping"
         case .regularList:
-            return "RegularList"
+            return "Regular"
         case .delete:
-            return "Trash"
+            return "Completed"
         case .setting:
             return "Setting"
         }
@@ -37,6 +37,19 @@ enum TabBarItems: Int, CaseIterable {
             return "Trash"
         case .setting:
             return "Setting"
+        }
+    }
+    
+    var iconSize: CGSize {
+        switch self {
+        case .shoppingList:
+            return CGSize(width: 23, height: 23)
+        case .regularList:
+            return CGSize(width: 23, height: 23)
+        case .delete:
+            return CGSize(width: 30, height: 30)
+        case .setting:
+            return CGSize(width: 27, height: 27)
         }
     }
 }
@@ -66,7 +79,10 @@ struct MainTabView: View {
                             Button{
                                 selectedTab = item.rawValue
                             } label: {
-                                CustomTabItem(imageName: item.iconName, title: item.title, isActive: (selectedTab == item.rawValue))
+                                CustomTabItem(imageName: item.iconName,
+                                              title: item.title,
+                                              isActive: (selectedTab == item.rawValue),
+                                              iconSize: item.iconSize)
                             }
                         }
                     }
@@ -82,15 +98,19 @@ struct MainTabView: View {
 }
 
 extension MainTabView {
-    func CustomTabItem(imageName: String, title: String, isActive: Bool) -> some View {
+    func CustomTabItem(imageName: String,
+                       title: String,
+                       isActive: Bool,
+                       iconSize: CGSize
+    ) -> some View {
         HStack(spacing: 10) {
             Spacer()
             Image(imageName)
                 .resizable()
                 .renderingMode(.template)
                 .foregroundColor(isActive ? .black : .gray)
-                .scaleEffect(isActive ? 1.5 : 1.3)
-                .frame(width: 20, height: 20)
+                .scaleEffect(1.2)
+                .frame(width: iconSize.width, height: iconSize.height)
             if isActive {
                 Text(title)
                     .font(.system(size: 14))
@@ -98,7 +118,7 @@ extension MainTabView {
             }
             Spacer()
         }
-        .frame(width: isActive ? .infinity : 75, height: 60)
+        .frame(width: isActive ? .infinity : 50, height: 60)
         .background(
             ZStack {
                 if isActive {
