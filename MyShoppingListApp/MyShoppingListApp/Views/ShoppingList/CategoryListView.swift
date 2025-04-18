@@ -139,13 +139,14 @@ struct CategoryListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    //                    Menu("メニュー", systemImage: "ellipsis") {
-                    Picker("並び替え", selection: $sortOption) {
-                        ForEach(SortOption.allCases, id: \.self) { option in
-                            Text(option.rawValue).tag(option)
+                    Menu("メニュー", systemImage: "arrow.up.arrow.down") {
+                        Picker("並び替え", selection: $sortOption) {
+                            ForEach(SortOption.allCases, id: \.self) { option in
+                                Text(option.rawValue).tag(option)
+                            }
                         }
+                        .pickerStyle(MenuPickerStyle())
                     }
-                    .pickerStyle(MenuPickerStyle())
                     Button(action: {
                         isModalPresented = true
                     }) {

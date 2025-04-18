@@ -18,10 +18,11 @@ struct CustomAlertView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
-                .fill(LinearGradient(gradient: Gradient(colors: [.red.opacity(0.2), .blue.opacity(0.2)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+//                .fill(LinearGradient(gradient: Gradient(colors: [.red.opacity(0.4), .blue.opacity(0.4)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                .fill(Color.white)
                 .shadow(radius: 5)
                 .frame(height: 180)
-            VStack(alignment: .leading, spacing: 13) {
+            VStack(alignment: .center, spacing: 13) {
                 HStack {
                     Image(systemName: "cart")
                         .resizable()
