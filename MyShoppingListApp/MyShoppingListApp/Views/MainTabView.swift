@@ -58,6 +58,7 @@ struct MainTabView: View {
     
     @State var selectedTab = 0
     @StateObject private var keyboard = KeyboardResponder()
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         
@@ -89,7 +90,10 @@ struct MainTabView: View {
                     .padding(6)
                 }
                 .frame(height: 70)
-                .background(.pink.opacity(0.2))
+//                .background(.pink.opacity(0.2))
+                .background(
+                    (colorScheme == .dark ? Color.white : Color.pink).opacity(0.2)
+                )
                 .cornerRadius(35)
                 .padding(.horizontal, 26)
             }
@@ -103,6 +107,7 @@ extension MainTabView {
                        isActive: Bool,
                        iconSize: CGSize
     ) -> some View {
+        
         HStack(spacing: 10) {
             Spacer()
             Image(imageName)
@@ -121,10 +126,18 @@ extension MainTabView {
         .frame(width: isActive ? .infinity : 50, height: 60)
         .background(
             ZStack {
-                if isActive {
-                    Color.pink.opacity(0.4)
-                        .cornerRadius(30)
-                        .offset(x: isActive ? 0 : 60)
+                if colorScheme == .dark {
+                    if isActive {
+                        Color(red: 0.7, green: 0.3, blue: 0.5)
+                            .cornerRadius(30)
+                            .offset(x: isActive ? 0 : 60)
+                    }
+                } else {
+                    if isActive {
+                                            Color.pink.opacity(0.4)
+                            .cornerRadius(30)
+                            .offset(x: isActive ? 0 : 60)
+                    }
                 }
             }
         )

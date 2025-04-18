@@ -32,9 +32,6 @@ struct DeleteItemView: View {
             List {
                 ForEach(deleteItemViewModel) { list in
                     HStack {
-                        Image(systemName:  "checkmark.square")
-                            .foregroundStyle(.green)
-                            .scaleEffect(1.2)
                         Text(list.name)
                         Spacer()
                         Text(dateFormatter.string(from: list.date))
