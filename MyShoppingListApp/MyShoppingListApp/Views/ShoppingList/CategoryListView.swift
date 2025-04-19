@@ -252,7 +252,7 @@ struct ItemListView: View {
             .padding()
         } // VStack
         .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
         .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

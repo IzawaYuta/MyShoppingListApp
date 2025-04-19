@@ -54,6 +54,7 @@ struct RegularListView: View {
     @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
     @State private var selectedAllItems = false
     @State private var isDone = false
+    @Environment(\.presentationMode) var presentationMode
     
     
     var body: some View {
@@ -96,6 +97,7 @@ struct RegularListView: View {
             .padding()
         }
         .listStyle(PlainListStyle())
+        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
         .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -131,6 +133,13 @@ struct RegularListView: View {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
                     }
                 } // HStack
+            } // topBarTrailing
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                }
             }
         }
         .navigationTitle("\(categoryListModel.name) の定期品")
