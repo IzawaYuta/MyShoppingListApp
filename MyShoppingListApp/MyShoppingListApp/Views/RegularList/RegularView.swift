@@ -73,7 +73,6 @@ struct RegularListView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        
                         toggleSelection(for: list)
                     }
                 }
@@ -131,7 +130,7 @@ struct RegularListView: View {
                     }) {
                         Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
                     }
-                }
+                } // HStack
             }
         }
         .navigationTitle("\(categoryListModel.name) の定期品")

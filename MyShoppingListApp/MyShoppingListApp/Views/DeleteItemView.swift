@@ -9,13 +9,15 @@ import SwiftUI
 import RealmSwift
 
 class DeleteItemViewModel: Object, Identifiable {
-    @Persisted var id: String = UUID().uuidString 
+    @Persisted var id: String = UUID().uuidString
     @Persisted var name = ""
     @Persisted var date = Date()
 }
 
 struct DeleteItemView: View {
     @ObservedResults(DeleteItemViewModel.self) var deleteItemViewModel
+//    let categoryListModel = CategoryListModel()
+//    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
     
     // Dateをフォーマットするヘルパー
     private var dateFormatter: DateFormatter {
@@ -26,24 +28,44 @@ struct DeleteItemView: View {
     }
     
     var body: some View {
-        if deleteItemViewModel.isEmpty {
-            Text("買ったものはありません")
-        } else {
-            List {
-                ForEach(deleteItemViewModel) { list in
-                    HStack {
-                        Text(list.name)
-                        Spacer()
-                        Text(dateFormatter.string(from: list.date))
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+        NavigationStack {
+            if deleteItemViewModel.isEmpty {
+                Text("買ったものはありません")
+            } else {
+                List {
+                    ForEach(deleteItemViewModel) { list in
+                        HStack {
+//                            Image(systemName: selectedItems.contains(list.id) ? "circle.inset.filled" : "circle")
+                            Text(list.name)
+                            Spacer()
+                            Text(dateFormatter.string(from: list.date))
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        .contentShape(Rectangle())
+//                        .onTapGesture {
+//                            toggleSelection(for: list)
+//                        }
                     }
-                }
-            } // List
-//            .scrollContentBackground(.hidden)
-//            .background(
-//                LinearGradient(gradient: Gradient(colors: [.pink, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
-//            )
+                } // List
+                //            .scrollContentBackground(.hidden)
+                //            .background(
+                //                LinearGradient(gradient: Gradient(colors: [.pink, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                //            )
+                .navigationTitle("購入済みアイテム")
+//                .toolbar {
+//                    ToolbarItem(placement: .topBarTrailing) {
+//                        if selectedItems == [] {
+//                        } else {
+//                            Button(action: {
+//                                saveSelectedItems()
+//                            }) {
+//                                Image(systemName: "arrow.up")
+//                            }
+//                        }
+//                    }
+//                }
+            }
         }
     }
     
@@ -60,6 +82,27 @@ struct DeleteItemView: View {
             }
         }
     }
+//    private func toggleSelection(for item: DeleteItemViewModel) {
+//        if selectedItems.contains(item.id) {
+//            selectedItems.remove(item.id)
+//        } else {
+//            selectedItems.insert(item.id)
+//        }
+//    }
+//    private func saveSelectedItems() {
+//        let realm = try! Realm()
+//        try! realm.write {
+//            let selectedRegularItems = deleteItemViewModel.filter { selectedItems.contains($0.id) }
+//            
+//            for regularItem in selectedRegularItems {
+//                let item = Item()
+//                item.name = regularItem.name
+//                
+//                categoryListModel.items.append(item) // Listに追加 (realm.writeブロック内で行う)
+//                realm.add(item) // Realmに明示的に保存
+//            }
+//        }
+//    }
 }
 
 #Preview {

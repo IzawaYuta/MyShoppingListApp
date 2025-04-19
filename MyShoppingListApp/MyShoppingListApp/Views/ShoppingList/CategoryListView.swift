@@ -191,6 +191,7 @@ struct ItemListView: View {
     @State private var newShoppingListTextField = ""
     @State private var isTrash = false
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     
     @ObservedRealmObject var category: CategoryListModel
     
@@ -225,19 +226,26 @@ struct ItemListView: View {
             HStack {
                 TextField("入力してください", text: $newShoppingListTextField)
                     .padding()
-                    .foregroundColor(Color.primary)
+                    .foregroundColor(Color.black)
                 
                 Button(action: {
                     addShoppingList()
                 }) {
-                    Text("追加")
-                        .padding()
-                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
-                        .cornerRadius(8)
+                    if colorScheme == .dark {
+                        Text("追加")
+                            .padding()
+                            .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                            .cornerRadius(8)
+                    } else {
+                        Text("追加")
+                            .padding()
+                            .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
+                            .cornerRadius(8)
+                    }
                 }
                 .disabled(newShoppingListTextField.isEmpty)
             }
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color.gray : Color.white)
             .cornerRadius(10)
             .frame(height: 130)
             .shadow(radius: 3)
