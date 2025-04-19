@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct SettingView: View {
     
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
+    @Environment(\.requestReview) var requestReview
     
     var body: some View {
         NavigationStack {
@@ -33,13 +35,21 @@ struct SettingView: View {
                 }
                 Section("サポート") {
                     Link("リンク", destination: URL(string: "https://www.google.com")!)
+
+                    Text("お問い合わせ")
+                    Text("プライバシーポリシー")
                     HStack {
                         Text("アプリバージョン")
                         Spacer()
                         Text("v1.0.0 (1)")
+                            .foregroundColor(Color.gray)
                     }
-                    Text("お問い合わせ")
-                    Text("レビュー")
+                }
+                Section("評価") {
+                    Button("レビュー") {
+                        requestReview()
+                    }
+                    .foregroundColor(Color.black)
                 }
             }
             .listStyle(.grouped)
