@@ -16,6 +16,7 @@ class DeleteItemViewModel: Object, Identifiable {
 
 struct DeleteItemView: View {
     @ObservedResults(DeleteItemViewModel.self) var deleteItemViewModel
+    @State private var showAlert = false
 //    let categoryListModel = CategoryListModel()
 //    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
     
@@ -53,8 +54,8 @@ struct DeleteItemView: View {
                 //                LinearGradient(gradient: Gradient(colors: [.pink, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
                 //            )
                 .navigationTitle("購入済みアイテム")
-//                .toolbar {
-//                    ToolbarItem(placement: .topBarTrailing) {
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
 //                        if selectedItems == [] {
 //                        } else {
 //                            Button(action: {
@@ -63,8 +64,19 @@ struct DeleteItemView: View {
 //                                Image(systemName: "arrow.up")
 //                            }
 //                        }
-//                    }
-//                }
+                        Button(action: {
+                            showAlert = true
+                        }) {
+                            Image(systemName: "info.circle")
+                        }
+                        .alert("", isPresented: $showAlert) {
+                            Button("完了", role: .cancel) {}
+                        } message: {
+                            Text("購入済みアイテムは30日後に削除されます。")
+                        }
+
+                    }
+                }
             }
         }
     }

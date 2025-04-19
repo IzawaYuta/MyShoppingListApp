@@ -13,6 +13,9 @@ struct SettingView: View {
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
     @Environment(\.requestReview) var requestReview
     
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    
     var body: some View {
         NavigationStack {
             List {
@@ -41,7 +44,9 @@ struct SettingView: View {
                     HStack {
                         Text("アプリバージョン")
                         Spacer()
-                        Text("v1.0.0 (1)")
+                        Text("\(appVersion)")
+                            .foregroundColor(Color.gray)
+                        Text("(\(buildNumber))")
                             .foregroundColor(Color.gray)
                     }
                 }
