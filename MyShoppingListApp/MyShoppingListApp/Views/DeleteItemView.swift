@@ -18,10 +18,7 @@ struct DeleteItemView: View {
     @ObservedResults(DeleteItemViewModel.self) var deleteItemViewModel
     @State private var showAlert = false
     @State private var timer: Timer? = nil
-//    let categoryListModel = CategoryListModel()
-//    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
     
-    // Dateをフォーマットするヘルパー
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -58,7 +55,7 @@ struct DeleteItemView: View {
                         .alert("", isPresented: $showAlert) {
                             Button("完了", role: .cancel) {}
                         } message: {
-                            Text("購入履歴は30日後に削除されます。")
+                            Text("購入履歴は30日後に削除されます")
                         }
 
                     }
@@ -78,15 +75,22 @@ struct DeleteItemView: View {
     }
     
     private func deleteExpiredItems() {
-        let realm = try! Realm()
+        let realm = try! Realm() // 現在の Realm インスタンスを取得
         let currentDate = Date()
-        let expiredItems = deleteItemViewModel.filter {
-            let timeInterval = currentDate.timeIntervalSince($0.date)
+        
+        // Realm オブジェクトとしてフィルタリングする
+        let expiredItems = deleteItemViewModel.filter { item in
+            guard let realmItem = item.thaw() else { return false } // 必要なら thaw
+            let timeInterval = currentDate.timeIntervalSince(realmItem.date)
             return timeInterval > (24 * 60 * 60)
         }
+        
+        // 削除処理
         try! realm.write {
             for item in expiredItems {
-                realm.delete(item)
+                if let thawedItem = item.thaw() { // thaw されたオブジェクトを削除
+                    realm.delete(thawedItem)
+                }
             }
         }
     }

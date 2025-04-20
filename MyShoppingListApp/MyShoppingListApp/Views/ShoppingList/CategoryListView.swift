@@ -191,7 +191,6 @@ struct ItemListView: View {
                 TextField("入力してください", text: $newShoppingListTextField)
                     .padding()
                     .foregroundColor(Color.black)
-                
                 Button(action: {
                     addShoppingList()
                 }) {

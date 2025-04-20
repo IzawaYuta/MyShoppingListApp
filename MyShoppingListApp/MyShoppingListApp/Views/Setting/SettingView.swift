@@ -27,7 +27,6 @@ struct SettingView: View {
         NavigationStack {
             List {
                 Section("プロフィール") {
-                    VStack {
                         HStack {
                             Image(systemName: "person")
                                 .font(.system(size: 30))
@@ -37,12 +36,7 @@ struct SettingView: View {
                                 }
                                 .font(.system(size: 20))
                         }
-                        Text("ニックネームの設定は任意ですが、リストを共有する場合はニックネームを設定してください")
-                            .font(.caption)
-                    }
                     .frame(height: 60) // 縦幅を80ポイントに設定
-                        
-
                 }
                 Section("設定") {
                     HStack {

@@ -55,6 +55,7 @@ struct RegularListView: View {
     @State private var selectedAllItems = false
     @State private var isDone = false
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     
     
     var body: some View {
@@ -82,17 +83,27 @@ struct RegularListView: View {
             HStack {
                 TextField("入力してください", text: $newRegularItemName)
                     .padding()
+                    .foregroundColor(Color.black)
                 Button(action: {
                     addItem()
                 }) {
-                    Text("追加")
-                        .padding()
+                    if colorScheme == .dark {
+                        Text("追加")
+                            .padding()
+                            .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                            .cornerRadius(8)
+                    } else {
+                        Text("追加")
+                            .padding()
+                            .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
+                            .cornerRadius(8)
+                    }
                 }
                 .disabled(newRegularItemName.isEmpty)
             }
-            .background(Color.white)
-            .frame(height: 100)
+            .background(colorScheme == .dark ? Color.gray : Color.white)
             .cornerRadius(10)
+            .frame(height: 110)
             .shadow(radius: 3)
             .padding()
         }
