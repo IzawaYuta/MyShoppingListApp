@@ -94,33 +94,3 @@ struct ShareView: View {
 #Preview {
     ShareView()
 }
-
-
-//VStack(spacing: 15) {
-//    ForEach(categoryListModel) { list in
-//        ZStack {
-//            RoundedRectangle(cornerRadius: 10)
-//                .foregroundColor(.gray)
-//                .frame(width: 350, height: 50)
-//            HStack {
-//                Text(list.name)
-//                Spacer()
-//                Toggle("トグル", isOn: Binding(
-//                    get: { list.isOn },
-//                    set: { newValue in
-//                        if let realm = list.realm {
-//                            try? realm.write {
-//                                list.isOn = newValue
-//                            }
-//                        }
-//                    }
-//                ))
-//                .labelsHidden()
-//            }
-//            .padding(.horizontal)
-//        }
-//    }
-//}
-//.padding()
-//}
-//}
