@@ -54,7 +54,7 @@ struct SettingView: View {
                     Button("レビュー") {
                         requestReview()
                     }
-                    .foregroundColor(Color.black)
+                    .foregroundColor(Color.primary)
                 }
             }
             .listStyle(.grouped)
