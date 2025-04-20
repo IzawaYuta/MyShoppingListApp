@@ -53,54 +53,27 @@ struct CategoryListView: View {
     
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
-    @State private var sortOption: SortOption = .default // 並び替え
     @State private var isModalPresented = false
     @ObservedResults(CategoryListModel.self) var categoryListModel
-    
-    enum SortOption: String, CaseIterable {
-        case `default` = "デフォルト順"
-        case nameAscending = "名前昇順"
-        case nameDescending = "名前降順"
-        case itemCountAscending = "アイテム数昇順"
-        case itemCountDescending = "アイテム数降順"
-    }
-    
-    var sortedCategories: [CategoryListModel] {
-        switch sortOption {
-        case .default:
-            return Array(categoryListModel)
-        case .nameAscending:
-            return categoryListModel.sorted(by: { $0.name < $1.name })
-        case .nameDescending:
-            return categoryListModel.sorted(by: { $0.name > $1.name })
-        case.itemCountAscending:
-            return categoryListModel.sorted(by: { $0.itemCount < $1.itemCount })
-        case .itemCountDescending:
-            return categoryListModel.sorted(by: { $0.itemCount > $1.itemCount })
-        }
-    }
     
     var body: some View {
         NavigationView {
             VStack {
-                // sortedCategoriesが空の場合にメッセージを表示
                 if categoryListModel.isEmpty {
                     Text("カテゴリーを追加しましょう！")
-                        .foregroundColor(.gray) // 文字色を指定することも可能
+                        .foregroundColor(.gray)
                         .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 中央に表示
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
-                        ForEach(sortedCategories) { category in
+                        ForEach(categoryListModel) { category in
                             NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                                 HStack {
-                                    //                                    VStack {
                                     Text(category.name)
                                     if category.isOn {
                                         Image(systemName: "person.2.fill")
                                             .font(.system(size: 15))
                                             .foregroundColor(.gray)
-                                        //                                        }
                                     }
                                     Spacer()
                                     Text("\(category.uncheckedItemCount)/\(category.itemCount)")
@@ -109,7 +82,7 @@ struct CategoryListView: View {
                             }
                         }
                         .onDelete(perform: deleteCategory)
-                    }
+                    } // List
                 }
             }
             .navigationTitle("カテゴリー")
@@ -139,14 +112,7 @@ struct CategoryListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Menu("メニュー", systemImage: "arrow.up.arrow.down") {
-                        Picker("並び替え", selection: $sortOption) {
-                            ForEach(SortOption.allCases, id: \.self) { option in
-                                Text(option.rawValue).tag(option)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                    }
+                    EditButton()
                     Button(action: {
                         isModalPresented = true
                     }) {
@@ -164,7 +130,6 @@ struct CategoryListView: View {
     
     private func addCategory() {
         guard !newCategoryTextField.isEmpty else {
-            // テキストフィールドが空なら何もしない
             return
         }
         let realm = try!Realm()
@@ -178,7 +143,6 @@ struct CategoryListView: View {
     private func deleteCategory(at offsets: IndexSet) {
         let realm = try! Realm()
         try! realm.write {
-            // 削除対象のアイテムを削除
             $categoryListModel.remove(atOffsets: offsets)
         }
     }
