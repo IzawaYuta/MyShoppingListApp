@@ -18,7 +18,6 @@ struct CustomAlertView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
-//                .fill(LinearGradient(gradient: Gradient(colors: [.red.opacity(0.4), .blue.opacity(0.4)]), startPoint: .topLeading, endPoint: .bottomTrailing))
                 .fill(Color.white)
                 .shadow(radius: 5)
                 .frame(height: 180)
@@ -34,9 +33,7 @@ struct CustomAlertView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color.gray.opacity(0.1))
-//                        .border(.red)
-//                        .cornerRadius(20)
-                        .frame(width: 340, height: 50)
+                        .frame(width: 390, height: 50)
                     TextField("カテゴリー", text: $newText)
                         .frame(height: 50) // 高さを指定
                         .padding(.horizontal)

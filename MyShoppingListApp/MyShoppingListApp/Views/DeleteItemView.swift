@@ -17,6 +17,7 @@ class DeleteItemViewModel: Object, Identifiable {
 struct DeleteItemView: View {
     @ObservedResults(DeleteItemViewModel.self) var deleteItemViewModel
     @State private var showAlert = false
+    @State private var timer: Timer? = nil
 //    let categoryListModel = CategoryListModel()
 //    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
     
@@ -36,34 +37,19 @@ struct DeleteItemView: View {
                 List {
                     ForEach(deleteItemViewModel) { list in
                         HStack {
-//                            Image(systemName: selectedItems.contains(list.id) ? "circle.inset.filled" : "circle")
-                            Text(list.name)
+                                Text(list.name)
+                                    .font(.headline)
                             Spacer()
                             Text(dateFormatter.string(from: list.date))
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
                         .contentShape(Rectangle())
-//                        .onTapGesture {
-//                            toggleSelection(for: list)
-//                        }
                     }
                 } // List
-                //            .scrollContentBackground(.hidden)
-                //            .background(
-                //                LinearGradient(gradient: Gradient(colors: [.pink, .green]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                //            )
-                .navigationTitle("購入済みアイテム")
+                .navigationTitle("購入履歴")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-//                        if selectedItems == [] {
-//                        } else {
-//                            Button(action: {
-//                                saveSelectedItems()
-//                            }) {
-//                                Image(systemName: "arrow.up")
-//                            }
-//                        }
                         Button(action: {
                             showAlert = true
                         }) {
@@ -72,10 +58,20 @@ struct DeleteItemView: View {
                         .alert("", isPresented: $showAlert) {
                             Button("完了", role: .cancel) {}
                         } message: {
-                            Text("購入済みアイテムは30日後に削除されます。")
+                            Text("購入履歴は30日後に削除されます。")
                         }
 
                     }
+                }
+                .onAppear {
+                    deleteExpiredItems()
+                    // 1時間ごとに削除チェック
+                    timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+                        deleteExpiredItems()
+                    }
+                }
+                .onDisappear {
+                    timer?.invalidate() // タイマーを停止
                 }
             }
         }
@@ -94,27 +90,6 @@ struct DeleteItemView: View {
             }
         }
     }
-//    private func toggleSelection(for item: DeleteItemViewModel) {
-//        if selectedItems.contains(item.id) {
-//            selectedItems.remove(item.id)
-//        } else {
-//            selectedItems.insert(item.id)
-//        }
-//    }
-//    private func saveSelectedItems() {
-//        let realm = try! Realm()
-//        try! realm.write {
-//            let selectedRegularItems = deleteItemViewModel.filter { selectedItems.contains($0.id) }
-//            
-//            for regularItem in selectedRegularItems {
-//                let item = Item()
-//                item.name = regularItem.name
-//                
-//                categoryListModel.items.append(item) // Listに追加 (realm.writeブロック内で行う)
-//                realm.add(item) // Realmに明示的に保存
-//            }
-//        }
-//    }
 }
 
 #Preview {
