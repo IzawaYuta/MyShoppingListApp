@@ -16,7 +16,7 @@ struct ShareView: View {
     
     @ObservedResults(CategoryListModel.self) var categoryListModel
     @State private var isOn = false
-    @State private var isExpanded = false
+    @State private var isEdit = false
     
     @State private var nickname: String = "" // ローカルの状態で保持
     @ObservedResults(Nickname.self) private var nicknames // Realmのデータを監視
@@ -33,57 +33,54 @@ struct ShareView: View {
         if nicknames.first?.nickname?.isEmpty ?? true {
             Text("共有をする場合は、\nニックネームを設定してください")
         } else {
-            VStack(spacing: 50) {
-                ZStack {
-                    // 背景のRoundedRectangle
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.white)
-                        .shadow(color: .gray.opacity(0.5), radius: 5)
-                        .frame(width: 420, height: 140) // 高さを少し広げる
-                        .padding()
-                    
-                    // 説明文テキスト
-                    VStack(alignment: .leading, spacing: 10) { // 縦方向に余白を追加
-                        Text("共有をONにすると共同編集が有効になります。")
-                            .font(.system(size: 14, weight: .semibold)) // 少し強調
-                        Text("共有を有効にする場合は、ニックネームの設定が必要です。")
-                            .font(.system(size: 12))
-                        Text("共有する前に、相手がアプリをインストールしていることを確認してください。")
-                            .font(.system(size: 12))
-                        Text("共有先のデバイスにアプリがインストールされていないと、正常にリストが共有されません。")
-                            .font(.system(size: 12))
-                    }
-                    .foregroundColor(.black.opacity(0.8)) // テキストカラー
-                    .padding(.horizontal, 20) // 左右の余白を追加
-                    .padding(.vertical, 10) // 上下の余白を追加
-                    .frame(maxWidth: .infinity, alignment: .leading) // 左揃え
+            VStack(alignment: .trailing) {
+                Button(action: {
+                    isEdit.toggle()
+                }) {
+                    Text("編集")
                 }
-                List {
-                    ForEach(categoryListModel) { list in
-                        HStack {
-                            Text(list.name)
-                            Spacer()
-                            Toggle("", isOn: Binding(
-                                get: { list.isOn },
-                                set: { newValue in
-                                    let realm = try! Realm()
-                                    if let thawList = list.thaw() {
-                                        try! realm.write {
-                                            thawList.isOn = newValue
-                                        }
-                                    }
-                                    if newValue {
-                                        ShareLink(item: "カテゴリー共有", preview: SharePreview("メッセージです", image: Image("MyImage"))) {
-                                            Label("カテゴリーを共有", systemImage: "square.and.arrow.up")
-                                        }
-                                    }
+                .padding(.horizontal, 40)
+                VStack(spacing: 50) {
+                    ZStack {
+                        // 背景のRoundedRectangle
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white)
+                            .shadow(color: .gray.opacity(0.5), radius: 5)
+                            .frame(width: 420, height: 140) // 高さを少し広げる
+                            .padding()
+                        
+                        // 説明文テキスト
+                        VStack(alignment: .leading, spacing: 10) { // 縦方向に余白を追加
+                            Text("共有をONにすると共同編集が有効になります。")
+                                .font(.system(size: 14, weight: .semibold)) // 少し強調
+                            Text("共有を有効にする場合は、ニックネームの設定が必要です。")
+                                .font(.system(size: 12))
+                            Text("共有する前に、相手がアプリをインストールしていることを確認してください。")
+                                .font(.system(size: 12))
+                            Text("共有先のデバイスにアプリがインストールされていないと、正常にリストが共有されません。")
+                                .font(.system(size: 12))
+                        }
+                        .foregroundColor(.black.opacity(0.8)) // テキストカラー
+                        .padding(.horizontal, 20) // 左右の余白を追加
+                        .padding(.vertical, 10) // 上下の余白を追加
+                        .frame(maxWidth: .infinity, alignment: .leading) // 左揃え
+                    }
+                    List {
+                        ForEach(categoryListModel) { list in
+                            HStack {
+                                Text(list.name)
+                                Spacer()
+                                if isEdit {
+                                    Text("編集中")
                                 }
-                            ))
-                            .labelsHidden()
+                                if isOn {
+                                    Text("共有中")
+                                }
+                            }
                         }
                     } // List
+                    .listStyle(.inset)
                 }
-                .listStyle(.inset)
             }
             .padding(.horizontal)
         }
