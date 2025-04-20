@@ -247,7 +247,7 @@ struct ItemListView: View {
             }
             .background(colorScheme == .dark ? Color.gray : Color.white)
             .cornerRadius(10)
-            .frame(height: 130)
+            .frame(height: 110)
             .shadow(radius: 3)
             .padding()
         } // VStack

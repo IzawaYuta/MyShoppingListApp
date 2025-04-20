@@ -45,7 +45,6 @@ struct CustomAlertView: View {
                             .resizable()
                             .frame(width: 25, height: 25)
                         Button("キャンセル", role: .cancel) {
-                            onCancel()
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -53,20 +52,26 @@ struct CustomAlertView: View {
                     .background(Color.gray.opacity(0.2))
                     .foregroundColor(Color.black)
                     .cornerRadius(15)
+                    .onTapGesture {
+                        onCancel()
+                    }
                     Spacer()
                     HStack(spacing: 5) {
                         Image(systemName: "checkmark")
                             .resizable()
                             .frame(width: 10, height: 10)
-                        Button("追加") {
-                            onAdd()
-                        }
+                        Text("追加")
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(newText.isEmpty ? Color.gray : Color.pink.opacity(0.5))
                     .foregroundColor(Color.black)
                     .cornerRadius(15)
+                    .onTapGesture { // ボタンの判定範囲を広げる
+                        if !newText.isEmpty {
+                            onAdd()
+                        }
+                    }
                     .disabled(newText.isEmpty)
                 }
                 .padding(.horizontal)

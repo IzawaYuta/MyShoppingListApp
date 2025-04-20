@@ -91,7 +91,7 @@ struct RegularListView: View {
                 .disabled(newRegularItemName.isEmpty)
             }
             .background(Color.white)
-            .frame(height: 80)
+            .frame(height: 100)
             .cornerRadius(10)
             .shadow(radius: 3)
             .padding()
