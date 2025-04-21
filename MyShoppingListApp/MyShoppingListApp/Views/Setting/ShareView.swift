@@ -8,10 +8,6 @@
 import SwiftUI
 import RealmSwift
 
-enum NavigationTarget: Hashable {
-    case setting
-}
-
 struct ShareView: View {
     
     @ObservedResults(CategoryListModel.self) var categoryListModel
@@ -20,6 +16,11 @@ struct ShareView: View {
     
     @State private var nickname: String = "" // ローカルの状態で保持
     @ObservedResults(Nickname.self) private var nicknames // Realmのデータを監視
+    
+    @State private var tutorialStep: Int = 0
+    @State private var showTutorial: Bool = true
+    @State private var ok = false
+    @State private var back = false
     
     private func navigateToSettings() {
         let keyWindow = UIApplication.shared.connectedScenes
@@ -33,64 +34,95 @@ struct ShareView: View {
         if nicknames.first?.nickname?.isEmpty ?? true {
             Text("共有をする場合は、\nニックネームを設定してください")
         } else {
-            VStack(alignment: .trailing) {
-                Button(action: {
-                    isEdit.toggle()
-                }) {
-                    Text("編集")
-                }
-                .padding(.horizontal, 40)
-                VStack(spacing: 50) {
-                    ZStack {
-                        // 背景のRoundedRectangle
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.white)
-                            .shadow(color: .gray.opacity(0.5), radius: 5)
-                            .frame(width: 420, height: 140) // 高さを少し広げる
-                            .padding()
-                        
-                        // 説明文テキスト
-                        VStack(alignment: .leading, spacing: 10) { // 縦方向に余白を追加
-                            Text("共有をONにすると共同編集が有効になります。")
-                                .font(.system(size: 14, weight: .semibold)) // 少し強調
-                            Text("共有を有効にする場合は、ニックネームの設定が必要です。")
-                                .font(.system(size: 12))
-                            Text("共有する前に、相手がアプリをインストールしていることを確認してください。")
-                                .font(.system(size: 12))
-                            Text("共有先のデバイスにアプリがインストールされていないと、正常にリストが共有されません。")
-                                .font(.system(size: 12))
-                        }
-                        .foregroundColor(.black.opacity(0.8)) // テキストカラー
-                        .padding(.horizontal, 20) // 左右の余白を追加
-                        .padding(.vertical, 10) // 上下の余白を追加
-                        .frame(maxWidth: .infinity, alignment: .leading) // 左揃え
+            if showTutorial {
+                Spacer()
+                    if tutorialStep == 0 {
+                        Text("共有を有効にすると、") +
+                        Text("共同編集")
+                            .foregroundColor(.red)
+                            .bold() +
+                        Text("が有効になります。")
+                    } else if tutorialStep == 1 {
+                        Text("共有をONにする場合、必ずニックネームを設定してください。\n相手のリストに表示されます。")
+                    } else if tutorialStep == 2 {
+                        Text("相手のデバイスにアプリがインストールされていますか？\nインストールされていない場合、共有機能は正しく動作しません。")
                     }
-                    List {
-                        ForEach(categoryListModel) { list in
-                            HStack {
-                                Text(list.name)
-                                Spacer()
-                                if isEdit {
-                                    Text("編集中")
-                                }
-                                if isOn {
-                                    Text("共有中")
+                Spacer()
+                    HStack(spacing: 100) {
+                        Button(action: {
+                            back.toggle()
+                            tutorialStep -= 1
+                        }) {
+                            Image(systemName: "arrow.left")
+                        }
+                        .font(.system(size: 40))
+                        .disabled(tutorialStep == 0)
+                        Button(action: {
+                            ok.toggle()
+                            tutorialStep += 1
+                            if tutorialStep > 2 {
+                                showTutorial = false
+                            }
+                        }) {
+                            Image(systemName: "checkmark")
+                        }
+                        .font(.system(size: 40))
+                        .foregroundColor(Color.pink.opacity(0.9))
+                    }
+                    .padding(.top, -300)
+//                }
+            } else {
+                VStack(alignment: .trailing) {
+                    HStack {
+                        Button(action: {
+                            isEdit.toggle()
+                        }) {
+                            Text("編集")
+                        }
+                        Button(action: {
+                            showTutorial = true
+                        }) {
+                            Image(systemName: "info.circle")
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                        List {
+                            ForEach(categoryListModel) { list in
+                                HStack {
+                                    Text(list.name)
+                                    Spacer()
+                                    if isEdit {
+                                        Text("編集中")
+                                    }
+                                    if isOn {
+                                        Text("共有中")
+                                    }
                                 }
                             }
-                        }
-                    } // List
-                    .listStyle(.inset)
-                }
+                        } // List
+                        .listStyle(.inset)
+                    }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
-    }
-    
-    private func shareList() {
-        
     }
 }
 
 #Preview {
     ShareView()
 }
+
+//struct TutorialBubble: View {
+//    var text: String
+//    
+//    var body: some View {
+//        VStack {
+//            Text(text)
+//                .font(.body)
+//                .padding()
+//                .background(RoundedRectangle(cornerRadius: 10).fill(Color.white))
+//                .shadow(radius: 5)
+//        }
+//        .frame(maxWidth: 500)
+//    }
+//}

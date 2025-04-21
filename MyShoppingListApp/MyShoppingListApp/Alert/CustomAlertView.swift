@@ -44,8 +44,7 @@ struct CustomAlertView: View {
                         Image("xmark")
                             .resizable()
                             .frame(width: 25, height: 25)
-                        Button("キャンセル", role: .cancel) {
-                        }
+                        Text("キャンセル")
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
