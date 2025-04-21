@@ -25,6 +25,7 @@ class CategoryListModel: Object, Identifiable {
     @Persisted(primaryKey: true) var id: String = UUID().uuidString
     @Persisted var name: String = ""
     @Persisted var items = RealmSwift.List<Item>()
+    @Persisted var sortIndex: Int // 並び順を保持
     @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
     @Persisted var isOn: Bool = false
     
@@ -54,7 +55,10 @@ struct CategoryListView: View {
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var isModalPresented = false
-    @ObservedResults(CategoryListModel.self) var categoryListModel
+    @State private var editMode: EditMode = .inactive
+//    @ObservedResults(CategoryListModel.self) var categoryListModel
+    @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
+    var categoryListModel
     
     var body: some View {
         NavigationView {
@@ -81,8 +85,10 @@ struct CategoryListView: View {
                                 } ///HStack
                             }
                         }
+                        .onMove(perform: moveCategory)
                         .onDelete(perform: deleteCategory)
                     } // List
+                    .environment(\.editMode, $editMode)
                 }
             }
             .navigationTitle("カテゴリー")
@@ -112,14 +118,14 @@ struct CategoryListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    EditButton()
                     Button(action: {
-                        isModalPresented = true
+                        if editMode.isEditing {
+                            editMode = .inactive
+                        } else {
+                            editMode = .active
+                        }
                     }) {
-                        Text("リストを共有")
-                    }
-                    .sheet(isPresented: $isModalPresented) {
-                        ShareView()
+                        Text(editMode.isEditing ? "完了" : "編集")
                     }
                 }
                 //                }
@@ -144,6 +150,27 @@ struct CategoryListView: View {
         let realm = try! Realm()
         try! realm.write {
             $categoryListModel.remove(atOffsets: offsets)
+        }
+    }
+    
+    private func moveCategory(from source: IndexSet, to destination: Int) {
+        let realm = try! Realm()
+        
+        // thaw() を使ってフローズン状態を解除
+        guard let thawedCategories = categoryListModel.thaw() else {
+            print("Failed to thaw categories")
+            return
+        }
+        
+        // 並び替え用の一時配列を作成
+        var reorderedCategories = Array(thawedCategories)
+        reorderedCategories.move(fromOffsets: source, toOffset: destination)
+        
+        // Realm に書き込み
+        try! realm.write {
+            for (index, category) in reorderedCategories.enumerated() {
+                category.sortIndex = index
+            }
         }
     }
 }
@@ -216,7 +243,7 @@ struct ItemListView: View {
         } // VStack
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
-        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
+//        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
