@@ -41,7 +41,6 @@ struct RegularCategoryListView: View {
                 }
             }
             .navigationTitle("定期品リスト")
-//            .toolbar(.visible, for: .tabBar)
         }
     }
 }
@@ -103,7 +102,7 @@ struct RegularListView: View {
             }
             .background(colorScheme == .dark ? Color.gray : Color.white)
             .cornerRadius(10)
-            .frame(height: 110)
+            .frame(height: 165)
             .shadow(radius: 3)
             .padding()
         }
