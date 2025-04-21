@@ -11,10 +11,8 @@ import RealmSwift
 struct ShareView: View {
     
     @ObservedResults(CategoryListModel.self) var categoryListModel
-    @State private var isOn = false
-    @State private var isEdit = false
-    
     @State private var nickname: String = "" // ローカルの状態で保持
+    @State var select = false
     @ObservedResults(Nickname.self) private var nicknames // Realmのデータを監視
     
     @State private var tutorialStep: Int = 0
@@ -70,12 +68,11 @@ struct ShareView: View {
                         .foregroundColor(Color.pink.opacity(0.9))
                     }
                     .padding(.top, -300)
-//                }
             } else {
                 VStack(alignment: .trailing) {
                     HStack {
+                        ShareLink(item: "あ")
                         Button(action: {
-                            isEdit.toggle()
                         }) {
                             Text("編集")
                         }
@@ -91,12 +88,10 @@ struct ShareView: View {
                                 HStack {
                                     Text(list.name)
                                     Spacer()
-                                    if isEdit {
-                                        Text("編集中")
-                                    }
-                                    if isOn {
-                                        Text("共有中")
-                                    }
+                                    Image(systemName: select ? "circle.fill" : "circle")
+                                }
+                                .onTapGesture {
+                                    select.toggle()
                                 }
                             }
                         } // List

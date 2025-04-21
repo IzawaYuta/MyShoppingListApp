@@ -26,18 +26,18 @@ struct SettingView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("プロフィール") {
-                        HStack {
-                            Image(systemName: "person")
-                                .font(.system(size: 30))
-                            TextField("ニックネーム", text: $nickname)
-                                .onChange(of: nickname) { newValue in
-                                    saveNickname(newValue)
-                                }
-                                .font(.system(size: 20))
-                        }
-                    .frame(height: 60) // 縦幅を80ポイントに設定
-                }
+//                Section("プロフィール") {
+//                        HStack {
+//                            Image(systemName: "person")
+//                                .font(.system(size: 30))
+//                            TextField("ニックネーム", text: $nickname)
+//                                .onChange(of: nickname) { newValue in
+//                                    saveNickname(newValue)
+//                                }
+//                                .font(.system(size: 20))
+//                        }
+//                    .frame(height: 60) // 縦幅を80ポイントに設定
+//                }
                 Section("設定") {
                     HStack {
                         Text("外観モード")
@@ -52,9 +52,9 @@ struct SettingView: View {
                         .pickerStyle(.automatic)
                         .frame(height: 20) // 縦幅を80ポイントに設定
                     }
-                    NavigationLink(destination: ShareView()) {
-                        Text("共有設定")
-                    }
+//                    NavigationLink(destination: ShareView()) {
+//                        Text("共有設定")
+//                    }
                 }
                 Section("サポート") {
                     NavigationLink(destination: ContactUsView()) {
