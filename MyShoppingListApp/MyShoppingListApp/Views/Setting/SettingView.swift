@@ -57,9 +57,9 @@ struct SettingView: View {
                     }
                 }
                 Section("サポート") {
-                    Link("リンク", destination: URL(string: "https://www.google.com")!)
-
-                    Text("お問い合わせ")
+                    NavigationLink(destination: ContactUsView()) {
+                        Text("お問い合わせ")
+                    }
                     Text("プライバシーポリシー")
                     HStack {
                         Text("アプリバージョン")
@@ -75,8 +75,8 @@ struct SettingView: View {
                         requestReview()
                     }
                     .foregroundColor(Color.primary)
-                    Text("アプリを共有")
-//                    Link("アプリを共有", destination: URL(string: "")!)
+//                    Text("アプリを共有")
+////                    Link("アプリを共有", destination: URL(string: "")!)
                 }
             }
             .listStyle(.grouped)
