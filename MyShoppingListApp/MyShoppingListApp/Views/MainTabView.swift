@@ -90,12 +90,13 @@ struct MainTabView: View {
                     .padding(6)
                 }
                 .frame(height: 70)
-//                .background(.pink.opacity(0.2))
+                //                .background(.pink.opacity(0.2))
                 .background(
                     (colorScheme == .dark ? Color.white : Color.pink).opacity(0.2)
                 )
                 .cornerRadius(35)
                 .padding(.horizontal, 26)
+                
             }
         }
     }
@@ -134,7 +135,7 @@ extension MainTabView {
                     }
                 } else {
                     if isActive {
-                                            Color.pink.opacity(0.4)
+                        Color.pink.opacity(0.4)
                             .cornerRadius(30)
                             .offset(x: isActive ? 0 : 60)
                     }
