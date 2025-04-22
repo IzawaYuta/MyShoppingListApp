@@ -9,16 +9,17 @@ import SwiftUI
 import RealmSwift
 import StoreKit
 
-class Nickname: Object, Identifiable {
-    @Persisted(primaryKey: true) var id: String = UUID().uuidString
-    @Persisted var nickname: String?
-}
+//class Nickname: Object, Identifiable {
+//    @Persisted(primaryKey: true) var id: String = UUID().uuidString
+////    @Persisted var nickname: String?
+//}
 
 struct SettingView: View {
     
     @AppStorage(wrappedValue: 0, "appearanceMode") var appearanceMode
     @Environment(\.requestReview) var requestReview
-    @State private var nickname = ""
+//    @State private var nickname = ""
+    @State private var showMailSheet = false
     
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
@@ -60,6 +61,14 @@ struct SettingView: View {
                     NavigationLink(destination: ContactUsView()) {
                         Text("お問い合わせ")
                     }
+                    Button(action: {
+                        showMailSheet.toggle()
+                    }) {
+                        Text("あ")
+                    }
+                    .sheet(isPresented: $showMailSheet) {
+                        MailView(isShowing: $showMailSheet, name: "", email: "", message: "")
+                    }
                     Text("プライバシーポリシー")
                     HStack {
                         Text("アプリバージョン")
@@ -80,34 +89,34 @@ struct SettingView: View {
                 }
             }
             .listStyle(.grouped)
-            .onAppear {
-                loadNickname()
-            }
+//            .onAppear {
+//                loadNickname()
+//            }
         }
     }
     
-    private func saveNickname(_ newNickname: String) {
-        let realm = try! Realm()
-        if let existingNickname = realm.objects(Nickname.self).first {
-            try! realm.write {
-                existingNickname.nickname = newNickname
-            }
-        } else {
-            let nicknameObject = Nickname()
-            nicknameObject.nickname = newNickname
-            try! realm.write {
-                realm.add(nicknameObject)
-            }
-        }
-    }
+//    private func saveNickname(_ newNickname: String) {
+//        let realm = try! Realm()
+//        if let existingNickname = realm.objects(Nickname.self).first {
+//            try! realm.write {
+//                existingNickname.nickname = newNickname
+//            }
+//        } else {
+//            let nicknameObject = Nickname()
+//            nicknameObject.nickname = newNickname
+//            try! realm.write {
+//                realm.add(nicknameObject)
+//            }
+//        }
+//    }
     
-    // Realmからニックネームをロード
-    private func loadNickname() {
-        let realm = try! Realm()
-        if let existingNickname = realm.objects(Nickname.self).first {
-            nickname = existingNickname.nickname ?? ""
-        }
-    }
+//    // Realmからニックネームをロード
+//    private func loadNickname() {
+//        let realm = try! Realm()
+//        if let existingNickname = realm.objects(Nickname.self).first {
+//            nickname = existingNickname.nickname ?? ""
+//        }
+//    }
 }
 
 #Preview {

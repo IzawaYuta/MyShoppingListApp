@@ -39,6 +39,7 @@ struct ContactUsView: View {
                 Section {
                     Button(action: {
                         if isValidInput() {
+                            print("Message: \(message)") // Debug用
                             showMailSheet.toggle()
                         } else {
                             showAlert.toggle()
@@ -70,44 +71,44 @@ struct ContactUsView: View {
 import SwiftUI
 import MessageUI
 
-struct MailView: UIViewControllerRepresentable {
-    @Binding var isShowing: Bool
-    var name: String
-    var email: String
-    var message: String
-    
-    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        var parent: MailView
-        
-        init(parent: MailView) {
-            self.parent = parent
-        }
-        
-        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-            parent.isShowing = false
-            controller.dismiss(animated: true)
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(parent: self)
-    }
-    
-    func makeUIViewController(context: Context) -> MFMailComposeViewController {
-        let mailComposeVC = MFMailComposeViewController()
-        mailComposeVC.mailComposeDelegate = context.coordinator
-        mailComposeVC.setToRecipients(["yutaizw2512@icloud.com"])
-        mailComposeVC.setSubject("買い物リストアプリお問い合わせ") // メールの件名
-        mailComposeVC.setMessageBody(
-            """
-            お名前: \(name)
-            メールアドレス: \(email)
-            
-            お問い合わせ内容:
-            \(message)
-            """, isHTML: false)
-        return mailComposeVC
-    }
-    
-    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {}
-}
+//struct MailView: UIViewControllerRepresentable {
+//    @Binding var isShowing: Bool
+//    var name: String
+//    var email: String
+//    var message: String
+//    
+//    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+//        var parent: MailView
+//        
+//        init(parent: MailView) {
+//            self.parent = parent
+//        }
+//        
+//        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+//            parent.isShowing = false
+//            controller.dismiss(animated: true)
+//        }
+//    }
+//    
+//    func makeCoordinator() -> Coordinator {
+//        return Coordinator(parent: self)
+//    }
+//    
+//    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+//        let mailComposeVC = MFMailComposeViewController()
+//        mailComposeVC.mailComposeDelegate = context.coordinator
+//        mailComposeVC.setToRecipients(["yutaizw2512@icloud.com"])
+//        mailComposeVC.setSubject("買い物リストアプリお問い合わせ") // メールの件名
+//        mailComposeVC.setMessageBody(
+//            """
+//            お名前: \(name)
+//            メールアドレス: \(email)
+//            
+//            お問い合わせ内容:
+//            \(message)
+//            """, isHTML: false)
+//        return mailComposeVC
+//    }
+//    
+//    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {}
+//}
