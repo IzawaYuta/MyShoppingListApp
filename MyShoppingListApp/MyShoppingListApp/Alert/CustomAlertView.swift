@@ -26,8 +26,10 @@ struct CustomAlertView: View {
                     Image(systemName: "cart")
                         .resizable()
                         .frame(width: 20, height: 18)
+                        .foregroundColor(Color.black)
                     Text("カテゴリーを追加")
                         .font(.subheadline)
+                        .foregroundColor(Color.black)
                 }
                 .padding(.horizontal)
                 ZStack {
