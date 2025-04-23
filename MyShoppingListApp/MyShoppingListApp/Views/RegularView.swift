@@ -7,6 +7,7 @@
 
 import RealmSwift
 import SwiftUI
+import FirebaseAnalytics
 
 class RegularItem: Object, Identifiable {
     @Persisted(primaryKey: true) var id: UUID = UUID() // プライマリキーを明示
@@ -107,6 +108,12 @@ struct RegularListView: View {
             .padding()
         }
         .listStyle(PlainListStyle())
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+                AnalyticsParameterScreenName: "RegularListView",
+                AnalyticsParameterScreenClass: "RegularListView"
+            ])
+        }
         .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
         .toolbar(.hidden, for: .tabBar)
         .toolbar {

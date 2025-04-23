@@ -10,6 +10,7 @@
 		5A92D25F196D3B84C2A6302C /* Pods_MyShoppingListApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 919942BB48894B3A6BA973CE /* Pods_MyShoppingListApp.framework */; };
 		A634CF0A2DB27D620054C92B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A634CF092DB27D620054C92B /* FirebaseAuth */; };
 		A634CF0C2DB27D620054C92B /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = A634CF0B2DB27D620054C92B /* FirebaseCore */; };
+		A6FFAF142DB91F1600665645 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A6FFAF132DB91F1600665645 /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 			files = (
 				5A92D25F196D3B84C2A6302C /* Pods_MyShoppingListApp.framework in Frameworks */,
 				A634CF0C2DB27D620054C92B /* FirebaseCore in Frameworks */,
+				A6FFAF142DB91F1600665645 /* FirebaseAnalytics in Frameworks */,
 				A634CF0A2DB27D620054C92B /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -426,6 +428,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A634CF082DB27D620054C92B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		A6FFAF132DB91F1600665645 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

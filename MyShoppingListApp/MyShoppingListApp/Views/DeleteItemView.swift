@@ -7,6 +7,7 @@
 
 import SwiftUI
 import RealmSwift
+import FirebaseAnalytics
 
 class DeleteItemViewModel: Object, Identifiable {
     @Persisted var id: String = UUID().uuidString
@@ -43,6 +44,12 @@ struct DeleteItemView: View {
                         .contentShape(Rectangle())
                     }
                 } // List
+                .onAppear {
+                    Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+                        AnalyticsParameterScreenName: "DeleteListView",
+                        AnalyticsParameterScreenClass: "DeleteListView"
+                    ])
+                }
                 .navigationTitle("購入履歴")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {

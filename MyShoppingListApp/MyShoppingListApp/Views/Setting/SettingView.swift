@@ -8,6 +8,7 @@
 import SwiftUI
 import RealmSwift
 import StoreKit
+import FirebaseAnalytics
 
 //class Nickname: Object, Identifiable {
 //    @Persisted(primaryKey: true) var id: String = UUID().uuidString
@@ -58,18 +59,22 @@ struct SettingView: View {
 //                    }
                 }
                 Section("サポート") {
-                    NavigationLink(destination: ContactUsView()) {
-                        Text("お問い合わせ")
-                    }
-                    Button(action: {
-                        showMailSheet.toggle()
-                    }) {
-                        Text("あ")
-                    }
-                    .sheet(isPresented: $showMailSheet) {
-                        MailView(isShowing: $showMailSheet, name: "", email: "", message: "")
-                    }
-                    Text("プライバシーポリシー")
+//                    NavigationLink(destination: ContactUsView()) {
+//                        Text("お問い合わせ")
+//                    }
+//                    Button(action: {
+//                        showMailSheet.toggle()
+//                    }) {
+//                        Text("あ")
+//                    }
+//                    .sheet(isPresented: $showMailSheet) {
+//                        MailView(isShowing: $showMailSheet, name: "", email: "", message: "")
+                    //                    }
+                    Link("お問い合わせ", destination: URL(string: "https://shoppinglistsupport.wixsite.com/my-site-1")!)
+                        .foregroundColor(Color.primary)
+                    
+                    Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)
+                        .foregroundColor(Color.primary)
                     HStack {
                         Text("アプリバージョン")
                         Spacer()
@@ -89,6 +94,12 @@ struct SettingView: View {
                 }
             }
             .listStyle(.grouped)
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+                    AnalyticsParameterScreenName: "SettingView",
+                    AnalyticsParameterScreenClass: "SettingView"
+                ])
+            }
 //            .onAppear {
 //                loadNickname()
 //            }

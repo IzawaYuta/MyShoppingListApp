@@ -7,6 +7,8 @@
 
 import SwiftUI
 import RealmSwift
+import FirebaseAnalytics
+import FirebaseAnalytics
 
 // MARK: Item
 class Item: Object, Identifiable {
@@ -90,6 +92,12 @@ struct CategoryListView: View {
                     } // List
                     .environment(\.editMode, $editMode)
                 }
+            }
+            .onAppear {
+                Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+                    AnalyticsParameterScreenName: "CategoryListView",
+                    AnalyticsParameterScreenClass: "CategoryListView"
+                ])
             }
             .navigationTitle("カテゴリー")
             .toolbar(.visible, for:.tabBar)
@@ -241,6 +249,12 @@ struct ItemListView: View {
             .shadow(radius: 3)
             .padding()
         } // VStack
+        .onAppear {
+            Analytics.logEvent(AnalyticsEventScreenView, parameters: [
+                AnalyticsParameterScreenName: "ItemListView",
+                AnalyticsParameterScreenClass: "ItemListView"
+            ])
+        }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
 //        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
