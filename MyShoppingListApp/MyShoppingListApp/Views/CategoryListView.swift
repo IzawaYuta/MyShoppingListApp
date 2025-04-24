@@ -228,6 +228,7 @@ struct ItemListView: View {
                     .foregroundColor(Color.black)
                 Button(action: {
                     addShoppingList()
+                    buttonAnalytics()
                 }) {
                     if colorScheme == .dark {
                         Text("追加")
@@ -341,6 +342,12 @@ struct ItemListView: View {
                 }
             }
         }
+    }
+    
+    private func buttonAnalytics() {
+        Analytics.logEvent("button_tapped", parameters: [
+            "item_addButton": "item_addButton"
+        ])
     }
 }
 

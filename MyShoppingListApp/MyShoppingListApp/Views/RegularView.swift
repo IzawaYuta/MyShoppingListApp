@@ -221,6 +221,12 @@ struct RegularListView: View {
             }
         }
     }
+    
+    private func buttonAnalytics() {
+        Analytics.logEvent("button_tapped", parameters: [
+            "regular_arrow.up": "regular_arrow.up"
+        ])
+    }
 }
 
 #Preview {
