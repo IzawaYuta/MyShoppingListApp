@@ -88,7 +88,7 @@ struct DeleteItemView: View {
         let expiredItems = deleteItemViewModel.filter { item in
             guard let realmItem = item.thaw() else { return false } // 必要なら thaw
             let timeInterval = currentDate.timeIntervalSince(realmItem.date)
-            return timeInterval > (24 * 60 * 60)
+            return timeInterval > (30 * 24 * 60 * 60)
         }
         
         // 削除処理
