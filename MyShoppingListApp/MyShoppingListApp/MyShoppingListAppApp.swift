@@ -12,9 +12,9 @@ import FirebaseAuth
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-#if !DEBUG || !targetEnvironment(simulator)
+//#if !DEBUG || !targetEnvironment(simulator)
         FirebaseApp.configure()
-#endif
+//#endif
         return true
     }
 }

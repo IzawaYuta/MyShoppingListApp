@@ -90,6 +90,7 @@ struct SettingView: View {
                     }
                     .foregroundColor(Color.primary)
                     Link("アプリを共有", destination: URL(string: "https://apps.apple.com/jp/app/%E3%82%AB%E3%82%B4%E3%82%8A%E3%81%99%E3%81%A8/id6745005617?itscg=30200&itsct=apps_box_link&mttnsubad=6745005617")!)
+                        .foregroundColor(Color.primary)
                 }
             }
             .listStyle(.grouped)
