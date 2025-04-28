@@ -39,6 +39,10 @@ struct RegularCategoryListView: View {
                             }
                         }
                     }
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [.pink.opacity(0.1), .yellow.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
                 }
             }
             .navigationTitle("定期品リスト")
@@ -80,6 +84,10 @@ struct RegularListView: View {
                 }
                 .onDelete(perform: deleteItem)
             }
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.pink.opacity(0.1), .yellow.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
             HStack {
                 TextField("入力してください", text: $newRegularItemName)
                     .padding()
@@ -107,7 +115,7 @@ struct RegularListView: View {
             .shadow(radius: 3)
             .padding()
         }
-        .listStyle(PlainListStyle())
+//        .listStyle(PlainListStyle())
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                 AnalyticsParameterScreenName: "RegularListView",

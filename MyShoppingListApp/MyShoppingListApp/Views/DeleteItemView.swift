@@ -32,10 +32,9 @@ struct DeleteItemView: View {
                 Text("買ったものはありません")
             } else {
                 List {
-                    ForEach(deleteItemViewModel) { list in
+                    ForEach(deleteItemViewModel.sorted(by: { $0.date > $1.date })) { list in
                         HStack {
                                 Text(list.name)
-                                    .font(.headline)
                             Spacer()
                             Text(dateFormatter.string(from: list.date))
                                 .font(.subheadline)
@@ -44,6 +43,10 @@ struct DeleteItemView: View {
                         .contentShape(Rectangle())
                     }
                 } // List
+                .scrollContentBackground(.hidden)
+                .background(
+                    RadialGradient(gradient: Gradient(colors: [.brown.opacity(0.2), .indigo.opacity(0.2)]), center: .topLeading, startRadius: 10, endRadius: 900)
+                )
                 .onAppear {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                         AnalyticsParameterScreenName: "DeleteListView",
@@ -88,7 +91,7 @@ struct DeleteItemView: View {
         let expiredItems = deleteItemViewModel.filter { item in
             guard let realmItem = item.thaw() else { return false } // 必要なら thaw
             let timeInterval = currentDate.timeIntervalSince(realmItem.date)
-            return timeInterval > (24 * 60 * 60)
+            return timeInterval > (30 * 24 * 60 * 60)
         }
         
         // 削除処理

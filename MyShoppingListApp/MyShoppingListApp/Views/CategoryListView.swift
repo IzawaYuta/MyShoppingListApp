@@ -85,12 +85,17 @@ struct CategoryListView: View {
                                     Text("\(category.uncheckedItemCount)/\(category.itemCount)")
                                         .foregroundColor(.gray)
                                 } ///HStack
+                                .frame(height: 10)
                             }
                         }
                         .onMove(perform: moveCategory)
                         .onDelete(perform: deleteCategory)
                     } // List
                     .environment(\.editMode, $editMode)
+                    .scrollContentBackground(.hidden)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
                 }
             }
             .onAppear {
@@ -203,16 +208,17 @@ struct ItemListView: View {
                     HStack {
                         Image(systemName: item.isChecked ? "checkmark.square" : "square")
                             .foregroundStyle(item.isChecked ? .green : .red)
-                            .scaleEffect(item.isChecked ? 1.2 : 1.0)
+                            .scaleEffect(item.isChecked ? 0.7 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
                         
                         Text(item.name)
-//                            .foregroundStyle(item.isChecked ? Color.gray : Color.black)
+                            .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
                             .strikethrough(item.isChecked, color: .gray)
                             .animation(.easeOut, value: item.isChecked)
                         
                         Spacer()
                     }
+                    .frame(height: item.isChecked ? 5 : 20)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         withAnimation {
@@ -221,7 +227,11 @@ struct ItemListView: View {
                     }
                 }
             }
-            .listStyle(PlainListStyle())
+            .environment(\.defaultMinListRowHeight, 3)
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
             HStack {
                 TextField("入力してください", text: $newShoppingListTextField)
                     .padding()
