@@ -92,6 +92,10 @@ struct CategoryListView: View {
                         .onDelete(perform: deleteCategory)
                     } // List
                     .environment(\.editMode, $editMode)
+                    .scrollContentBackground(.hidden)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
                 }
             }
             .onAppear {
@@ -223,8 +227,11 @@ struct ItemListView: View {
                     }
                 }
             }
-                .environment(\.defaultMinListRowHeight, 3)
-            .listStyle(PlainListStyle())
+            .environment(\.defaultMinListRowHeight, 3)
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
             HStack {
                 TextField("入力してください", text: $newShoppingListTextField)
                     .padding()
