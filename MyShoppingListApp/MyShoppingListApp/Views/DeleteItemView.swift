@@ -32,10 +32,9 @@ struct DeleteItemView: View {
                 Text("買ったものはありません")
             } else {
                 List {
-                    ForEach(deleteItemViewModel) { list in
+                    ForEach(deleteItemViewModel.sorted(by: { $0.date > $1.date })) { list in
                         HStack {
                                 Text(list.name)
-                                    .font(.headline)
                             Spacer()
                             Text(dateFormatter.string(from: list.date))
                                 .font(.subheadline)
