@@ -70,7 +70,7 @@ struct SettingView: View {
 //                    .sheet(isPresented: $showMailSheet) {
 //                        MailView(isShowing: $showMailSheet, name: "", email: "", message: "")
                     //                    }
-                    Link("お問い合わせ", destination: URL(string: "https://shoppinglistsupport.wixsite.com/my-site-1")!)
+                    Link("お問い合わせ", destination: URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link")!)
                         .foregroundColor(Color.primary)
                     
                     Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)
@@ -85,10 +85,10 @@ struct SettingView: View {
                     }
                 }
                 Section("") {
-                    Button("レビュー") {
-                        requestReview()
-                    }
-                    .foregroundColor(Color.primary)
+//                    Button("レビュー") {
+//                        requestReview()
+//                    }
+//                    .foregroundColor(Color.primary)
                     Link("アプリを共有", destination: URL(string: "https://apps.apple.com/jp/app/%E3%82%AB%E3%82%B4%E3%82%8A%E3%81%99%E3%81%A8/id6745005617?itscg=30200&itsct=apps_box_link&mttnsubad=6745005617")!)
                         .foregroundColor(Color.primary)
                 }
