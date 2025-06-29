@@ -70,7 +70,7 @@ struct SettingView: View {
 //                    .sheet(isPresented: $showMailSheet) {
 //                        MailView(isShowing: $showMailSheet, name: "", email: "", message: "")
                     //                    }
-                    Link("お問い合わせ", destination: URL(string: "https://shoppinglistsupport.wixsite.com/my-site-1")!)
+                    Link("お問い合わせ", destination: URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link")!)
                         .foregroundColor(Color.primary)
                     
                     Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)

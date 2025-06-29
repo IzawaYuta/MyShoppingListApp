@@ -202,64 +202,89 @@ struct ItemListView: View {
     var categoryId: String
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            List {
-                ForEach(category.items) { item in
-                    HStack {
-                        Image(systemName: item.isChecked ? "checkmark.square" : "square")
-                            .foregroundStyle(item.isChecked ? .green : .red)
-                            .scaleEffect(item.isChecked ? 0.7 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
-                        
-                        Text(item.name)
-                            .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
-                            .strikethrough(item.isChecked, color: .gray)
-                            .animation(.easeOut, value: item.isChecked)
-                        
-                        Spacer()
-                    }
-                    .frame(height: item.isChecked ? 5 : 20)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation {
-                            toggleCheckState(for: item)
+//        ZStack {
+            VStack {
+                List {
+                    VStack {
+                        HStack {
+                            TextField("入力してください", text: $newShoppingListTextField)
+                            Button(action: {
+                                addShoppingList()
+                                buttonAnalytics()
+                            }) {
+                                if colorScheme == .dark {
+                                    Text("追加")
+                                        .padding()
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                                        .cornerRadius(8)
+                                } else {
+                                    Text("追加")
+                                        .padding()
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
+                                        .cornerRadius(8)
+                                }
+                            }
+                            .disabled(newShoppingListTextField.isEmpty)
+                        }
+                        ForEach(category.items) { item in
+                            HStack {
+                                Image(systemName: item.isChecked ? "checkmark.square" : "square")
+                                    .foregroundStyle(item.isChecked ? .green : .red)
+                                    .scaleEffect(item.isChecked ? 0.7 : 1.0)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
+                                
+                                Text(item.name)
+                                    .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
+                                    .strikethrough(item.isChecked, color: .gray)
+                                    .animation(.easeOut, value: item.isChecked)
+                                
+                                Spacer()
+                            }
+                            .frame(height: item.isChecked ? 5 : 20)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation {
+                                    toggleCheckState(for: item)
+                                }
+                            }
                         }
                     }
                 }
+                .environment(\.defaultMinListRowHeight, 3)
+                .scrollContentBackground(.hidden)
+                .background(
+                    LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+                
+//                HStack {
+//                    TextField("入力してください", text: $newShoppingListTextField)
+//                        .padding()
+//                        .foregroundColor(Color.black)
+//                    Button(action: {
+//                        addShoppingList()
+//                        buttonAnalytics()
+//                    }) {
+//                        if colorScheme == .dark {
+//                            Text("追加")
+//                                .padding()
+//                                .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
+//                                .cornerRadius(8)
+//                        } else {
+//                            Text("追加")
+//                                .padding()
+//                                .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
+//                                .cornerRadius(8)
+//                        }
+//                    }
+//                    .disabled(newShoppingListTextField.isEmpty)
+//                }
+//                .background(colorScheme == .dark ? Color.gray : Color.white)
+//                .cornerRadius(10)
+//                .frame(height: 70)
+//                .shadow(radius: 3)
+//                .padding()
             }
-            .environment(\.defaultMinListRowHeight, 3)
-            .scrollContentBackground(.hidden)
-            .background(
-                LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-            )
-            HStack {
-                TextField("入力してください", text: $newShoppingListTextField)
-                    .padding()
-                    .foregroundColor(Color.black)
-                Button(action: {
-                    addShoppingList()
-                    buttonAnalytics()
-                }) {
-                    if colorScheme == .dark {
-                        Text("追加")
-                            .padding()
-                            .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
-                            .cornerRadius(8)
-                    } else {
-                        Text("追加")
-                            .padding()
-                            .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
-                            .cornerRadius(8)
-                    }
-                }
-                .disabled(newShoppingListTextField.isEmpty)
-            }
-            .background(colorScheme == .dark ? Color.gray : Color.white)
-            .cornerRadius(10)
-            .frame(height: 70)
-            .shadow(radius: 3)
-            .padding()
-        } // VStack
+//        } // ZStack
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                 AnalyticsParameterScreenName: "ItemListView",

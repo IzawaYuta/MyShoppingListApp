@@ -68,52 +68,75 @@ struct RegularListView: View {
         
         ZStack(alignment: .bottom) {
             List {
-                ForEach(regularItemsArray, id: \.id) { list in
+                VStack {
                     HStack {
-                        Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
-                            .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
-                        Text(list.name)
-                        
-                        Spacer()
+                        TextField("入力してください", text: $newRegularItemName)
+                            .padding()
+                            .foregroundColor(Color.black)
+                        Button(action: {
+                            addItem()
+                        }) {
+                            if colorScheme == .dark {
+                                Text("追加")
+                                    .padding()
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                                    .cornerRadius(8)
+                            } else {
+                                Text("追加")
+                                    .padding()
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
+                                    .cornerRadius(8)
+                            }
+                        }
+                        .disabled(newRegularItemName.isEmpty)
                     }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        toggleSelection(for: list)
+                    ForEach(regularItemsArray, id: \.id) { list in
+                        HStack {
+                            Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
+                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
+                            Text(list.name)
+                            
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            toggleSelection(for: list)
+                        }
                     }
+                    .onDelete(perform: deleteItem)
                 }
-                .onDelete(perform: deleteItem)
             }
             .scrollContentBackground(.hidden)
             .background(
                 LinearGradient(gradient: Gradient(colors: [.pink.opacity(0.1), .yellow.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
             )
-            HStack {
-                TextField("入力してください", text: $newRegularItemName)
-                    .padding()
-                    .foregroundColor(Color.black)
-                Button(action: {
-                    addItem()
-                }) {
-                    if colorScheme == .dark {
-                        Text("追加")
-                            .padding()
-                            .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
-                            .cornerRadius(8)
-                    } else {
-                        Text("追加")
-                            .padding()
-                            .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
-                            .cornerRadius(8)
-                    }
-                }
-                .disabled(newRegularItemName.isEmpty)
-            }
-            .background(colorScheme == .dark ? Color.gray : Color.white)
-            .cornerRadius(10)
-            .frame(height: 165)
-            .shadow(radius: 3)
-            .padding()
+//            HStack {
+//                TextField("入力してください", text: $newRegularItemName)
+//                    .padding()
+//                    .foregroundColor(Color.black)
+//                Button(action: {
+//                    addItem()
+//                }) {
+//                    if colorScheme == .dark {
+//                        Text("追加")
+//                            .padding()
+//                            .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
+//                            .cornerRadius(8)
+//                    } else {
+//                        Text("追加")
+//                            .padding()
+//                            .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
+//                            .cornerRadius(8)
+//                    }
+//                }
+//                .disabled(newRegularItemName.isEmpty)
+//            }
+//            .background(colorScheme == .dark ? Color.gray : Color.white)
+//            .cornerRadius(10)
+//            .frame(height: 165)
+//            .shadow(radius: 3)
+//            .padding()
         }
 //        .listStyle(PlainListStyle())
         .onAppear {
