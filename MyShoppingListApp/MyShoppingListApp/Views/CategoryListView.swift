@@ -248,6 +248,7 @@ struct ItemListView: View {
                                 }
                             }
                         }
+                        .frame(height: 35)
                     }
                 }
                 .environment(\.defaultMinListRowHeight, 3)

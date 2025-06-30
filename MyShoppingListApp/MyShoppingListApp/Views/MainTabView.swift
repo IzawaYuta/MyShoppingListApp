@@ -54,94 +54,125 @@ enum TabBarItems: Int, CaseIterable {
     }
 }
 
-struct MainTabView: View {
-    
-    @State var selectedTab = 0
-    @StateObject private var keyboard = KeyboardResponder()
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        
-        ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
-                CategoryListView()
-                    .tag(0)
-                RegularCategoryListView()
-                    .tag(1)
-                DeleteItemView()
-                    .tag(2)
-                SettingView()
-                    .tag(3)
-            }
-            if !keyboard.isVisible {
-                ZStack {
-                    HStack {
-                        ForEach((TabBarItems.allCases), id: \.self) { item in
-                            Button{
-                                selectedTab = item.rawValue
-                            } label: {
-                                CustomTabItem(imageName: item.iconName,
-                                              title: item.title,
-                                              isActive: (selectedTab == item.rawValue),
-                                              iconSize: item.iconSize)
-                            }
-                        }
-                    }
-                    .padding(6)
-                }
-                .frame(height: 70)
-                //                .background(.pink.opacity(0.2))
-                .background(
-                    (colorScheme == .dark ? Color.white : Color.pink).opacity(0.2)
-                )
-                .cornerRadius(35)
-                .padding(.horizontal, 26)
-                
-            }
-        }
-    }
-}
+//struct MainTabView: View {
+//    
+//    @State var selectedTab = 0
+//    @StateObject private var keyboard = KeyboardResponder()
+//    @Environment(\.colorScheme) var colorScheme
+//    
+//    var body: some View {
+//        
+//        ZStack(alignment: .bottom) {
+//            TabView(selection: $selectedTab) {
+//                CategoryListView()
+//                    .tag(0)
+//                RegularCategoryListView()
+//                    .tag(1)
+//                DeleteItemView()
+//                    .tag(2)
+//                SettingView()
+//                    .tag(3)
+//            }
+//            if !keyboard.isVisible {
+//                ZStack {
+//                    HStack {
+//                        ForEach((TabBarItems.allCases), id: \.self) { item in
+//                            Button{
+//                                selectedTab = item.rawValue
+//                            } label: {
+//                                CustomTabItem(imageName: item.iconName,
+//                                              title: item.title,
+//                                              isActive: (selectedTab == item.rawValue),
+//                                              iconSize: item.iconSize)
+//                            }
+//                        }
+//                    }
+//                    .padding(6)
+//                }
+//                .frame(height: 70)
+//                //                .background(.pink.opacity(0.2))
+//                .background(
+//                    (colorScheme == .dark ? Color.white : Color.pink).opacity(0.2)
+//                )
+//                .cornerRadius(35)
+//                .padding(.horizontal, 26)
+//                
+//            }
+//        }
+//    }
+//}
+//
+//extension MainTabView {
+//    func CustomTabItem(imageName: String,
+//                       title: String,
+//                       isActive: Bool,
+//                       iconSize: CGSize
+//    ) -> some View {
+//        
+//        HStack(spacing: 10) {
+//            Spacer()
+//            Image(imageName)
+//                .resizable()
+//                .renderingMode(.template)
+//                .foregroundColor(isActive ? .black : .gray)
+//                .scaleEffect(1.2)
+//                .frame(width: iconSize.width, height: iconSize.height)
+//            if isActive {
+//                Text(title)
+//                    .font(.system(size: 14))
+//                    .foregroundColor(isActive ? .white : .gray)
+//            }
+//            Spacer()
+//        }
+//        .frame(width: isActive ? .infinity : 50, height: 60)
+//        .background(
+//            ZStack {
+//                if colorScheme == .dark {
+//                    if isActive {
+//                        Color(red: 0.7, green: 0.3, blue: 0.5)
+//                            .cornerRadius(30)
+//                            .offset(x: isActive ? 0 : 60)
+//                    }
+//                } else {
+//                    if isActive {
+//                        Color.pink.opacity(0.4)
+//                            .cornerRadius(30)
+//                            .offset(x: isActive ? 0 : 60)
+//                    }
+//                }
+//            }
+//        )
+//    }
+//}
 
-extension MainTabView {
-    func CustomTabItem(imageName: String,
-                       title: String,
-                       isActive: Bool,
-                       iconSize: CGSize
-    ) -> some View {
-        
-        HStack(spacing: 10) {
-            Spacer()
-            Image(imageName)
-                .resizable()
-                .renderingMode(.template)
-                .foregroundColor(isActive ? .black : .gray)
-                .scaleEffect(1.2)
-                .frame(width: iconSize.width, height: iconSize.height)
-            if isActive {
-                Text(title)
-                    .font(.system(size: 14))
-                    .foregroundColor(isActive ? .white : .gray)
-            }
-            Spacer()
-        }
-        .frame(width: isActive ? .infinity : 50, height: 60)
-        .background(
-            ZStack {
-                if colorScheme == .dark {
-                    if isActive {
-                        Color(red: 0.7, green: 0.3, blue: 0.5)
-                            .cornerRadius(30)
-                            .offset(x: isActive ? 0 : 60)
-                    }
-                } else {
-                    if isActive {
-                        Color.pink.opacity(0.4)
-                            .cornerRadius(30)
-                            .offset(x: isActive ? 0 : 60)
-                    }
+struct MainTabView: View {
+    var body: some View {
+        TabView{
+            CategoryListView()
+                .tabItem {
+                    Image(systemName: "checklist")
+//                        .resizable()
+//                        .frame(width: 1)
                 }
-            }
-        )
+            RegularCategoryListView()
+                .tabItem {
+                    Image(systemName: "pencil.and.list.clipboard")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                }
+            DeleteItemView()
+                .tabItem {
+                    Image(systemName: "trash")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+            SettingView()
+                .tabItem {
+                    Image(systemName: "gearshape")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                }
+        }
     }
 }
 

@@ -105,6 +105,7 @@ struct RegularListView: View {
                         }
                     }
                     .onDelete(perform: deleteItem)
+                    .frame(height: 35)
                 }
             }
             .scrollContentBackground(.hidden)
