@@ -166,12 +166,12 @@ struct MainTabView: View {
                         .resizable()
                         .frame(width: 30, height: 30)
                 }
-            SettingView()
-                .tabItem {
-                    Image(systemName: "gearshape")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                }
+//            SettingView()
+//                .tabItem {
+//                    Image(systemName: "gearshape")
+//                        .resizable()
+//                        .frame(width: 40, height: 40)
+//                }
         }
     }
 }

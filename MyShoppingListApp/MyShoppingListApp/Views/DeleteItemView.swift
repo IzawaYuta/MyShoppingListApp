@@ -45,7 +45,7 @@ struct DeleteItemView: View {
                 } // List
                 .scrollContentBackground(.hidden)
                 .background(
-                    RadialGradient(gradient: Gradient(colors: [.brown.opacity(0.2), .indigo.opacity(0.2)]), center: .topLeading, startRadius: 10, endRadius: 900)
+                    RadialGradient(gradient: Gradient(colors: [.deleteListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
                 )
                 .onAppear {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters: [

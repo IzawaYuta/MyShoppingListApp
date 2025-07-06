@@ -26,6 +26,8 @@ struct CustomAlertView: View {
                     Image(systemName: "cart")
                         .resizable()
                         .frame(width: 20, height: 18)
+//                        .frame(maxWidth: .infinity)
+//                        .frame(height: 18)
                         .foregroundColor(Color.black)
                     Text("カテゴリーを追加")
                         .font(.subheadline)
@@ -35,17 +37,22 @@ struct CustomAlertView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color.gray.opacity(0.1))
-                        .frame(width: 390, height: 50)
+//                        .frame(width: 390, height: 50)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
                     TextField("カテゴリー", text: $newText)
                         .frame(height: 50) // 高さを指定
                         .padding(.horizontal)
                         .focused($isFocused) // フォーカス状態を設定
                 }
+                .padding(.horizontal)
                 HStack(spacing: 10) {
                     HStack(spacing: -3) {
                         Image("xmark")
                             .resizable()
                             .frame(width: 25, height: 25)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 25)
                         Text("キャンセル")
                     }
                     .frame(maxWidth: .infinity)
@@ -61,6 +68,8 @@ struct CustomAlertView: View {
                         Image(systemName: "checkmark")
                             .resizable()
                             .frame(width: 10, height: 10)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 10)
                         Text("追加")
                     }
                     .frame(maxWidth: .infinity)
@@ -78,6 +87,7 @@ struct CustomAlertView: View {
                 .padding(.horizontal)
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {

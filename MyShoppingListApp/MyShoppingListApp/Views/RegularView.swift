@@ -21,7 +21,9 @@ class RegularItem: Object, Identifiable {
 
 // MARK: RegularCategoryListView
 struct RegularCategoryListView: View {
-    @ObservedResults(CategoryListModel.self) var categoryListModel
+    
+    @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
+    var categoryListModel
     
     var body: some View {
         NavigationStack {
@@ -41,7 +43,7 @@ struct RegularCategoryListView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .background(
-                        LinearGradient(gradient: Gradient(colors: [.pink.opacity(0.1), .yellow.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        RadialGradient(gradient: Gradient(colors: [.regularListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
                     )
                 }
             }
@@ -70,7 +72,7 @@ struct RegularListView: View {
             List {
                 VStack {
                     HStack {
-                        TextField("入力してください", text: $newRegularItemName)
+                        TextField("アイテム", text: $newRegularItemName)
                             .padding()
                             .foregroundColor(Color.black)
                         Button(action: {
@@ -110,7 +112,7 @@ struct RegularListView: View {
             }
             .scrollContentBackground(.hidden)
             .background(
-                LinearGradient(gradient: Gradient(colors: [.pink.opacity(0.1), .yellow.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                Color.regularListBack
             )
 //            HStack {
 //                TextField("入力してください", text: $newRegularItemName)
