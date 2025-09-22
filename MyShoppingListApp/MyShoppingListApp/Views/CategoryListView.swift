@@ -98,9 +98,9 @@ struct CategoryListView: View {
 //                        )
                 }
             }
-            .background(
-                RadialGradient(gradient: Gradient(colors: [.shoppingListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-            )
+//            .background(
+//                RadialGradient(gradient: Gradient(colors: [.shoppingListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
+//            )
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                     AnalyticsParameterScreenName: "CategoryListView",
@@ -270,9 +270,9 @@ struct ItemListView: View {
                 }
                 .environment(\.defaultMinListRowHeight, 3)
                 .scrollContentBackground(.hidden)
-                .background(
-                    Color.shoppingListBack
-                )
+//                .background(
+//                    Color.shoppingListBack
+//                )
                 
 //                HStack {
 //                    TextField("入力してください", text: $newShoppingListTextField)
