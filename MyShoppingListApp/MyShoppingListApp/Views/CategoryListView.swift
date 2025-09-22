@@ -247,7 +247,7 @@ struct ItemListView: View {
                         }
                         .padding(.horizontal)
                         .background(.gray.opacity(0.1))
-                        .overlay(                       // ← 枠線をつける
+                        .overlay(
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.black, lineWidth: 1)
                         )
@@ -257,17 +257,19 @@ struct ItemListView: View {
                             HStack {
                                 Image(systemName: item.isChecked ? "checkmark.square" : "square")
                                     .foregroundStyle(item.isChecked ? .green : .red)
-                                    .scaleEffect(item.isChecked ? 0.7 : 1.0)
+                                    .scaleEffect(item.isChecked ? 1.0 : 1.5)
                                     .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
-                                
+                                Spacer()
+                                    .frame(width: 15)
                                 Text(item.name)
+                                    .font(.system(size: 18))
                                     .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
                                     .strikethrough(item.isChecked, color: .gray)
                                     .animation(.easeOut, value: item.isChecked)
                                 
                                 Spacer()
                             }
-                            .frame(height: item.isChecked ? 5 : 20)
+                            .frame(height: item.isChecked ? 5 : 50)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 withAnimation {
@@ -275,7 +277,7 @@ struct ItemListView: View {
                                 }
                             }
                         }
-                        .frame(height: 35)
+                        .frame(height: 40)
                     }
                     .listRowBackground(Color.clear)
                 }
