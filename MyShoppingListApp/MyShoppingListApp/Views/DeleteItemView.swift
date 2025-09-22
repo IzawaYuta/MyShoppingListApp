@@ -32,18 +32,25 @@ struct DeleteItemView: View {
                 Text("買ったものはありません")
             } else {
                 List {
-                    ForEach(deleteItemViewModel.sorted(by: { $0.date > $1.date })) { list in
-                        HStack {
+                    Section {
+                        ForEach(deleteItemViewModel.sorted(by: { $0.date > $1.date })) { list in
+                            HStack {
                                 Text(list.name)
-                            Spacer()
-                            Text(dateFormatter.string(from: list.date))
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
+                                Spacer()
+                                Text(dateFormatter.string(from: list.date))
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
+                    } header: {
+                        HStack {
+                            Spacer()
+                            Text("履歴は30日後に削除されます")
+                        }
                     }
                 } // List
-                .scrollContentBackground(.hidden)
+//                .scrollContentBackground(.hidden)
 //                .background(
 //                    RadialGradient(gradient: Gradient(colors: [.deleteListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
 //                )
@@ -54,21 +61,21 @@ struct DeleteItemView: View {
                     ])
                 }
                 .navigationTitle("購入履歴")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: {
-                            showAlert = true
-                        }) {
-                            Image(systemName: "info.circle")
-                        }
-                        .alert("", isPresented: $showAlert) {
-                            Button("完了", role: .cancel) {}
-                        } message: {
-                            Text("購入履歴は30日後に削除されます")
-                        }
-
-                    }
-                }
+//                .toolbar {
+//                    ToolbarItem(placement: .topBarTrailing) {
+//                        Button(action: {
+//                            showAlert = true
+//                        }) {
+//                            Image(systemName: "info.circle")
+//                        }
+//                        .alert("", isPresented: $showAlert) {
+//                            Button("完了", role: .cancel) {}
+//                        } message: {
+//                            Text("購入履歴は30日後に削除されます")
+//                        }
+//
+//                    }
+//                }
                 .onAppear {
                     deleteExpiredItems()
                     // 1時間ごとに削除チェック
