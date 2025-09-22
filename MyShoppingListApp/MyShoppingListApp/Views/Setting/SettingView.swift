@@ -40,24 +40,24 @@ struct SettingView: View {
 //                        }
 //                    .frame(height: 60) // 縦幅を80ポイントに設定
 //                }
-                Section("") {
-                    HStack {
-                        Text("外観モード")
-                        Picker("", selection: $appearanceMode) {
-                            Text("システム")
-                                .tag(0)
-                            Text("ライト")
-                                .tag(1)
-                            Text("ダーク")
-                                .tag(2)
-                        }
-                        .pickerStyle(.automatic)
-                        .frame(height: 20) // 縦幅を80ポイントに設定
-                    }
-//                    NavigationLink(destination: ShareView()) {
-//                        Text("共有設定")
+//                Section("") {
+//                    HStack {
+//                        Text("外観モード")
+//                        Picker("", selection: $appearanceMode) {
+//                            Text("システム")
+//                                .tag(0)
+//                            Text("ライト")
+//                                .tag(1)
+//                            Text("ダーク")
+//                                .tag(2)
+//                        }
+//                        .pickerStyle(.automatic)
+//                        .frame(height: 20) // 縦幅を80ポイントに設定
 //                    }
-                }
+////                    NavigationLink(destination: ShareView()) {
+////                        Text("共有設定")
+////                    }
+//                }
                 Section("") {
 //                    NavigationLink(destination: ContactUsView()) {
 //                        Text("お問い合わせ")
@@ -93,7 +93,11 @@ struct SettingView: View {
                         .foregroundColor(Color.primary)
                 }
             }
+            .background(
+//                Color.customLight
+            )
             .listStyle(.grouped)
+            
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                     AnalyticsParameterScreenName: "SettingView",

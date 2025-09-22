@@ -93,11 +93,14 @@ struct CategoryListView: View {
                     } // List
                     .environment(\.editMode, $editMode)
                     .scrollContentBackground(.hidden)
-                        .background(
-                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
+//                        .background(
+//                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+//                        )
                 }
             }
+            .background(
+                RadialGradient(gradient: Gradient(colors: [.shoppingListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
+            )
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                     AnalyticsParameterScreenName: "CategoryListView",
@@ -108,28 +111,42 @@ struct CategoryListView: View {
             .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        isCategoryAdditionAlert.toggle()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                    
-                    .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
-                        CustomAlertView(
-                            newText: $newCategoryTextField,
-                            onAdd: {
-                                addCategory()
-                                isCategoryAdditionAlert = false
-                            },
-                            onCancel: {
-                                isCategoryAdditionAlert = false
-                                newCategoryTextField = ""
+                    HStack {
+                        Button(action: {
+                            isCategoryAdditionAlert.toggle()
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                        .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
+                            CustomAlertView(
+                                newText: $newCategoryTextField,
+                                onAdd: {
+                                    addCategory()
+                                    isCategoryAdditionAlert = false
+                                },
+                                onCancel: {
+                                    isCategoryAdditionAlert = false
+                                    newCategoryTextField = ""
+                                }
+
+                            )
+                            .offset(y: 120)
+                            .presentationBackground(Color.clear)
+                        }
+                        Menu {
+                            Button("お問い合わせ") {
+                                if let url = URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
-                        )
-                        .offset(y: 120)
-                        .presentationBackground(Color.clear)
+                            Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)
+                            Link("アプリを共有", destination: URL(string: "https://apps.apple.com/jp/app/%E3%82%AB%E3%82%B4%E3%82%8A%E3%81%99%E3%81%A8/id6745005617?itscg=30200&itsct=apps_box_link&mttnsubad=6745005617")!)
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
                     }
                 }
+
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
                         if editMode.isEditing {
@@ -207,7 +224,7 @@ struct ItemListView: View {
                 List {
                     VStack {
                         HStack {
-                            TextField("入力してください", text: $newShoppingListTextField)
+                            TextField("アイテム", text: $newShoppingListTextField)
                             Button(action: {
                                 addShoppingList()
                                 buttonAnalytics()
@@ -248,12 +265,13 @@ struct ItemListView: View {
                                 }
                             }
                         }
+                        .frame(height: 35)
                     }
                 }
                 .environment(\.defaultMinListRowHeight, 3)
                 .scrollContentBackground(.hidden)
                 .background(
-                    LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    Color.shoppingListBack
                 )
                 
 //                HStack {
