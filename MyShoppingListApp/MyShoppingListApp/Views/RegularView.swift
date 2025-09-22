@@ -73,20 +73,20 @@ struct RegularListView: View {
                 VStack {
                     HStack {
                         TextField("アイテム", text: $newRegularItemName)
-                            .padding()
-                            .foregroundColor(Color.black)
+//                            .padding()
+//                            .foregroundColor(Color.black)
                         Button(action: {
                             addItem()
                         }) {
                             if colorScheme == .dark {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.blue.opacity(0.5))
                                     .cornerRadius(8)
                             } else {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.blue)
                                     .cornerRadius(8)
                             }
                         }
@@ -106,7 +106,7 @@ struct RegularListView: View {
                                 .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
                             Text(list.name)
-                            
+                                .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
                             Spacer()
                         }
                         .contentShape(Rectangle())
@@ -157,19 +157,20 @@ struct RegularListView: View {
                 AnalyticsParameterScreenClass: "RegularListView"
             ])
         }
-        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
         .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
-                    if selectedItems == [] {
-                    } else {
+//                    if selectedItems == [] {
+//                    } else {
                         Button(action: {
                             saveSelectedItems()
                             isDone = true
                         }) {
                             Image(systemName: "arrow.up")
                         }
+                        .disabled(selectedItems.isEmpty)
                         .sheet(isPresented: $isDone) {
                             SuccessAlertView()
                                 .presentationDetents([.fraction(0.3)])
@@ -185,22 +186,22 @@ struct RegularListView: View {
                                 }
                             }
                         }
-                    }
+//                    }
                     Button(action: {
                         selectedAllItems.toggle()
                         selectAllItems()
                     }) {
-                        Image(systemName: selectedItems.count == (categoryListModel.regularItems.count) ? "xmark.circle" : "checkmark.circle")
+                        Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
                     }
                 } // HStack
             } // topBarTrailing
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                }
-            }
+//            ToolbarItem(placement: .navigationBarLeading) {
+//                Button(action: {
+//                    presentationMode.wrappedValue.dismiss()
+//                }) {
+//                    Image(systemName: "chevron.left")
+//                }
+//            }
         }
         .navigationTitle("\(categoryListModel.name) の定期品")
     }

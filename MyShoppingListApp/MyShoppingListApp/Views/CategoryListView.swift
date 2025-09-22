@@ -324,7 +324,7 @@ struct ItemListView: View {
             ])
         }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
 //        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -361,13 +361,13 @@ struct ItemListView: View {
                     }
                 }
             }
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                }
-            }
+//            ToolbarItem(placement: .navigationBarLeading) {
+//                Button(action: {
+//                    presentationMode.wrappedValue.dismiss()
+//                }) {
+//                    Image(systemName: "chevron.left")
+//                }
+//            }
         } // toolbar
     }
     
