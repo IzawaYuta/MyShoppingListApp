@@ -234,12 +234,12 @@ struct ItemListView: View {
                                 if colorScheme == .dark {
                                     Text("追加")
                                         .padding()
-                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.blue.opacity(0.5))
                                         .cornerRadius(8)
                                 } else {
                                     Text("追加")
                                         .padding()
-                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.blue)
                                         .cornerRadius(8)
                                 }
                             }
@@ -262,7 +262,7 @@ struct ItemListView: View {
                                 Spacer()
                                     .frame(width: 15)
                                 Text(item.name)
-                                    .font(.system(size: 18))
+                                    .font(.system(size: item.isChecked ? 17 : 20))
                                     .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
                                     .strikethrough(item.isChecked, color: .gray)
                                     .animation(.easeOut, value: item.isChecked)
