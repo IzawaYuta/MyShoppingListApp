@@ -92,7 +92,7 @@ struct CategoryListView: View {
                         .onDelete(perform: deleteCategory)
                     } // List
                     .environment(\.editMode, $editMode)
-                    .scrollContentBackground(.hidden)
+//                    .scrollContentBackground(.hidden)
 //                        .background(
 //                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
 //                        )
@@ -225,6 +225,8 @@ struct ItemListView: View {
                     VStack {
                         HStack {
                             TextField("アイテム", text: $newShoppingListTextField)
+//                                .frame(height: 1)
+//                                .background(.red)
                             Button(action: {
                                 addShoppingList()
                                 buttonAnalytics()
@@ -243,6 +245,14 @@ struct ItemListView: View {
                             }
                             .disabled(newShoppingListTextField.isEmpty)
                         }
+                        .padding(.horizontal)
+                        .background(.gray.opacity(0.1))
+                        .overlay(                       // ← 枠線をつける
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.black, lineWidth: 1)
+                        )
+                        .cornerRadius(8)
+                        Spacer()
                         ForEach(category.items) { item in
                             HStack {
                                 Image(systemName: item.isChecked ? "checkmark.square" : "square")
@@ -267,9 +277,11 @@ struct ItemListView: View {
                         }
                         .frame(height: 35)
                     }
+                    .listRowBackground(Color.clear)
                 }
                 .environment(\.defaultMinListRowHeight, 3)
-                .scrollContentBackground(.hidden)
+//                .scrollContentBackground(.hidden)
+//                .background(Color.gray)
 //                .background(
 //                    Color.shoppingListBack
 //                )
