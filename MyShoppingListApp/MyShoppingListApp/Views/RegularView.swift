@@ -41,7 +41,7 @@ struct RegularCategoryListView: View {
                             }
                         }
                     }
-                    .scrollContentBackground(.hidden)
+//                    .scrollContentBackground(.hidden)
 //                    .background(
 //                        RadialGradient(gradient: Gradient(colors: [.regularListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
 //                    )
@@ -92,10 +92,18 @@ struct RegularListView: View {
                         }
                         .disabled(newRegularItemName.isEmpty)
                     }
+                    .padding(.horizontal)
+                    .background(.gray.opacity(0.1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+                    .cornerRadius(8)
+                    Spacer()
                     ForEach(regularItemsArray, id: \.id) { list in
                         HStack {
                             Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
-                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 1.0)
+                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
                                 .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
                             Text(list.name)
                             
@@ -107,10 +115,11 @@ struct RegularListView: View {
                         }
                     }
                     .onDelete(perform: deleteItem)
-                    .frame(height: 35)
+                    .frame(height: 40)
                 }
+                .listRowBackground(Color.clear)
             }
-            .scrollContentBackground(.hidden)
+//            .scrollContentBackground(.hidden)
 //            .background(
 //                Color.regularListBack
 //            )
