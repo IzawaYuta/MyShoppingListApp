@@ -92,15 +92,15 @@ struct CategoryListView: View {
                         .onDelete(perform: deleteCategory)
                     } // List
                     .environment(\.editMode, $editMode)
-                    .scrollContentBackground(.hidden)
+//                    .scrollContentBackground(.hidden)
 //                        .background(
 //                            LinearGradient(gradient: Gradient(colors: [.cyan.opacity(0.15), .purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
 //                        )
                 }
             }
-            .background(
-                RadialGradient(gradient: Gradient(colors: [.shoppingListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-            )
+//            .background(
+//                RadialGradient(gradient: Gradient(colors: [.shoppingListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
+//            )
             .onAppear {
                 Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                     AnalyticsParameterScreenName: "CategoryListView",
@@ -225,6 +225,8 @@ struct ItemListView: View {
                     VStack {
                         HStack {
                             TextField("アイテム", text: $newShoppingListTextField)
+//                                .frame(height: 1)
+//                                .background(.red)
                             Button(action: {
                                 addShoppingList()
                                 buttonAnalytics()
@@ -232,25 +234,35 @@ struct ItemListView: View {
                                 if colorScheme == .dark {
                                     Text("追加")
                                         .padding()
-                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.pink.opacity(0.5))
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.white : Color.blue.opacity(0.5))
                                         .cornerRadius(8)
                                 } else {
                                     Text("追加")
                                         .padding()
-                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.pink)
+                                        .foregroundColor(newShoppingListTextField.isEmpty ? Color.gray : Color.blue)
                                         .cornerRadius(8)
                                 }
                             }
                             .disabled(newShoppingListTextField.isEmpty)
                         }
+                        .padding(.horizontal)
+                        .background(.gray.opacity(0.1))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.black, lineWidth: 1)
+                        )
+                        .cornerRadius(8)
+                        Spacer()
                         ForEach(category.items) { item in
                             HStack {
                                 Image(systemName: item.isChecked ? "checkmark.square" : "square")
                                     .foregroundStyle(item.isChecked ? .green : .red)
-                                    .scaleEffect(item.isChecked ? 0.7 : 1.0)
+                                    .scaleEffect(item.isChecked ? 1.0 : 1.5)
                                     .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: item.isChecked)
-                                
+                                Spacer()
+                                    .frame(width: 15)
                                 Text(item.name)
+                                    .font(.system(size: item.isChecked ? 17 : 20))
                                     .foregroundStyle(item.isChecked ? Color.gray : Color.primary)
                                     .strikethrough(item.isChecked, color: .gray)
                                     .animation(.easeOut, value: item.isChecked)
@@ -265,14 +277,16 @@ struct ItemListView: View {
                                 }
                             }
                         }
-                        .frame(height: 35)
+                        .frame(height: 40)
                     }
+                    .listRowBackground(Color.clear)
                 }
                 .environment(\.defaultMinListRowHeight, 3)
-                .scrollContentBackground(.hidden)
-                .background(
-                    Color.shoppingListBack
-                )
+//                .scrollContentBackground(.hidden)
+//                .background(Color.gray)
+//                .background(
+//                    Color.shoppingListBack
+//                )
                 
 //                HStack {
 //                    TextField("入力してください", text: $newShoppingListTextField)
@@ -310,7 +324,7 @@ struct ItemListView: View {
             ])
         }
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
+//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
 //        .toolbar(.hidden, for: .tabBar) // タブバーを非表示にする
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -347,13 +361,13 @@ struct ItemListView: View {
                     }
                 }
             }
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                }
-            }
+//            ToolbarItem(placement: .navigationBarLeading) {
+//                Button(action: {
+//                    presentationMode.wrappedValue.dismiss()
+//                }) {
+//                    Image(systemName: "chevron.left")
+//                }
+//            }
         } // toolbar
     }
     
