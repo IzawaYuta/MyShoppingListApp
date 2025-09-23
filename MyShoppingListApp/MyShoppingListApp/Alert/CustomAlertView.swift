@@ -74,7 +74,7 @@ struct CustomAlertView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(newText.isEmpty ? Color.gray : Color.pink.opacity(0.5))
+                    .background(newText.isEmpty ? Color.gray : Color.blue.opacity(0.5))
                     .foregroundColor(Color.black)
                     .cornerRadius(15)
                     .onTapGesture { // ボタンの判定範囲を広げる
