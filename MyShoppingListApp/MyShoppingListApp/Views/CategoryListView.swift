@@ -40,10 +40,22 @@ struct CategoryListView: View {
                                             .foregroundColor(.gray)
                                     }
                                     Spacer()
-                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
-                                        .foregroundColor(.gray)
+//                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
+//                                        .foregroundColor(.gray)
+                                    if (category.favorite) {
+                                        Image(systemName: "star.fill")
+                                            .foregroundColor(.yellow)
+                                    }
                                 } ///HStack
                                 .frame(height: 10)
+                                .swipeActions {
+                                    Button(action: {
+                                        changeFavorite(category)
+                                    }) {
+                                        Image(systemName: "star.fill")
+                                    }
+                                    .tint(category.favorite ? .yellow : .gray)
+                                }
                             }
                         }
                         .onMove(perform: moveCategory)
@@ -150,6 +162,15 @@ struct CategoryListView: View {
         try! realm.write {
             for (index, category) in reorderedCategories.enumerated() {
                 category.sortIndex = index
+            }
+        }
+    }
+    
+    private func changeFavorite(_ category: CategoryListModel) {
+        let realm = try! Realm()
+        if let thawed = category.thaw() {
+            try! realm.write {
+                thawed.favorite.toggle()
             }
         }
     }
