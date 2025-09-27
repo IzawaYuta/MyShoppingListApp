@@ -13,12 +13,22 @@ import FirebaseAnalytics
 // MARK: CategoryListView
 struct CategoryListView: View {
     
+    @AppStorage("showFavoritesOnly") private var showFavoritesOnly = false
+    
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var isModalPresented = false
     @State private var editMode: EditMode = .inactive
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
+    
+    var filteredCategories: [CategoryListModel] {
+        if showFavoritesOnly {
+            return categoryListModel.filter { $0.favorite }
+        } else {
+            return Array(categoryListModel)
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -30,7 +40,7 @@ struct CategoryListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
-                        ForEach(categoryListModel) { category in
+                        ForEach(filteredCategories) { category in
                             NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                                 HStack {
                                     Text(category.name)
@@ -70,7 +80,7 @@ struct CategoryListView: View {
                     AnalyticsParameterScreenClass: "CategoryListView"
                 ])
             }
-            .navigationTitle("カテゴリー")
+            .navigationTitle(showFavoritesOnly ? "カテゴリー(★)" :"カテゴリー")
             .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -111,14 +121,24 @@ struct CategoryListView: View {
                 }
                 
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        if editMode.isEditing {
-                            editMode = .inactive
-                        } else {
-                            editMode = .active
+                    Menu {
+                        Button(action: {
+                            showFavoritesOnly.toggle()
+                        }) {
+                            Text("お気に入り")
+                            Image(systemName: "star.fill")
                         }
-                    }) {
-                        Text(editMode.isEditing ? "完了" : "編集")
+                        Button(action: {
+                            if editMode.isEditing {
+                                editMode = .inactive
+                            } else {
+                                editMode = .active
+                            }
+                        }) {
+                            Text(editMode.isEditing ? "完了" : "編集")
+                        }
+                    } label: {
+                        Image(systemName: "arrow.up.arrow.down")
                     }
                 }
             }
