@@ -48,6 +48,7 @@ struct RegularCategoryListView: View {
                 }
             }
             .navigationTitle("定期品リスト")
+            .toolbarTitleDisplayMode(.inlineLarge)
         }
     }
 }

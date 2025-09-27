@@ -80,7 +80,8 @@ struct CategoryListView: View {
                     AnalyticsParameterScreenClass: "CategoryListView"
                 ])
             }
-            .navigationTitle(showFavoritesOnly ? "カテゴリー(★)" :"カテゴリー")
+            .navigationTitle(showFavoritesOnly ? "カテゴリー(★)" : "カテゴリー")
+            .toolbarTitleDisplayMode(.automatic)
             .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

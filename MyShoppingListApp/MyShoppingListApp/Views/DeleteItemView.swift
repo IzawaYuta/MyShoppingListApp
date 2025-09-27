@@ -75,6 +75,7 @@ struct DeleteItemView: View {
                     ])
                 }
                 .navigationTitle("購入履歴")
+                .toolbarTitleDisplayMode(.inlineLarge)
                 //                .toolbar {
                 //                    ToolbarItem(placement: .topBarTrailing) {
                 //                        Button(action: {
