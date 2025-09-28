@@ -19,6 +19,7 @@ struct CategoryListView: View {
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var isModalPresented = false
     @State private var editMode: EditMode = .inactive
+    @State private var showSupportAlert = false
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
     
@@ -108,15 +109,31 @@ struct CategoryListView: View {
                             .presentationBackground(Color.clear)
                         }
                         Menu {
+                            Button(action: {
+                                showSupportAlert = true
+                            }) {
+                                Text("サポート")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        .confirmationDialog("サポート", isPresented: $showSupportAlert) {
                             Button("お問い合わせ") {
                                 if let url = URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link") {
                                     UIApplication.shared.open(url)
                                 }
                             }
-                            Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)
-                            Link("アプリを共有", destination: URL(string: "https://apps.apple.com/jp/app/%E3%82%AB%E3%82%B4%E3%82%8A%E3%81%99%E3%81%A8/id6745005617?itscg=30200&itsct=apps_box_link&mttnsubad=6745005617")!)
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
+                            Button("プライバシーポリシー") {
+                                if let url = URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            Button("アプリを共有") {
+                                if let url = URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            Button("キャンセル", role: .cancel) {}
                         }
                     }
                 }
