@@ -41,13 +41,22 @@ struct RegularCategoryListView: View {
                             }
                         }
                     }
-//                    .scrollContentBackground(.hidden)
-//                    .background(
-//                        RadialGradient(gradient: Gradient(colors: [.regularListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-//                    )
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.brown.opacity(0.7), .clear, .brown.opacity(0.6)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .ignoresSafeArea()
+                    )
                 }
             }
             .navigationTitle("定期品リスト")
+            .toolbarTitleDisplayMode(.inlineLarge)
         }
     }
 }
@@ -81,12 +90,12 @@ struct RegularListView: View {
                             if colorScheme == .dark {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.blue.opacity(0.5))
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
                                     .cornerRadius(8)
                             } else {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.blue)
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
                                     .cornerRadius(8)
                             }
                         }
@@ -119,10 +128,11 @@ struct RegularListView: View {
                 }
                 .listRowBackground(Color.clear)
             }
-//            .scrollContentBackground(.hidden)
-//            .background(
-//                Color.regularListBack
-//            )
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.gray.opacity(0.3)
+                    .ignoresSafeArea()
+            )
 //            HStack {
 //                TextField("入力してください", text: $newRegularItemName)
 //                    .padding()
@@ -167,8 +177,10 @@ struct RegularListView: View {
                         Button(action: {
                             saveSelectedItems()
                             isDone = true
+                            selectedItems = []
                         }) {
                             Image(systemName: "arrow.up")
+                                .foregroundColor(.black)
                         }
                         .disabled(selectedItems.isEmpty)
                         .sheet(isPresented: $isDone) {
@@ -192,6 +204,7 @@ struct RegularListView: View {
                         selectAllItems()
                     }) {
                         Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
+                            .foregroundColor(.black)
                     }
                 } // HStack
             } // topBarTrailing

@@ -153,18 +153,21 @@ struct MainTabView: View {
                     Image(systemName: "checklist")
 //                        .resizable()
 //                        .frame(width: 1)
+                        .foregroundColor(.black)
                 }
             RegularCategoryListView()
                 .tabItem {
                     Image(systemName: "pencil.and.list.clipboard")
                         .resizable()
                         .frame(width: 20, height: 20)
+                        .foregroundColor(.black)
                 }
             DeleteItemView()
                 .tabItem {
                     Image(systemName: "trash")
                         .resizable()
                         .frame(width: 30, height: 30)
+                        .foregroundColor(.black)
                 }
 //            SettingView()
 //                .tabItem {
