@@ -108,15 +108,16 @@ struct CategoryListView: View {
                             .offset(y: 120)
                             .presentationBackground(Color.clear)
                         }
-                        Menu {
-                            Button(action: {
-                                showSupportAlert = true
-                            }) {
-                                Text("サポート")
-                            }
-                        } label: {
+                        //                        Menu {
+                        Button(action: {
+                            showSupportAlert = true
+                        }) {
                             Image(systemName: "ellipsis.circle")
                         }
+                        //                        } label: {
+                        //                            Image(systemName: "ellipsis.circle")
+                        //                        }
+                        
                         .confirmationDialog("サポート", isPresented: $showSupportAlert) {
                             Button("お問い合わせ") {
                                 if let url = URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link") {
@@ -128,11 +129,13 @@ struct CategoryListView: View {
                                     UIApplication.shared.open(url)
                                 }
                             }
-                            Button("アプリを共有") {
-                                if let url = URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617") {
-                                    UIApplication.shared.open(url)
-                                }
-                            }
+//                            Button("アプリを共有") {
+//                                if let url = URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617") {
+//                                    UIApplication.shared.open(url)
+//                                }
+//                            }
+                            //TODO: アプリ共有
+//                            ShareLink(item: URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617")!)
                             Button("キャンセル", role: .cancel) {}
                         }
                     }
