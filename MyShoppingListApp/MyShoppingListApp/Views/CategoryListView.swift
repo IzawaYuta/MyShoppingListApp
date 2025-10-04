@@ -142,25 +142,26 @@ struct CategoryListView: View {
                 }
                 
                 ToolbarItem(placement: .topBarLeading) {
-                    Menu {
+//                    Menu {
                         Button(action: {
                             showFavoritesOnly.toggle()
                         }) {
-                            Text("お気に入り")
-                            Image(systemName: "star.fill")
+//                            Text("お気に入り")
+                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
                         }
-                        Button(action: {
-                            if editMode.isEditing {
-                                editMode = .inactive
-                            } else {
-                                editMode = .active
-                            }
-                        }) {
-                            Text(editMode.isEditing ? "完了" : "編集")
-                        }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
-                    }
+//                        Button(action: {
+//                            if editMode.isEditing {
+//                                editMode = .inactive
+//                            } else {
+//                                editMode = .active
+//                            }
+//                        }) {
+//                            Text(editMode.isEditing ? "完了" : "編集")
+//                        }
+//                    } label: {
+//                        Image(systemName: "arrow.up.arrow.down")
+//                    }
                 }
             }
         } /// NavigationView
