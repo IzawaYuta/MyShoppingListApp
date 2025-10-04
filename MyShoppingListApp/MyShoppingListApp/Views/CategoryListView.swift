@@ -38,10 +38,27 @@ struct CategoryListView: View {
         NavigationView {
             VStack {
                 if categoryListModel.isEmpty {
-                    Text("カテゴリーを追加しましょう！\n食品\n日用品")
-                        .foregroundColor(.gray)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack(spacing: 6) {
+                        HStack(spacing: 0) {
+                            Text("カテゴリーを")
+                            Button(action: {
+                                isCategoryAdditionAlert.toggle() // 追加ボタンのアクション
+                            }) {
+                                Text("追加")
+                                    .foregroundColor(.blue.opacity(0.9))
+                            }
+                            Text("しましょう！")
+                        }
+                        Text("「食品」")
+                        Text("「日用品」")
+                        Text("・")
+                        Text("・")
+                        Text("・")
+                    }
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if showFavoritesOnly && filteredCategories.isEmpty {
                 // 「お気に入りだけ表示」のときに空だった場合
                 Text("「お気に入り」を追加してください。\nカテゴリーをスライドして追加できます。")
