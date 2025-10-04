@@ -41,10 +41,18 @@ struct RegularCategoryListView: View {
                             }
                         }
                     }
-//                    .scrollContentBackground(.hidden)
-//                    .background(
-//                        RadialGradient(gradient: Gradient(colors: [.regularListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-//                    )
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.brown.opacity(0.7), .clear, .brown.opacity(0.6)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .ignoresSafeArea()
+                    )
                 }
             }
             .navigationTitle("定期品リスト")
@@ -120,10 +128,11 @@ struct RegularListView: View {
                 }
                 .listRowBackground(Color.clear)
             }
-//            .scrollContentBackground(.hidden)
-//            .background(
-//                Color.regularListBack
-//            )
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.gray.opacity(0.3)
+                    .ignoresSafeArea()
+            )
 //            HStack {
 //                TextField("入力してください", text: $newRegularItemName)
 //                    .padding()

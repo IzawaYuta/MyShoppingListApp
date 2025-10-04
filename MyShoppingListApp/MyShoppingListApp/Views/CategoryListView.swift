@@ -342,6 +342,11 @@ struct ItemListView: View {
                 .listRowBackground(Color.clear)
             }
             .environment(\.defaultMinListRowHeight, 3)
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.gray.opacity(0.3)
+                    .ignoresSafeArea()
+            )
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters: [
