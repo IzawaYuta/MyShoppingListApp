@@ -90,12 +90,12 @@ struct RegularListView: View {
                             if colorScheme == .dark {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.blue.opacity(0.5))
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
                                     .cornerRadius(8)
                             } else {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.blue)
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
                                     .cornerRadius(8)
                             }
                         }
@@ -177,8 +177,10 @@ struct RegularListView: View {
                         Button(action: {
                             saveSelectedItems()
                             isDone = true
+                            selectedItems = []
                         }) {
                             Image(systemName: "arrow.up")
+                                .foregroundColor(.black)
                         }
                         .disabled(selectedItems.isEmpty)
                         .sheet(isPresented: $isDone) {
@@ -202,6 +204,7 @@ struct RegularListView: View {
                         selectAllItems()
                     }) {
                         Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
+                            .foregroundColor(.black)
                     }
                 } // HStack
             } // topBarTrailing
