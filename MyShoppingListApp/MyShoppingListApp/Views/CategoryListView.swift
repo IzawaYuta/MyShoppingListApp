@@ -139,6 +139,7 @@ struct CategoryListView: View {
                             isCategoryAdditionAlert.toggle()
                         }) {
                             Image(systemName: "plus")
+                                .foregroundColor(.black)
                         }
                         .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
                             CustomAlertView(
@@ -161,6 +162,7 @@ struct CategoryListView: View {
                             showSupportAlert = true
                         }) {
                             Image(systemName: "ellipsis.circle")
+                                .foregroundColor(.black)
                         }
                         //                        } label: {
                         //                            Image(systemName: "ellipsis.circle")
