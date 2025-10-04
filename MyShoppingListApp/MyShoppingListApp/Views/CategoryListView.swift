@@ -25,9 +25,6 @@ struct CategoryListView: View {
     
     var filteredCategories: [CategoryListModel] {
         if showFavoritesOnly {
-            if categoryListModel.filter { $0.favorite } .isEmpty {
-                Text("「お気に入り」を追加してください。\nカテゴリーの各リストをスライドして追加できます。")
-            }
             return categoryListModel.filter { $0.favorite }
         } else {
             return Array(categoryListModel)
@@ -66,21 +63,21 @@ struct CategoryListView: View {
                     .multilineTextAlignment(.center)
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                // 通常のリスト表示
-                List {
-                    ForEach(filteredCategories) { category in
-                        NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
-                            HStack {
-                                Text(category.name)
-                                if category.isOn {
-                                    Image(systemName: "person.2.fill")
-                                        .font(.system(size: 15))
-                                        .foregroundColor(.gray)
-                                }
+                } else {
+                    // 通常のリスト表示
+                    List {
+                        ForEach(filteredCategories) { category in
+                            NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
+                                HStack {
+                                    Text(category.name)
+                                    if category.isOn {
+                                        Image(systemName: "person.2.fill")
+                                            .font(.system(size: 15))
+                                            .foregroundColor(.gray)
+                                    }
                                     Spacer()
-//                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
-//                                        .foregroundColor(.gray)
+                                    //                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
+                                    //                                        .foregroundColor(.gray)
                                     if (category.favorite) {
                                         Image(systemName: "star.fill")
                                             .foregroundColor(.yellow)
@@ -108,10 +105,22 @@ struct CategoryListView: View {
                                 }
                             }
                         }
-//                        .onMove(perform: moveCategory)
+                        //                        .onMove(perform: moveCategory)
                         .onDelete(perform: deleteCategory)
                     } // List
-//                    .environment(\.editMode, $editMode)
+                    //                    .environment(\.editMode, $editMode)
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.black.opacity(0.5), .clear, .black.opacity(0.4)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .ignoresSafeArea()
+                    )
                 }
             }
             .onAppear {
