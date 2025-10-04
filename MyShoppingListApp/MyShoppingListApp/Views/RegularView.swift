@@ -157,7 +157,6 @@ struct RegularListView: View {
                                 .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
                             Spacer()
                         }
-                        .contentShape(Rectangle())
                         .onTapGesture {
                             toggleSelection(for: list)
                         }

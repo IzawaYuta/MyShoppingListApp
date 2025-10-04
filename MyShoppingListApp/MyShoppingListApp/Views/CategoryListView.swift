@@ -330,7 +330,6 @@ struct ItemListView: View {
                             Spacer()
                         }
                         .frame(height: item.isChecked ? 5 : 20)
-                        .contentShape(Rectangle())
                         .onTapGesture {
                             withAnimation {
                                 toggleCheckState(for: item)
