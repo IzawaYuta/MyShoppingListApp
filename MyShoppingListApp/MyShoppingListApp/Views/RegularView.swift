@@ -24,6 +24,15 @@ struct RegularCategoryListView: View {
     
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
+    @State private var showFavoritesOnly = false
+    
+    var filteredCategories: [CategoryListModel] {
+        if showFavoritesOnly {
+            return categoryListModel.filter { $0.favorite }
+        } else {
+            return Array(categoryListModel)
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -31,11 +40,18 @@ struct RegularCategoryListView: View {
                 // categoryListModelが空の場合
                 if categoryListModel.isEmpty {
                     Text("カテゴリーを追加しましょう！")
-                        .foregroundColor(.gray) // 文字色を指定することも可能
+                        .foregroundColor(.gray)
+                } else if showFavoritesOnly && filteredCategories.isEmpty {
+                    // 「お気に入りだけ表示」のときに空だった場合
+                    Text("カテゴリー画面でお気に入り登録をしてください")
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     // categoryListModelにデータがある場合
                     List {
-                        ForEach(categoryListModel) { category in
+                        ForEach(filteredCategories) { category in
                             NavigationLink(destination: RegularListView(categoryListModel: category)) {
                                 HStack {
                                     Text(category.name)
@@ -62,8 +78,24 @@ struct RegularCategoryListView: View {
                     )
                 }
             }
-            .navigationTitle("定期品リスト")
-            .toolbarTitleDisplayMode(.inlineLarge)
+            .navigationTitle("定期品")
+            .toolbarTitleDisplayMode(.automatic)
+            .toolbar(.visible, for: .tabBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        showFavoritesOnly.toggle()
+                    }) {
+//                        ZStack {
+//                            Circle()
+//                                .fill(Color.gray)
+//                                .frame(width: 33, height: 33)
+                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
+//                        }
+                    }
+                }
+            }
         }
     }
 }
