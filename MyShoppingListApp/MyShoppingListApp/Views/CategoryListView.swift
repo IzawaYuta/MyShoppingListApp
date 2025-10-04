@@ -25,6 +25,9 @@ struct CategoryListView: View {
     
     var filteredCategories: [CategoryListModel] {
         if showFavoritesOnly {
+            if categoryListModel.filter { $0.favorite } .isEmpty {
+                Text("「お気に入り」を追加してください。\nカテゴリーの各リストをスライドして追加できます。")
+            }
             return categoryListModel.filter { $0.favorite }
         } else {
             return Array(categoryListModel)
@@ -35,21 +38,29 @@ struct CategoryListView: View {
         NavigationView {
             VStack {
                 if categoryListModel.isEmpty {
-                    Text("カテゴリーを追加しましょう！")
+                    Text("カテゴリーを追加しましょう！\n食品\n日用品")
                         .foregroundColor(.gray)
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List {
-                        ForEach(filteredCategories) { category in
-                            NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
-                                HStack {
-                                    Text(category.name)
-                                    if category.isOn {
-                                        Image(systemName: "person.2.fill")
-                                            .font(.system(size: 15))
-                                            .foregroundColor(.gray)
-                                    }
+                } else if showFavoritesOnly && filteredCategories.isEmpty {
+                // 「お気に入りだけ表示」のときに空だった場合
+                Text("「お気に入り」を追加してください。\nカテゴリーをスライドして追加できます。")
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                // 通常のリスト表示
+                List {
+                    ForEach(filteredCategories) { category in
+                        NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
+                            HStack {
+                                Text(category.name)
+                                if category.isOn {
+                                    Image(systemName: "person.2.fill")
+                                        .font(.system(size: 15))
+                                        .foregroundColor(.gray)
+                                }
                                     Spacer()
 //                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
 //                                        .foregroundColor(.gray)
