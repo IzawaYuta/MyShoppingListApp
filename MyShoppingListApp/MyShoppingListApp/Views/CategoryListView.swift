@@ -70,20 +70,31 @@ struct CategoryListView: View {
                                     }
                                 } ///HStack
                                 .frame(height: 10)
-                                .swipeActions {
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button(action: {
                                         changeFavorite(category)
                                     }) {
                                         Image(systemName: "star.fill")
                                     }
                                     .tint(category.favorite ? .yellow : .gray)
+                                    
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                    // 削除
+                                    Button(role: .destructive) {
+                                        if let index = categoryListModel.firstIndex(of: category) {
+                                            deleteCategory(at: IndexSet(integer: index))
+                                        }
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
+                                    }
                                 }
                             }
                         }
-                        .onMove(perform: moveCategory)
+//                        .onMove(perform: moveCategory)
                         .onDelete(perform: deleteCategory)
                     } // List
-                    .environment(\.editMode, $editMode)
+//                    .environment(\.editMode, $editMode)
                 }
             }
             .onAppear {
