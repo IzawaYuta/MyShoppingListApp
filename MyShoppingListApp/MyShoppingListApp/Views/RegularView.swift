@@ -37,7 +37,14 @@ struct RegularCategoryListView: View {
                     List {
                         ForEach(categoryListModel) { category in
                             NavigationLink(destination: RegularListView(categoryListModel: category)) {
-                                Text(category.name)
+                                HStack {
+                                    Text(category.name)
+                                    Spacer()
+                                    if (category.favorite) {
+                                        Image(systemName: "star.fill")
+                                            .foregroundColor(.yellow)
+                                    }
+                                }
                             }
                         }
                     }
