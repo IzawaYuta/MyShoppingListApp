@@ -25,7 +25,10 @@ struct RegularCategoryListView: View {
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
     @State private var showFavoritesOnly = false
-    
+    @State private var selectedItems = Set<String>()
+//    @Environment(\.editMode) private var editMode
+    @State private var editMode: EditMode = .inactive
+
     var filteredCategories: [CategoryListModel] {
         if showFavoritesOnly {
             return categoryListModel.filter { $0.favorite }
@@ -39,7 +42,7 @@ struct RegularCategoryListView: View {
             VStack {
                 // categoryListModelが空の場合
                 if categoryListModel.isEmpty {
-                    Text("カテゴリーを追加しましょう！")
+                    Text("カテゴリーを追加しましょう")
                         .foregroundColor(.gray)
                 } else if showFavoritesOnly && filteredCategories.isEmpty {
                     // 「お気に入りだけ表示」のときに空だった場合
@@ -50,13 +53,15 @@ struct RegularCategoryListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     // categoryListModelにデータがある場合
-                    List {
-                        ForEach(filteredCategories) { category in
+                    List(filteredCategories, id: \.id, selection: $selectedItems) { category in
+                        if editMode == .active {
+                            Text(category.name)
+                        } else {
                             NavigationLink(destination: RegularListView(categoryListModel: category)) {
                                 HStack {
                                     Text(category.name)
                                     Spacer()
-                                    if (category.favorite) {
+                                    if category.favorite {
                                         Image(systemName: "star.fill")
                                             .foregroundColor(.yellow)
                                     }
@@ -64,6 +69,7 @@ struct RegularCategoryListView: View {
                             }
                         }
                     }
+                    .environment(\.editMode, $editMode)
                     .scrollContentBackground(.hidden)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
@@ -82,6 +88,20 @@ struct RegularCategoryListView: View {
             .toolbarTitleDisplayMode(.automatic)
             .toolbar(.visible, for: .tabBar)
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        if editMode == .active {
+                            // 🔸 編集モード終了時の任意処理
+                            handleFinishEditing()
+                            editMode = .inactive
+                        } else {
+                            // 🔸 編集モード開始時の任意処理
+                            editMode = .active
+                        }
+                    }) {
+                        Text(editMode == .active ? "完了" : "編集")
+                    }
+                }
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
                         showFavoritesOnly.toggle()
@@ -98,6 +118,29 @@ struct RegularCategoryListView: View {
             }
         }
     }
+    
+    private func toggleSelection(for item: RegularItem) {
+        if selectedItems.contains(item.id.uuidString) {
+            selectedItems.remove(item.id.uuidString)
+        } else {
+            selectedItems.insert(item.id.uuidString)
+        }
+    }
+    
+    private func handleFinishEditing() {
+        let realm = try! Realm()
+        
+        try! realm.write {
+            for frozenCategory in categoryListModel {
+                // thaw() で「解凍」したオブジェクトを取得
+                if let category = frozenCategory.thaw() {
+                    category.isDisplay = selectedItems.contains(category.id)
+                }
+            }
+        }
+        
+//        selectedItems.removeAll()
+    }
 }
 
 // MARK: RegularListView
@@ -105,7 +148,7 @@ struct RegularListView: View {
     @ObservedRealmObject var categoryListModel: CategoryListModel
     @State private var isAddingItem = false
     @State private var newRegularItemName = ""
-    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
+    @State private var selectedItems = Set<String>()
     @State private var selectedAllItems = false
     @State private var isDone = false
     @Environment(\.presentationMode) var presentationMode
