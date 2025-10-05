@@ -25,10 +25,8 @@ struct RegularCategoryListView: View {
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
     @State private var showFavoritesOnly = false
-    @State private var selectedItems = Set<String>()
-//    @Environment(\.editMode) private var editMode
-    @State private var editMode: EditMode = .inactive
-
+    @State private var isShowingDisplay = false
+    
     var filteredCategories: [CategoryListModel] {
         if showFavoritesOnly {
             return categoryListModel.filter { $0.favorite }
@@ -53,23 +51,18 @@ struct RegularCategoryListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     // categoryListModelにデータがある場合
-                    List(filteredCategories, id: \.id, selection: $selectedItems) { category in
-                        if editMode == .active {
-                            Text(category.name)
-                        } else {
-                            NavigationLink(destination: RegularListView(categoryListModel: category)) {
-                                HStack {
-                                    Text(category.name)
-                                    Spacer()
-                                    if category.favorite {
-                                        Image(systemName: "star.fill")
-                                            .foregroundColor(.yellow)
-                                    }
+                    List(filteredCategories, id: \.id) { category in
+                        NavigationLink(destination: RegularListView(categoryListModel: category)) {
+                            HStack {
+                                Text(category.name)
+                                Spacer()
+                                if category.favorite {
+                                    Image(systemName: "star.fill")
+                                        .foregroundColor(.yellow)
                                 }
                             }
                         }
                     }
-                    .environment(\.editMode, $editMode)
                     .scrollContentBackground(.hidden)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
@@ -90,56 +83,24 @@ struct RegularCategoryListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
-                        if editMode == .active {
-                            // 🔸 編集モード終了時の任意処理
-                            handleFinishEditing()
-                            editMode = .inactive
-                        } else {
-                            // 🔸 編集モード開始時の任意処理
-                            editMode = .active
-                        }
+                        isShowingDisplay = true
                     }) {
-                        Text(editMode == .active ? "完了" : "編集")
+                        Image(systemName: "plus")
+                    }
+                    .sheet(isPresented: $isShowingDisplay) {
+                        RegularIsDisplay(show: $isShowingDisplay)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
                         showFavoritesOnly.toggle()
                     }) {
-//                        ZStack {
-//                            Circle()
-//                                .fill(Color.gray)
-//                                .frame(width: 33, height: 33)
-                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
-                                .foregroundColor(.yellow)
-//                        }
+                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                            .foregroundColor(.yellow)
                     }
                 }
             }
         }
-    }
-    
-    private func toggleSelection(for item: RegularItem) {
-        if selectedItems.contains(item.id.uuidString) {
-            selectedItems.remove(item.id.uuidString)
-        } else {
-            selectedItems.insert(item.id.uuidString)
-        }
-    }
-    
-    private func handleFinishEditing() {
-        let realm = try! Realm()
-        
-        try! realm.write {
-            for frozenCategory in categoryListModel {
-                // thaw() で「解凍」したオブジェクトを取得
-                if let category = frozenCategory.thaw() {
-                    category.isDisplay = selectedItems.contains(category.id)
-                }
-            }
-        }
-        
-//        selectedItems.removeAll()
     }
 }
 

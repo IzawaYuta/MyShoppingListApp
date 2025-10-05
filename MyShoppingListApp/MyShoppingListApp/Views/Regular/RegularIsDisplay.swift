@@ -14,6 +14,7 @@ struct RegularIsDisplay: View {
     var categoryListModel
     
     @State private var select = Set<String>()
+    @Binding var show: Bool
     
     var body: some View {
         if categoryListModel.isEmpty {
@@ -41,6 +42,7 @@ struct RegularIsDisplay: View {
                 }
                 Button(action: {
                     save()
+                    show = false
                 }) {
                     Image(systemName: "plus")
                 }
@@ -70,5 +72,5 @@ struct RegularIsDisplay: View {
 }
 
 #Preview {
-    RegularIsDisplay()
+    RegularIsDisplay(show: .constant(true))
 }
