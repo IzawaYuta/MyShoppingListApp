@@ -31,7 +31,7 @@ struct RegularCategoryListView: View {
         if showFavoritesOnly {
             return categoryListModel.filter { $0.favorite }
         } else {
-            return Array(categoryListModel)
+            return Array(categoryListModel.filter { $0.isDisplay })
         }
     }
     
