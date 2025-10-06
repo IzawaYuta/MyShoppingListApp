@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseAuth
+import RealmSwift
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -22,6 +23,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct MyShoppingListAppApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    init() {
+        // Realm マイグレーション設定
+        let config = Realm.Configuration(
+            schemaVersion: 2, // ← モデルを変更したらここを +1 する
+            migrationBlock: { migration, oldSchemaVersion in
+                if oldSchemaVersion < 2 {
+                    // 必要に応じてマイグレーション処理を書く
+                    // 例: migration.renameProperty(onType: "OldModel", from: "oldName", to: "newName")
+                }
+            }
+        )
+        
+        // デフォルト設定を上書き
+        Realm.Configuration.defaultConfiguration = config
+        
+        // ✅ Realmのファイルパス確認（デバッグ用）
+        print("📂 Realm file path: \(Realm.Configuration.defaultConfiguration.fileURL!.path)")
+    }
     
     var body: some Scene {
         WindowGroup {
