@@ -85,20 +85,21 @@ struct RegularCategoryListView: View {
                     Button(action: {
                         isShowingDisplay = true
                     }) {
-                        Image(systemName: "plus")
+                        Text("編集")
+                            .foregroundColor(.black)
                     }
                     .sheet(isPresented: $isShowingDisplay) {
                         RegularIsDisplay(show: $isShowingDisplay)
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        showFavoritesOnly.toggle()
-                    }) {
-                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
-                            .foregroundColor(.yellow)
-                    }
-                }
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button(action: {
+//                        showFavoritesOnly.toggle()
+//                    }) {
+//                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+//                            .foregroundColor(.yellow)
+//                    }
+//                }
             }
         }
     }

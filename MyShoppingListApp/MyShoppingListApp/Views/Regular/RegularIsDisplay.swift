@@ -21,19 +21,23 @@ struct RegularIsDisplay: View {
             Text("カテゴリーを追加しましょう")
         } else {
             ZStack(alignment: .bottom) {
-                List(categoryListModel, id: \.id) { list in
-                    HStack {
-                        Image(systemName: select.contains(list.id) ? "circle.fill" : "circle")
-                        Text(list.name)
-                        Spacer()
-                        if list.favorite {
-                            Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
+                List {
+                    Section(header: Text("定期画面に表示するカテゴリーを選択してください")) {
+                        ForEach(categoryListModel, id: \.id) { list in
+                            HStack {
+                                Image(systemName: select.contains(list.id) ? "circle.fill" : "circle")
+                                Text(list.name)
+                                Spacer()
+                                if list.favorite {
+                                    Image(systemName: "star.fill")
+                                        .foregroundColor(.yellow)
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                toggleSelection(for: list.id)
+                            }
                         }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        toggleSelection(for: list.id)
                     }
                 }
                 .onAppear {
@@ -44,7 +48,13 @@ struct RegularIsDisplay: View {
                     save()
                     show = false
                 }) {
-                    Image(systemName: "plus")
+                    Text("完了")
+                        .foregroundColor(.black)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                 }
             }
         }
