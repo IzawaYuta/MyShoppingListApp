@@ -28,6 +28,8 @@ class CategoryListModel: Object, Identifiable {
     @Persisted var sortIndex: Int // 並び順を保持
     @Persisted var regularItems = RealmSwift.List<RegularItem>() // 定期品リスト
     @Persisted var isOn: Bool = false
+    @Persisted var favorite: Bool = false
+    @Persisted var isDisplay = false //リストの表示非表示
     
     convenience init(name: String, items: [String], regularItems : [String]) {
         self.init()

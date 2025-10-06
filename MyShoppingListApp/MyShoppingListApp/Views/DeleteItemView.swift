@@ -62,12 +62,19 @@ struct DeleteItemView: View {
                         }
                     }
                 }
-                
-                
-                //                .scrollContentBackground(.hidden)
-                //                .background(
-                //                    RadialGradient(gradient: Gradient(colors: [.deleteListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-                //                )
+                .scrollContentBackground(.hidden)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.red.opacity(0.2), .clear, .red.opacity(0.1)]),
+                                //                                    gradient: Gradient(colors: [.clear, .black.opacity(0.5), .clear]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .ignoresSafeArea()
+                )
                 .onAppear {
                     Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                         AnalyticsParameterScreenName: "DeleteListView",
@@ -75,6 +82,7 @@ struct DeleteItemView: View {
                     ])
                 }
                 .navigationTitle("購入履歴")
+                .toolbarTitleDisplayMode(.inlineLarge)
                 //                .toolbar {
                 //                    ToolbarItem(placement: .topBarTrailing) {
                 //                        Button(action: {

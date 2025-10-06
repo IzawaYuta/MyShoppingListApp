@@ -24,30 +24,83 @@ struct RegularCategoryListView: View {
     
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
+    @State private var showFavoritesOnly = false
+    @State private var isShowingDisplay = false
+    
+    var filteredCategories: [CategoryListModel] {
+        if showFavoritesOnly {
+            return categoryListModel.filter { $0.favorite }
+        } else {
+            return Array(categoryListModel.filter { $0.isDisplay })
+        }
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 // categoryListModelが空の場合
                 if categoryListModel.isEmpty {
-                    Text("カテゴリーを追加しましょう！")
-                        .foregroundColor(.gray) // 文字色を指定することも可能
+                    Text("カテゴリーを追加しましょう")
+                        .foregroundColor(.gray)
+                } else if showFavoritesOnly && filteredCategories.isEmpty {
+                    // 「お気に入りだけ表示」のときに空だった場合
+                    Text("カテゴリー画面でお気に入り登録をしてください")
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     // categoryListModelにデータがある場合
-                    List {
-                        ForEach(categoryListModel) { category in
-                            NavigationLink(destination: RegularListView(categoryListModel: category)) {
+                    List(filteredCategories, id: \.id) { category in
+                        NavigationLink(destination: RegularListView(categoryListModel: category)) {
+                            HStack {
                                 Text(category.name)
+                                Spacer()
+                                if category.favorite {
+                                    Image(systemName: "star.fill")
+                                        .foregroundColor(.yellow)
+                                }
                             }
                         }
                     }
-//                    .scrollContentBackground(.hidden)
-//                    .background(
-//                        RadialGradient(gradient: Gradient(colors: [.regularListBack, .white]), center: .top, startRadius: 300, endRadius: 500)
-//                    )
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.brown.opacity(0.7), .clear, .brown.opacity(0.6)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .ignoresSafeArea()
+                    )
                 }
             }
-            .navigationTitle("定期品リスト")
+            .navigationTitle("定期品")
+            .toolbarTitleDisplayMode(.automatic)
+            .toolbar(.visible, for: .tabBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        isShowingDisplay = true
+                    }) {
+                        Text("編集")
+                            .foregroundColor(.black)
+                    }
+                    .sheet(isPresented: $isShowingDisplay) {
+                        RegularIsDisplay(show: $isShowingDisplay)
+                    }
+                }
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button(action: {
+//                        showFavoritesOnly.toggle()
+//                    }) {
+//                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+//                            .foregroundColor(.yellow)
+//                    }
+//                }
+            }
         }
     }
 }
@@ -57,7 +110,7 @@ struct RegularListView: View {
     @ObservedRealmObject var categoryListModel: CategoryListModel
     @State private var isAddingItem = false
     @State private var newRegularItemName = ""
-    @State private var selectedItems = Set<String>() // 選択されたアイテムを追跡
+    @State private var selectedItems = Set<String>()
     @State private var selectedAllItems = false
     @State private var isDone = false
     @Environment(\.presentationMode) var presentationMode
@@ -81,12 +134,12 @@ struct RegularListView: View {
                             if colorScheme == .dark {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.blue.opacity(0.5))
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
                                     .cornerRadius(8)
                             } else {
                                 Text("追加")
                                     .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.blue)
+                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
                                     .cornerRadius(8)
                             }
                         }
@@ -109,7 +162,6 @@ struct RegularListView: View {
                                 .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
                             Spacer()
                         }
-                        .contentShape(Rectangle())
                         .onTapGesture {
                             toggleSelection(for: list)
                         }
@@ -119,10 +171,11 @@ struct RegularListView: View {
                 }
                 .listRowBackground(Color.clear)
             }
-//            .scrollContentBackground(.hidden)
-//            .background(
-//                Color.regularListBack
-//            )
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.gray.opacity(0.3)
+                    .ignoresSafeArea()
+            )
 //            HStack {
 //                TextField("入力してください", text: $newRegularItemName)
 //                    .padding()
@@ -167,8 +220,10 @@ struct RegularListView: View {
                         Button(action: {
                             saveSelectedItems()
                             isDone = true
+                            selectedItems = []
                         }) {
                             Image(systemName: "arrow.up")
+                                .foregroundColor(.black)
                         }
                         .disabled(selectedItems.isEmpty)
                         .sheet(isPresented: $isDone) {
@@ -192,6 +247,7 @@ struct RegularListView: View {
                         selectAllItems()
                     }) {
                         Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
+                            .foregroundColor(.black)
                     }
                 } // HStack
             } // topBarTrailing

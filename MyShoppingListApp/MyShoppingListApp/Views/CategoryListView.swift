@@ -13,24 +13,60 @@ import FirebaseAnalytics
 // MARK: CategoryListView
 struct CategoryListView: View {
     
+    @AppStorage("showFavoritesOnly") private var showFavoritesOnly = false
+    
     @State private var isCategoryAdditionAlert = false // カテゴリー追加アラート
     @State private var newCategoryTextField = "" // NEWカテゴリーTextField
     @State private var isModalPresented = false
     @State private var editMode: EditMode = .inactive
+    @State private var showSupportAlert = false
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
+    
+    var filteredCategories: [CategoryListModel] {
+        if showFavoritesOnly {
+            return categoryListModel.filter { $0.favorite }
+        } else {
+            return Array(categoryListModel)
+        }
+    }
     
     var body: some View {
         NavigationView {
             VStack {
                 if categoryListModel.isEmpty {
-                    Text("カテゴリーを追加しましょう！")
-                        .foregroundColor(.gray)
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack(spacing: 6) {
+                        HStack(spacing: 0) {
+                            Text("カテゴリーを")
+                            Button(action: {
+                                isCategoryAdditionAlert.toggle() // 追加ボタンのアクション
+                            }) {
+                                Text("追加")
+                                    .foregroundColor(.blue.opacity(0.9))
+                            }
+                            Text("しましょう！")
+                        }
+                        Text("「食品」")
+                        Text("「日用品」")
+                        Text("・")
+                        Text("・")
+                        Text("・")
+                    }
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if showFavoritesOnly && filteredCategories.isEmpty {
+                // 「お気に入りだけ表示」のときに空だった場合
+                Text("「お気に入り」を追加してください。\nカテゴリーをスライドして追加できます。")
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
+                    // 通常のリスト表示
                     List {
-                        ForEach(categoryListModel) { category in
+                        ForEach(filteredCategories) { category in
                             NavigationLink(destination: ItemListView(category: category, categoryId: category.id)) {
                                 HStack {
                                     Text(category.name)
@@ -40,16 +76,51 @@ struct CategoryListView: View {
                                             .foregroundColor(.gray)
                                     }
                                     Spacer()
-                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
-                                        .foregroundColor(.gray)
+                                    //                                    Text("\(category.uncheckedItemCount)/\(category.itemCount)")
+                                    //                                        .foregroundColor(.gray)
+                                    if (category.favorite) {
+                                        Image(systemName: "star.fill")
+                                            .foregroundColor(.yellow)
+                                    }
                                 } ///HStack
                                 .frame(height: 10)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(action: {
+                                        changeFavorite(category)
+                                    }) {
+                                        Image(systemName: "star.fill")
+                                    }
+                                    .tint(category.favorite ? .yellow : .gray)
+                                    
+                                }
+                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                    // 削除
+                                    Button(role: .destructive) {
+                                        if let index = categoryListModel.firstIndex(of: category) {
+                                            deleteCategory(at: IndexSet(integer: index))
+                                        }
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
-                        .onMove(perform: moveCategory)
+                        //                        .onMove(perform: moveCategory)
                         .onDelete(perform: deleteCategory)
                     } // List
-                    .environment(\.editMode, $editMode)
+                    //                    .environment(\.editMode, $editMode)
+                    .scrollContentBackground(.hidden)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.black.opacity(0.5), .clear, .black.opacity(0.4)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .ignoresSafeArea()
+                    )
                 }
             }
             .onAppear {
@@ -58,7 +129,8 @@ struct CategoryListView: View {
                     AnalyticsParameterScreenClass: "CategoryListView"
                 ])
             }
-            .navigationTitle("カテゴリー")
+            .navigationTitle(showFavoritesOnly ? "カテゴリー(★)" : "カテゴリー")
+            .toolbarTitleDisplayMode(.automatic)
             .toolbar(.visible, for:.tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -67,6 +139,7 @@ struct CategoryListView: View {
                             isCategoryAdditionAlert.toggle()
                         }) {
                             Image(systemName: "plus")
+                                .foregroundColor(.black)
                         }
                         .fullScreenCover(isPresented: $isCategoryAdditionAlert) {
                             CustomAlertView(
@@ -84,30 +157,61 @@ struct CategoryListView: View {
                             .offset(y: 120)
                             .presentationBackground(Color.clear)
                         }
-                        Menu {
+                        //                        Menu {
+                        Button(action: {
+                            showSupportAlert = true
+                        }) {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundColor(.black)
+                        }
+                        //                        } label: {
+                        //                            Image(systemName: "ellipsis.circle")
+                        //                        }
+                        
+                        .confirmationDialog("サポート", isPresented: $showSupportAlert) {
                             Button("お問い合わせ") {
                                 if let url = URL(string: "https://www.notion.so/21d95f7f1d1080949bf3e3603829544c?source=copy_link") {
                                     UIApplication.shared.open(url)
                                 }
                             }
-                            Link("プライバシーポリシー", destination: URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a")!)
-                            Link("アプリを共有", destination: URL(string: "https://apps.apple.com/jp/app/%E3%82%AB%E3%82%B4%E3%82%8A%E3%81%99%E3%81%A8/id6745005617?itscg=30200&itsct=apps_box_link&mttnsubad=6745005617")!)
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
+                            Button("プライバシーポリシー") {
+                                if let url = URL(string: "https://ten-emery-9f5.notion.site/1dc95f7f1d1080ceb0eae74b2ada2c5a") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+//                            Button("アプリを共有") {
+//                                if let url = URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617") {
+//                                    UIApplication.shared.open(url)
+//                                }
+//                            }
+                            //TODO: アプリ共有
+//                            ShareLink(item: URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617")!)
+                            Button("キャンセル", role: .cancel) {}
                         }
                     }
                 }
                 
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        if editMode.isEditing {
-                            editMode = .inactive
-                        } else {
-                            editMode = .active
+//                    Menu {
+                        Button(action: {
+                            showFavoritesOnly.toggle()
+                        }) {
+//                            Text("お気に入り")
+                            Image(systemName: showFavoritesOnly ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
                         }
-                    }) {
-                        Text(editMode.isEditing ? "完了" : "編集")
-                    }
+//                        Button(action: {
+//                            if editMode.isEditing {
+//                                editMode = .inactive
+//                            } else {
+//                                editMode = .active
+//                            }
+//                        }) {
+//                            Text(editMode.isEditing ? "完了" : "編集")
+//                        }
+//                    } label: {
+//                        Image(systemName: "arrow.up.arrow.down")
+//                    }
                 }
             }
         } /// NavigationView
@@ -150,6 +254,15 @@ struct CategoryListView: View {
         try! realm.write {
             for (index, category) in reorderedCategories.enumerated() {
                 category.sortIndex = index
+            }
+        }
+    }
+    
+    private func changeFavorite(_ category: CategoryListModel) {
+        let realm = try! Realm()
+        if let thawed = category.thaw() {
+            try! realm.write {
+                thawed.favorite.toggle()
             }
         }
     }
@@ -217,7 +330,6 @@ struct ItemListView: View {
                             Spacer()
                         }
                         .frame(height: item.isChecked ? 5 : 20)
-                        .contentShape(Rectangle())
                         .onTapGesture {
                             withAnimation {
                                 toggleCheckState(for: item)
@@ -229,6 +341,11 @@ struct ItemListView: View {
                 .listRowBackground(Color.clear)
             }
             .environment(\.defaultMinListRowHeight, 3)
+            .scrollContentBackground(.hidden)
+            .background(
+                Color.gray.opacity(0.3)
+                    .ignoresSafeArea()
+            )
         }
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters: [
