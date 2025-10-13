@@ -44,6 +44,9 @@ struct CustomAlertView: View {
                         .frame(height: 50) // 高さを指定
                         .padding(.horizontal)
                         .focused($isFocused) // フォーカス状態を設定
+                        .onSubmit {
+                            onCancel()
+                        }
                 }
                 .padding(.horizontal)
                 HStack(spacing: 10) {

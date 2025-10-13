@@ -217,7 +217,8 @@ struct RegularListView: View {
                         }
                     }
                     .onDelete(perform: deleteItem)
-                    .frame(height: 40)
+                    .frame(height: 30)
+                    .listRowSeparator(.hidden)
 //                }
                 .listRowBackground(Color.clear)
             }
@@ -244,7 +245,7 @@ struct RegularListView: View {
                         selectedItems = []
                     }) {
                         Image(systemName: "square.and.arrow.down")
-                            .foregroundColor(.black)
+                            .foregroundColor(selectedItems.isEmpty ? Color.clear : Color.black)
                     }
                     .disabled(selectedItems.isEmpty)
                     .sheet(isPresented: $isDone) {
@@ -263,28 +264,32 @@ struct RegularListView: View {
                         }
                     }
                     //                    }
-                    Button(action: {
-                        selectedAllItems.toggle()
-                        selectAllItems()
-                    }) {
-                        Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
-                            .foregroundColor(.black)
-                    }
-                    
                     Menu {
                         Button(action: {
                             showButton.toggle()
                         }) {
                             Text("追加")
                         }
+                        
+                        Button(action: {
+                            selectedAllItems.toggle()
+                            selectAllItems()
+                        }) {
+                            Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て選択")
+                                .foregroundColor(.black)
+                        }
+                        
                     } label: {
                         Image(systemName: "ellipsis")
                     }
                     .fullScreenCover(isPresented: $showButton) {
                     RegularItemAddAlert(
                         newRegularItemName: $newRegularItemName,
-                        onAdd: {showButton = false
-                        addItem()}
+                        onAdd: {
+                            addItem()},
+                        done: {
+                            showButton = false
+                        }
                     )
                     .offset(y: 230)
                     .presentationBackground(Color.clear)

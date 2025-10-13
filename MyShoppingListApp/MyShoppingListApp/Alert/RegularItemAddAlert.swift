@@ -10,51 +10,77 @@ import SwiftUI
 struct RegularItemAddAlert: View {
     
     @Binding var newRegularItemName: String
-    @FocusState private var isFocused: Bool // TextFieldのフォーカス状態を管理
+    @FocusState private var isFocused: Bool
     
     var onAdd: () -> Void
-        
+    var done: () -> Void
+    
     var body: some View {
-        HStack {
-            TextField("アイテム", text: $newRegularItemName)
-            //                            .padding()
-            //                            .foregroundColor(Color.black)
-                .focused($isFocused) // フォーカス状態を設定
-            Button(action: {
-//                addItem()
-//                showButton = false
-                onAdd()
-            }) {
-//                if colorScheme == .dark {
-//                    Text("追加")
-//                        .padding()
-//                        .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
-//                        .cornerRadius(8)
-//                } else {
+        HStack(spacing: 10) {
+            // 左側 HStack
+            HStack {
+                TextField("アイテム", text: $newRegularItemName)
+                    .focused($isFocused)
+                    .onSubmit {
+                        done()
+                        newRegularItemName = ""
+                    }
+                Button(action: {
+                    onAdd()
+                }) {
                     Text("追加")
-                        .padding()
+//                        .padding()
                         .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
                         .cornerRadius(8)
-//                }
+                }
+                .disabled(newRegularItemName.isEmpty)
             }
-            .disabled(newRegularItemName.isEmpty)
+            .padding(.horizontal)
+            .frame(maxHeight: .infinity) // 高さを親に合わせる
+            .background(.white)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.black, lineWidth: 1)
+            )
+            .cornerRadius(8)
+            .layoutPriority(1)
+            
+            // 右側 完了ボタン
+            Button(action: {
+                // 完了処理
+                done()
+                newRegularItemName = ""
+            }) {
+                Text("閉じる")
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .frame(width: UIScreen.main.bounds.width * 0.2)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .foregroundColor(.gray)
+            )
         }
+        .frame(height: 50) // 必要に応じて固定 or 自動調整
         .padding(.horizontal)
-        .background(.gray.opacity(0.1))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.black, lineWidth: 1)
-        )
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                 isFocused = true // 表示後にキーボードを表示
             }
         }
-        .cornerRadius(8)
-        .padding(.horizontal)
     }
 }
 
+// 高さを保持するためのPreferenceKey
+
+struct HeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+
 #Preview {
-    RegularItemAddAlert(newRegularItemName: .constant("あああ"), onAdd: {})
+    RegularItemAddAlert(newRegularItemName: .constant("あああ"), onAdd: {}, done: {})
 }
