@@ -110,8 +110,6 @@ struct RegularListView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     
-    private let text: [String] = ["あ", "い", "う", "え", "お"]
-    
     var body: some View {
         
         let regularItemsArray = Array(categoryListModel.regularItems)
@@ -199,7 +197,7 @@ struct RegularListView: View {
                             selectedAllItems.toggle()
                             selectAllItems()
                         }) {
-                            Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て選択")
+                            Text(selectedItems.count == (categoryListModel.regularItems.count) ? "選択解除" : "全て選択")
                                 .foregroundColor(.black)
                         }
                         
@@ -234,8 +232,6 @@ struct RegularListView: View {
             $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
         }
         newRegularItemName = ""
-        print("追加後のRegularItem: \(RegularItem())") // 正しいアイテムを表示
-        print("追加後のcategory: \($categoryListModel.regularItems)") // 正しいリストを表示
     }
     
     // 定期品削除メソッド
@@ -244,8 +240,6 @@ struct RegularListView: View {
         try! realm.write {
             $categoryListModel.regularItems.remove(atOffsets: offsets) // 同様に自動トランザクション
         }
-        print("削除後のRegularItem♥️♥️\(RegularItem())")
-        print("削除後のcategory♥️\($categoryListModel.regularItems)")
     }
     
     // チェック切り替え
