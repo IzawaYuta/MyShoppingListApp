@@ -92,14 +92,6 @@ struct RegularCategoryListView: View {
                         RegularIsDisplay(show: $isShowingDisplay)
                     }
                 }
-                //                ToolbarItem(placement: .topBarLeading) {
-                //                    Button(action: {
-                //                        showFavoritesOnly.toggle()
-                //                    }) {
-                //                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
-                //                            .foregroundColor(.yellow)
-                //                    }
-                //                }
             }
         }
     }
@@ -137,92 +129,25 @@ struct RegularListView: View {
         }()
         
         ZStack {
-//            Button(action: {
-//                
-//            }) {
-//                Image(systemName: "plus")
-//                    .foregroundColor(.black)
-//                    .padding()
-//                    .background(
-//                        RoundedRectangle(cornerRadius: 20)
-//                            .fill(Color.cyan)
-//                    )
-//                    .frame(width: 50, height: 50)
-//            }
-//            .padding()
-            //            VStack {
-            //                HStack {
-            //                    ForEach(text, id: \.self) { kana in
-            //                        Button(action: {
-            //                            if selectedKana == kana {
-            //                                selectedKana = nil
-            //                            } else {
-            //                                selectedKana = kana
-            //                            }
-            //                        }) {
-            //                            Text(kana)
-            //                                .font(.system(size: 15))
-            //                                .foregroundColor(.black)
-            //                                .padding()
-            //                                .background(
-            //                                    Circle()
-            //                                        .foregroundColor(selectedKana == kana ? .cyan.opacity(0.7) : .cyan.opacity(0.2))
-            //                                )
-            //                        }
-            //                        .buttonStyle(.plain)
-            //                    }
-            //                }
             List {
-//                VStack {
-//                    HStack {
-//                        TextField("アイテム", text: $newRegularItemName)
-//                        //                            .padding()
-//                        //                            .foregroundColor(Color.black)
-//                        Button(action: {
-//                            addItem()
-//                        }) {
-//                            if colorScheme == .dark {
-//                                Text("追加")
-//                                    .padding()
-//                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
-//                                    .cornerRadius(8)
-//                            } else {
-//                                Text("追加")
-//                                    .padding()
-//                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
-//                                    .cornerRadius(8)
-//                            }
-//                        }
-//                        .disabled(newRegularItemName.isEmpty)
-//                    }
-//                    .padding(.horizontal)
-//                    .background(.gray.opacity(0.1))
-//                    .overlay(
-//                        RoundedRectangle(cornerRadius: 8)
-//                            .stroke(Color.black, lineWidth: 1)
-//                    )
-//                    .cornerRadius(8)
-//                    Spacer()
-                    ForEach(filteredItems, id: \.id) { list in
-                        HStack {
-                            Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
-                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
-                            Text(list.name)
-                                .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
-                            Spacer()
-                        }
-                        .onTapGesture {
-                            toggleSelection(for: list)
-                        }
+                ForEach(filteredItems, id: \.id) { list in
+                    HStack {
+                        Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
+                            .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
+                        Text(list.name)
+                            .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
+                        Spacer()
                     }
-                    .onDelete(perform: deleteItem)
-                    .frame(height: 30)
-                    .listRowSeparator(.hidden)
-//                }
+                    .onTapGesture {
+                        toggleSelection(for: list)
+                    }
+                }
+                .onDelete(perform: deleteItem)
+                .frame(height: 30)
+                .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             }
-            //            }
             .scrollContentBackground(.hidden)
             .background(
                 Color.gray.opacity(0.3)
@@ -263,7 +188,6 @@ struct RegularListView: View {
                             }
                         }
                     }
-                    //                    }
                     Menu {
                         Button(action: {
                             showButton.toggle()
@@ -283,16 +207,16 @@ struct RegularListView: View {
                         Image(systemName: "ellipsis")
                     }
                     .fullScreenCover(isPresented: $showButton) {
-                    RegularItemAddAlert(
-                        newRegularItemName: $newRegularItemName,
-                        onAdd: {
-                            addItem()},
-                        done: {
-                            showButton = false
-                        }
-                    )
-                    .offset(y: 230)
-                    .presentationBackground(Color.clear)
+                        RegularItemAddAlert(
+                            newRegularItemName: $newRegularItemName,
+                            onAdd: {
+                                addItem()},
+                            done: {
+                                showButton = false
+                            }
+                        )
+                        .offset(y: 230)
+                        .presentationBackground(Color.clear)
                     }
                 } // HStack
             } // topBarTrailing

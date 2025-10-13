@@ -29,7 +29,6 @@ struct RegularItemAddAlert: View {
                     onAdd()
                 }) {
                     Text("追加")
-//                        .padding()
                         .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
                         .cornerRadius(8)
                 }
@@ -45,9 +44,7 @@ struct RegularItemAddAlert: View {
             .cornerRadius(8)
             .layoutPriority(1)
             
-            // 右側 完了ボタン
             Button(action: {
-                // 完了処理
                 done()
                 newRegularItemName = ""
             }) {
@@ -70,16 +67,6 @@ struct RegularItemAddAlert: View {
         }
     }
 }
-
-// 高さを保持するためのPreferenceKey
-
-struct HeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 
 #Preview {
     RegularItemAddAlert(newRegularItemName: .constant("あああ"), onAdd: {}, done: {})
