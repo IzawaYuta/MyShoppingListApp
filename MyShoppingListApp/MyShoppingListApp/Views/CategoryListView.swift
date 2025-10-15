@@ -154,7 +154,7 @@ struct CategoryListView: View {
                                 }
                                 
                             )
-                            .offset(y: 165)
+                            .offset(y: 135)
                             .presentationBackground(Color.clear)
                         }
                         //                        Menu {
