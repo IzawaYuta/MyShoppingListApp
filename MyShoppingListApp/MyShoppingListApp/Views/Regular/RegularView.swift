@@ -213,7 +213,7 @@ struct RegularListView: View {
                                 showButton = false
                             }
                         )
-                        .offset(y: 230)
+                        .offset(y: 210)
                         .presentationBackground(Color.clear)
                     }
                 } // HStack
