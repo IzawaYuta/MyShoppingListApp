@@ -92,14 +92,6 @@ struct RegularCategoryListView: View {
                         RegularIsDisplay(show: $isShowingDisplay)
                     }
                 }
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button(action: {
-//                        showFavoritesOnly.toggle()
-//                    }) {
-//                        Image(systemName: showFavoritesOnly ? "star.fill" : "star")
-//                            .foregroundColor(.yellow)
-//                    }
-//                }
             }
         }
     }
@@ -113,62 +105,45 @@ struct RegularListView: View {
     @State private var selectedItems = Set<String>()
     @State private var selectedAllItems = false
     @State private var isDone = false
+    @State private var showButton = false
+    @State private var selectedKana: String? = nil   // ← 選択中の「あ〜お」
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
-    
     
     var body: some View {
         
         let regularItemsArray = Array(categoryListModel.regularItems)
         
-        ZStack(alignment: .bottom) {
-            List {
-                VStack {
-                    HStack {
-                        TextField("アイテム", text: $newRegularItemName)
-//                            .padding()
-//                            .foregroundColor(Color.black)
-                        Button(action: {
-                            addItem()
-                        }) {
-                            if colorScheme == .dark {
-                                Text("追加")
-                                    .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.black.opacity(0.5))
-                                    .cornerRadius(8)
-                            } else {
-                                Text("追加")
-                                    .padding()
-                                    .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.black)
-                                    .cornerRadius(8)
-                            }
-                        }
-                        .disabled(newRegularItemName.isEmpty)
-                    }
-                    .padding(.horizontal)
-                    .background(.gray.opacity(0.1))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.black, lineWidth: 1)
-                    )
-                    .cornerRadius(8)
-                    Spacer()
-                    ForEach(regularItemsArray, id: \.id) { list in
-                        HStack {
-                            Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
-                                .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
-                            Text(list.name)
-                                .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
-                            Spacer()
-                        }
-                        .onTapGesture {
-                            toggleSelection(for: list)
-                        }
-                    }
-                    .onDelete(perform: deleteItem)
-                    .frame(height: 40)
+        // ✅ 選択中の文字でフィルタ
+        let filteredItems: [RegularItem] = {
+            if let kana = selectedKana {
+                return regularItemsArray.filter { item in
+                    guard let firstChar = item.name.first else { return false }
+                    return String(firstChar).hasPrefix(kana)
                 }
+            } else {
+                return regularItemsArray
+            }
+        }()
+        
+        ZStack {
+            List {
+                ForEach(filteredItems, id: \.id) { list in
+                    HStack {
+                        Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
+                            .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2), value: selectedItems)
+                        Text(list.name)
+                            .font(.system(size: selectedItems.contains(list.id.uuidString) ? 20 : 17))
+                        Spacer()
+                    }
+                    .onTapGesture {
+                        toggleSelection(for: list)
+                    }
+                }
+                .onDelete(perform: deleteItem)
+                .frame(height: 30)
+                .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
             }
             .scrollContentBackground(.hidden)
@@ -176,89 +151,75 @@ struct RegularListView: View {
                 Color.gray.opacity(0.3)
                     .ignoresSafeArea()
             )
-//            HStack {
-//                TextField("入力してください", text: $newRegularItemName)
-//                    .padding()
-//                    .foregroundColor(Color.black)
-//                Button(action: {
-//                    addItem()
-//                }) {
-//                    if colorScheme == .dark {
-//                        Text("追加")
-//                            .padding()
-//                            .foregroundColor(newRegularItemName.isEmpty ? Color.white : Color.pink.opacity(0.5))
-//                            .cornerRadius(8)
-//                    } else {
-//                        Text("追加")
-//                            .padding()
-//                            .foregroundColor(newRegularItemName.isEmpty ? Color.gray : Color.pink)
-//                            .cornerRadius(8)
-//                    }
-//                }
-//                .disabled(newRegularItemName.isEmpty)
-//            }
-//            .background(colorScheme == .dark ? Color.gray : Color.white)
-//            .cornerRadius(10)
-//            .frame(height: 165)
-//            .shadow(radius: 3)
-//            .padding()
         }
-//        .listStyle(PlainListStyle())
         .onAppear {
             Analytics.logEvent(AnalyticsEventScreenView, parameters: [
                 AnalyticsParameterScreenName: "RegularListView",
                 AnalyticsParameterScreenClass: "RegularListView"
             ])
         }
-//        .navigationBarBackButtonHidden(true) // デフォルトの戻るボタンを非表示
         .toolbar(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
-//                    if selectedItems == [] {
-//                    } else {
-                        Button(action: {
-                            saveSelectedItems()
-                            isDone = true
-                            selectedItems = []
-                        }) {
-                            Image(systemName: "arrow.up")
-                                .foregroundColor(.black)
-                        }
-                        .disabled(selectedItems.isEmpty)
-                        .sheet(isPresented: $isDone) {
-                            SuccessAlertView()
-                                .presentationDetents([.fraction(0.3)])
-                                .presentationBackground(.clear)
-                                .transition(.move(edge: .bottom))
-                        }
-                        .onChange(of: isDone) { newValue in
-                            if newValue {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                    withAnimation {
-                                        isDone = false
-                                    }
+                    Button(action: {
+                        saveSelectedItems()
+                        isDone = true
+                        selectedItems = []
+                    }) {
+                        Image(systemName: "square.and.arrow.down")
+                            .foregroundColor(selectedItems.isEmpty ? Color.clear : Color.black)
+                    }
+                    .disabled(selectedItems.isEmpty)
+                    .sheet(isPresented: $isDone) {
+                        SuccessAlertView()
+                            .presentationDetents([.fraction(0.3)])
+                            .presentationBackground(.clear)
+                            .transition(.move(edge: .bottom))
+                    }
+                    .onChange(of: isDone) { newValue in
+                        if newValue {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                withAnimation {
+                                    isDone = false
                                 }
                             }
                         }
-//                    }
-                    Button(action: {
-                        selectedAllItems.toggle()
-                        selectAllItems()
-                    }) {
-                        Text(selectedItems.count == (categoryListModel.regularItems.count) ? "解除" : "全て")
-                            .foregroundColor(.black)
+                    }
+                    Menu {
+                        Button(action: {
+                            showButton.toggle()
+                        }) {
+                            Text("追加")
+                        }
+                        
+                        Button(action: {
+                            selectedAllItems.toggle()
+                            selectAllItems()
+                        }) {
+                            Text(selectedItems.count == (categoryListModel.regularItems.count) ? "選択解除" : "全て選択")
+                                .foregroundColor(.black)
+                        }
+                        
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                    .fullScreenCover(isPresented: $showButton) {
+                        RegularItemAddAlert(
+                            newRegularItemName: $newRegularItemName,
+                            onAdd: {
+                                addItem()},
+                            done: {
+                                showButton = false
+                            }
+                        )
+                        .offset(y: 230)
+                        .presentationBackground(Color.clear)
                     }
                 } // HStack
             } // topBarTrailing
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button(action: {
-//                    presentationMode.wrappedValue.dismiss()
-//                }) {
-//                    Image(systemName: "chevron.left")
-//                }
-//            }
         }
+        .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("\(categoryListModel.name) の定期品")
     }
     
@@ -271,8 +232,6 @@ struct RegularListView: View {
             $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
         }
         newRegularItemName = ""
-        print("追加後のRegularItem: \(RegularItem())") // 正しいアイテムを表示
-        print("追加後のcategory: \($categoryListModel.regularItems)") // 正しいリストを表示
     }
     
     // 定期品削除メソッド
@@ -281,8 +240,6 @@ struct RegularListView: View {
         try! realm.write {
             $categoryListModel.regularItems.remove(atOffsets: offsets) // 同様に自動トランザクション
         }
-        print("削除後のRegularItem♥️♥️\(RegularItem())")
-        print("削除後のcategory♥️\($categoryListModel.regularItems)")
     }
     
     // チェック切り替え
