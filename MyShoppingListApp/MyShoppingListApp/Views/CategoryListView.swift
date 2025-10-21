@@ -343,7 +343,7 @@ struct ItemListView: View {
             .environment(\.defaultMinListRowHeight, 3)
             .scrollContentBackground(.hidden)
             .background(
-                Color.gray.opacity(0.3)
+                Color.white
                     .ignoresSafeArea()
             )
         }
