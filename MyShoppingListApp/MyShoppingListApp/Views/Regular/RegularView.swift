@@ -107,7 +107,9 @@ struct RegularListView: View {
     @State private var selectedItems = Set<String>()
     @State private var selectedAllItems = false
     @State private var isDone = false
-    @State private var showButton = false
+    @State private var showAddView = false
+    @State private var showDeleteView = false
+    @State private var firstSortItem = true
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     
@@ -116,6 +118,9 @@ struct RegularListView: View {
     var body: some View {
         
         let regularItemsArray = Array(categoryListModel.regularItems)
+            .sorted {
+                $0.furigana.compare($1.furigana, locale: Locale(identifier: "ja")) == .orderedAscending
+            }
         
         ZStack {
             List {
@@ -179,9 +184,15 @@ struct RegularListView: View {
                     }
                     Menu {
                         Button(action: {
-                            showButton.toggle()
+                            showAddView.toggle()
                         }) {
                             Text("追加")
+                        }
+                        
+                        Button(action: {
+                            showDeleteView.toggle()
+                        }) {
+                            Text("削除")
                         }
                         
                         Button(action: {
@@ -195,18 +206,21 @@ struct RegularListView: View {
                     } label: {
                         Image(systemName: "ellipsis")
                     }
-                    .fullScreenCover(isPresented: $showButton) {
+                    .fullScreenCover(isPresented: $showAddView) {
                         RegularItemAddAlert(
                             newRegularItemName: $newRegularItemName,
                             onAdd: {
                                 yahooAPI.furiganaWords = newRegularItemName
                                 addItem()},
                             done: {
-                                showButton = false
+                                showAddView = false
                             }
                         )
                         .offset(y: 210)
                         .presentationBackground(Color.clear)
+                    }
+                    .sheet(isPresented: $showDeleteView) {
+                        RegularItemDelete(categoryListModel: categoryListModel)
                     }
                 } // HStack
             } // topBarTrailing
@@ -269,8 +283,7 @@ struct RegularListView: View {
             }
         }
     }
-
-
+    
     // 定期品削除メソッド
     private func deleteItem(at offsets: IndexSet) {
         let realm = try! Realm()
