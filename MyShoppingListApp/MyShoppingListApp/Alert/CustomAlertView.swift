@@ -44,6 +44,14 @@ struct CustomAlertView: View {
                         .onSubmit {
                             onCancel()
                         }
+                        .onChange(of: newText) { newValue in
+                            // 空白を除去
+                            let filtered = newValue.replacingOccurrences(of: " ", with: "")
+                                .replacingOccurrences(of: "　", with: "") // 全角スペースも
+                            if filtered != newValue {
+                                newText = filtered
+                            }
+                        }
                 }
                 .padding(.horizontal)
                 HStack(spacing: 10) {

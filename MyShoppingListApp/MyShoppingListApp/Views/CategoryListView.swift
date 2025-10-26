@@ -287,6 +287,14 @@ struct ItemListView: View {
                 VStack {
                     HStack {
                         TextField("アイテム", text: $newShoppingListTextField)
+                            .onChange(of: newShoppingListTextField) { newValue in
+                                // 空白を除去
+                                let filtered = newValue.replacingOccurrences(of: " ", with: "")
+                                    .replacingOccurrences(of: "　", with: "") // 全角スペースも
+                                if filtered != newValue {
+                                    newShoppingListTextField = filtered
+                                }
+                            }
                         Button(action: {
                             addShoppingList()
                             buttonAnalytics()
