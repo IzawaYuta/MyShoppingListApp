@@ -12,10 +12,12 @@ import FirebaseAnalytics
 class RegularItem: Object, Identifiable {
     @Persisted(primaryKey: true) var id: UUID = UUID() // プライマリキーを明示
     @Persisted var name: String = ""
+    @Persisted var furigana: String = ""
     
-    convenience init(name: String) {
+    convenience init(name: String, furigana: String = "") {
         self.init()
         self.name = name
+        self.furigana = furigana
     }
 }
 
@@ -105,30 +107,24 @@ struct RegularListView: View {
     @State private var selectedItems = Set<String>()
     @State private var selectedAllItems = false
     @State private var isDone = false
-    @State private var showButton = false
-    @State private var selectedKana: String? = nil   // ← 選択中の「あ〜お」
+    @State private var showAddView = false
+    @State private var showDeleteView = false
+    @State private var firstSortItem = true
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
+    
+    @StateObject private var yahooAPI = YahooFuriganaAPI()
     
     var body: some View {
         
         let regularItemsArray = Array(categoryListModel.regularItems)
-        
-        // ✅ 選択中の文字でフィルタ
-        let filteredItems: [RegularItem] = {
-            if let kana = selectedKana {
-                return regularItemsArray.filter { item in
-                    guard let firstChar = item.name.first else { return false }
-                    return String(firstChar).hasPrefix(kana)
-                }
-            } else {
-                return regularItemsArray
+            .sorted {
+                $0.furigana.compare($1.furigana, locale: Locale(identifier: "ja")) == .orderedAscending
             }
-        }()
         
         ZStack {
             List {
-                ForEach(filteredItems, id: \.id) { list in
+                ForEach(regularItemsArray, id: \.id) { list in
                     HStack {
                         Image(systemName: selectedItems.contains(list.id.uuidString) ? "circle.inset.filled" : "circle")
                             .scaleEffect(selectedItems.contains(list.id.uuidString) ? 1.3 : 0.8)
@@ -148,7 +144,7 @@ struct RegularListView: View {
             }
             .scrollContentBackground(.hidden)
             .background(
-                Color.gray.opacity(0.3)
+                Color.white
                     .ignoresSafeArea()
             )
         }
@@ -188,9 +184,15 @@ struct RegularListView: View {
                     }
                     Menu {
                         Button(action: {
-                            showButton.toggle()
+                            showAddView.toggle()
                         }) {
                             Text("追加")
+                        }
+                        
+                        Button(action: {
+                            showDeleteView.toggle()
+                        }) {
+                            Text("削除")
                         }
                         
                         Button(action: {
@@ -204,17 +206,21 @@ struct RegularListView: View {
                     } label: {
                         Image(systemName: "ellipsis")
                     }
-                    .fullScreenCover(isPresented: $showButton) {
+                    .fullScreenCover(isPresented: $showAddView) {
                         RegularItemAddAlert(
                             newRegularItemName: $newRegularItemName,
                             onAdd: {
+                                yahooAPI.furiganaWords = newRegularItemName
                                 addItem()},
                             done: {
-                                showButton = false
+                                showAddView = false
                             }
                         )
                         .offset(y: 210)
                         .presentationBackground(Color.clear)
+                    }
+                    .sheet(isPresented: $showDeleteView) {
+                        RegularItemDelete(categoryListModel: categoryListModel)
                     }
                 } // HStack
             } // topBarTrailing
@@ -224,14 +230,58 @@ struct RegularListView: View {
     }
     
     // 定期品追加メソッド
+//    private func addItem() {
+//        guard !newRegularItemName.isEmpty else { return }
+//        let newItem = RegularItem(name: newRegularItemName) // データを渡して初期化
+//        let realm = try! Realm()
+//        try! realm.write {
+//            $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
+//        }
+//        newRegularItemName = ""
+//    }
+    
+//    private func addItem() {
+//        guard !newRegularItemName.isEmpty else { return }
+//        
+//        Task {
+//            do {
+//                let furigana = try await yahooAPI.getFurigana(text: newRegularItemName)
+//                print("取得したふりがな：\(furigana)")
+//                await MainActor.run {
+//                    let newItem = RegularItem(name: newRegularItemName, furigana: furigana)
+//                    let realm = try! Realm()
+//                    try! realm.write {
+//                        $categoryListModel.regularItems.append(newItem)
+//                    }
+//                    newRegularItemName = ""
+//                    
+//                }
+//                
+//            } catch {
+//                print("ルビ取得失敗: \(error)")
+//            }
+//        }
+//    }
+    
     private func addItem() {
         guard !newRegularItemName.isEmpty else { return }
-        let newItem = RegularItem(name: newRegularItemName) // データを渡して初期化
-        let realm = try! Realm()
-        try! realm.write {
-            $categoryListModel.regularItems.append(newItem) // トランザクション内で追加
+        
+        Task {
+            // ふりがな取得を開始
+            await yahooAPI.getFurigana(text: newRegularItemName)
+            
+            // 結果をAPIクラスの @Published から取得
+            let furigana = yahooAPI.furiganaWords
+            
+            await MainActor.run {
+                let newItem = RegularItem(name: newRegularItemName, furigana: furigana)
+                let realm = try! Realm()
+                try! realm.write {
+                    $categoryListModel.regularItems.append(newItem)
+                }
+                newRegularItemName = ""
+            }
         }
-        newRegularItemName = ""
     }
     
     // 定期品削除メソッド

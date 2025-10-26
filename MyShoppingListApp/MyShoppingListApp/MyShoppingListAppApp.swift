@@ -27,7 +27,7 @@ struct MyShoppingListAppApp: App {
     init() {
         // Realm マイグレーション設定
         let config = Realm.Configuration(
-            schemaVersion: 2, // ← モデルを変更したらここを +1 する
+            schemaVersion: 3, // ← モデルを変更したらここを +1 する
             migrationBlock: { migration, oldSchemaVersion in
                 if oldSchemaVersion < 2 {
                     // 必要に応じてマイグレーション処理を書く
