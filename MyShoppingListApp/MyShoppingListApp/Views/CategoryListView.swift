@@ -20,6 +20,7 @@ struct CategoryListView: View {
     @State private var isModalPresented = false
     @State private var editMode: EditMode = .inactive
     @State private var showSupportAlert = false
+    @State private var showNotice = false
     @ObservedResults(CategoryListModel.self, sortDescriptor: SortDescriptor(keyPath: "sortIndex", ascending: true))
     var categoryListModel
     
@@ -179,6 +180,12 @@ struct CategoryListView: View {
                                     UIApplication.shared.open(url)
                                 }
                             }
+                            
+                            Button(action: {
+                                showNotice.toggle()
+                            }) {
+                                Text("お知らせ")
+                            }
 //                            Button("アプリを共有") {
 //                                if let url = URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617") {
 //                                    UIApplication.shared.open(url)
@@ -187,6 +194,10 @@ struct CategoryListView: View {
                             //TODO: アプリ共有
 //                            ShareLink(item: URL(string: "https://apps.apple.com/jp/app/カゴりすと/id6745005617")!)
                             Button("キャンセル", role: .cancel) {}
+                        }
+                        .sheet(isPresented: $showNotice) {
+                            NoticeView()
+                                .presentationDetents([.height(200)])
                         }
                     }
                 }
@@ -287,6 +298,14 @@ struct ItemListView: View {
                 VStack {
                     HStack {
                         TextField("アイテム", text: $newShoppingListTextField)
+                            .onChange(of: newShoppingListTextField) { newValue in
+                                // 空白を除去
+                                let filtered = newValue.replacingOccurrences(of: " ", with: "")
+                                    .replacingOccurrences(of: "　", with: "") // 全角スペースも
+                                if filtered != newValue {
+                                    newShoppingListTextField = filtered
+                                }
+                            }
                         Button(action: {
                             addShoppingList()
                             buttonAnalytics()

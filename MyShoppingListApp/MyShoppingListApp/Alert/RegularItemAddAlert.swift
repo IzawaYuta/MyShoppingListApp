@@ -25,6 +25,14 @@ struct RegularItemAddAlert: View {
                         done()
                         newRegularItemName = ""
                     }
+                    .onChange(of: newRegularItemName) { newValue in
+                        // 空白を除去
+                        let filtered = newValue.replacingOccurrences(of: " ", with: "")
+                            .replacingOccurrences(of: "　", with: "") // 全角スペースも
+                        if filtered != newValue {
+                            newRegularItemName = filtered
+                        }
+                    }
                 Button(action: {
                     onAdd()
                 }) {
