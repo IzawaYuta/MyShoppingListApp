@@ -50,56 +50,58 @@ struct ItemInfoView: View {
     }
     
     var body: some View {
-        Form {
-            // 名前・数量・優先
-            Section {
-                HStack {
-                    TextField("アイテム名", text: $name)
-                    TextField("数量", text: $quantity)
-                        .multilineTextAlignment(.trailing)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: 80)
-                }
-                CheckRow(title: "優先", isOn: $isPriority)   // RecurringItemFormView.swift のものを使用
-            }
-            
-            // 追加先フォルダ（複数選択）
-            Section {
-                DisclosureGroup(isExpanded: $isFolderListExpanded) {
-                    ForEach(options) { option in
-                        folderRow(option)
-                    }
-                } label: {
+        NavigationStack {
+            Form {
+                // 名前・数量・優先
+                Section {
                     HStack {
-                        Text("追加先フォルダ")
-                        Spacer()
-                        Text(selectedNames)
+                        TextField("アイテム名", text: $name)
+                        TextField("数量", text: $quantity)
+                            .multilineTextAlignment(.trailing)
                             .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                            .frame(maxWidth: 80)
+                    }
+                    CheckRow(title: "優先", isOn: $isPriority)   // RecurringItemFormView.swift のものを使用
+                }
+                
+                // 追加先フォルダ（複数選択）
+                Section {
+                    DisclosureGroup(isExpanded: $isFolderListExpanded) {
+                        ForEach(options) { option in
+                            folderRow(option)
+                        }
+                    } label: {
+                        HStack {
+                            Text("追加先フォルダ")
+                            Spacer()
+                            Text(selectedNames)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                
+                // 定期アイテムとして登録（登録画面へ遷移）
+                Section {
+                    NavigationLink {
+                        RegularItemInfoView(draft: recurringDraft)
+                    } label: {
+                        Text("定期アイテムとして登録")
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
             }
-            
-            // 定期アイテムとして登録（登録画面へ遷移）
-            Section {
-                NavigationLink {
-                    RegularItemInfoView(draft: recurringDraft)
-                } label: {
-                    Text("定期アイテムとして登録")
-                        .foregroundStyle(Color.accentColor)
+            .navigationTitle("新規アイテム")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("キャンセル") { dismiss() }
                 }
-            }
-        }
-        .navigationTitle("新規アイテム")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("キャンセル") { dismiss() }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("追加") { add() }
-                    .fontWeight(.semibold)
-                    .disabled(!canAdd)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("追加") { add() }
+                        .fontWeight(.semibold)
+                        .disabled(!canAdd)
+                }
             }
         }
     }

@@ -200,6 +200,7 @@ struct HomeView: View {
                 Button("キャンセル", role: .cancel) { newFolderName = "" }
             }
         }
+        .environment(store)
     }
 }
 
@@ -256,11 +257,8 @@ struct FolderDetailView: View {
             Button("追加") { addFolder() }
             Button("キャンセル", role: .cancel) { newName = "" }
         }
-        .alert("新規アイテム", isPresented: $isAddingItem) {
-            // 実際のアプリでは、アイテム追加画面（シート）を表示する
-            TextField("アイテム名", text: $newName)
-            Button("追加") { addItem() }
-            Button("キャンセル", role: .cancel) { newName = "" }
+        .sheet(isPresented: $isAddingItem) {
+            ItemInfoView(currentFolder: node)
         }
     }
     
