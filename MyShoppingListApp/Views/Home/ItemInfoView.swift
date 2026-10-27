@@ -56,10 +56,11 @@ struct ItemInfoView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $name)
-                        TextField("数量", text: $quantity)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: 80)
+                        if isPriority {
+                            Image(systemName: "exclamationmark")
+                                .bold()
+                                .foregroundStyle(Color.red)
+                        }
                     }
                     CheckRow(title: "優先", isOn: $isPriority)   // RecurringItemFormView.swift のものを使用
                 }
