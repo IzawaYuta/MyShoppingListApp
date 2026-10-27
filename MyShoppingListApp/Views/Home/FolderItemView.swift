@@ -100,7 +100,7 @@ struct ItemRow: View {
 
 // MARK: - Screen
 
-struct HomeView: View {
+struct FolderItemView: View {
     @State private var folders = Folder.samples
     @State private var items = ShoppingItem.samples
     
@@ -142,7 +142,7 @@ struct HomeView: View {
 
 #Preview {
     NavigationStack {
-        HomeView()
+        FolderItemView()
     }
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
