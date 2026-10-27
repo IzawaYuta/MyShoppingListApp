@@ -30,12 +30,14 @@ final class FolderNode: Identifiable, Hashable {
     let id = UUID()
     var name: String
     var tint: FolderTint
+    var imageName: String?
     var children: [FolderNode]
     var items: [ShoppingItem]
     
-    init(name: String, tint: FolderTint, children: [FolderNode] = [], items: [ShoppingItem] = []) {
+    init(name: String, tint: FolderTint, imageName: String? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
         self.name = name
         self.tint = tint
+        self.imageName = imageName
         self.children = children
         self.items = items
     }
@@ -88,7 +90,7 @@ final class FolderStore {
         )
         
         let food = FolderNode(
-            name: "食品", tint: p[0],
+            name: "食品", tint: p[0], imageName: "Apple",
             children: [
                 vegetables,
                 FolderNode(name: "肉・魚", tint: p[3], items: [
@@ -111,6 +113,28 @@ final class FolderStore {
     }
 }
 
+struct FolderImageView: View {
+    let node: FolderNode
+    
+    var body: some View {
+        Group {
+            if let name = node.imageName {
+                Image(name).resizable().scaledToFill()
+            } else {
+                // imageName がないときは、今までの頭文字タイル
+                Text(node.initial)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(node.tint.foreground)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(node.tint.background)
+            }
+        }
+        .frame(width: 36, height: 36)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+
 // MARK: - Row
 
 struct FolderNodeRow: View {
@@ -118,12 +142,7 @@ struct FolderNodeRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            Text(node.initial)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(node.tint.foreground)
-                .frame(width: 36, height: 36)
-                .background(node.tint.background, in: RoundedRectangle(cornerRadius: 8))
-            
+            FolderImageView(node: node)
             Text(node.name)
             
             Spacer()
