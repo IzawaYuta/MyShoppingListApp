@@ -90,7 +90,7 @@ final class FolderStore {
         )
         
         let food = FolderNode(
-            name: "食品", tint: p[0], imageName: "Apple",
+            name: "食品", tint: p[0], imageName: "apple",
             children: [
                 vegetables,
                 FolderNode(name: "肉・魚", tint: p[3], items: [

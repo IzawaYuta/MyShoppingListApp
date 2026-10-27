@@ -16,6 +16,7 @@ struct ShoppingItem: Identifiable {
     let id = UUID()
     var name: String
     var quantity: String
+    var isPriority: Bool = false
     var isDone: Bool = false
 }
 

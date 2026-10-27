@@ -72,9 +72,15 @@ struct CheckRow: View {
 
 struct RegularItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var draft = RecurringItemDraft()
+    @State private var draft: RecurringItemDraft
     
-    var onSave: (RecurringItemDraft) -> Void = { _ in }
+    var onSave: (RecurringItemDraft) -> Void
+    
+    init(draft: RecurringItemDraft = RecurringItemDraft(),
+         onSave: @escaping (RecurringItemDraft) -> Void = { _ in }) {
+        _draft = State(initialValue: draft)
+        self.onSave = onSave
+    }
     
     var body: some View {
         NavigationStack {
@@ -170,6 +176,8 @@ struct RegularItemInfoView: View {
 // MARK: - Preview
 
 #Preview {
-    RegularItemInfoView()
-        .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
+    NavigationStack {
+        RegularItemInfoView()
+    }
+    .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

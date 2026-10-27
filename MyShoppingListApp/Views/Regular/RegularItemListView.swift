@@ -97,8 +97,9 @@ struct RegularItemListView: View {
             }
         }
         .sheet(isPresented: $isShowingForm) {
-            // 先に作成した RecurringItemFormView を使用
-            RegularItemInfoView()
+            NavigationStack {
+                RegularItemInfoView()
+            }
         }
     }
     
