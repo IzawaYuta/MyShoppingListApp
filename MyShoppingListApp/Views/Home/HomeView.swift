@@ -8,6 +8,11 @@ enum FolderLimit {
     static let maxDepth = 3
 }
 
+enum ActiveSheet: Identifiable {
+    case folder, item
+    var id: Self { self }
+}
+
 // MARK: - Model
 
 struct FolderTint {
@@ -187,17 +192,8 @@ struct HomeView: View {
                     .accessibilityLabel("フォルダを追加")
                 }
             }
-            .alert("新規フォルダ", isPresented: $isAddingFolder) {
-                TextField("フォルダ名", text: $newFolderName)
-                Button("追加") {
-                    let name = newFolderName.trimmingCharacters(in: .whitespaces)
-                    if !name.isEmpty {
-                        let tint = FolderTint.palette[store.roots.count % FolderTint.palette.count]
-                        store.roots.append(FolderNode(name: name, tint: tint))
-                    }
-                    newFolderName = ""
-                }
-                Button("キャンセル", role: .cancel) { newFolderName = "" }
+            .sheet(isPresented: $isAddingFolder) {
+                FolderAddView()
             }
         }
         .environment(store)
@@ -210,8 +206,9 @@ struct FolderDetailView: View {
     let route: FolderRoute
     @Bindable private var node: FolderNode
     
-    @State private var isAddingFolder = false
-    @State private var isAddingItem = false
+//    @State private var isAddingFolder = false
+//    @State private var isAddingItem = false
+    @State private var activeSheet: ActiveSheet?
     @State private var newName = ""
     
     init(route: FolderRoute) {
@@ -252,13 +249,11 @@ struct FolderDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { addMenu }
         }
-        .alert("新規フォルダ", isPresented: $isAddingFolder) {
-            TextField("フォルダ名", text: $newName)
-            Button("追加") { addFolder() }
-            Button("キャンセル", role: .cancel) { newName = "" }
-        }
-        .sheet(isPresented: $isAddingItem) {
-            ItemInfoView(currentFolder: node)
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .folder: FolderAddView(parent: node, level: route.level)
+            case .item:   ItemInfoView(currentFolder: node)
+            }
         }
     }
     
@@ -267,15 +262,16 @@ struct FolderDetailView: View {
     private var addMenu: some View {
         if route.canAddFolder {
             Menu {
-                Button("フォルダを追加", systemImage: "folder.badge.plus") { isAddingFolder = true }
-                Button("アイテムを追加", systemImage: "plus") { isAddingItem = true }
+                Button("フォルダを追加", systemImage: "folder.badge.plus") { activeSheet = .folder }
+                Button("アイテムを追加", systemImage: "plus") { activeSheet = .item }
+                // 最大階層の「＋」ボタンは activeSheet = .item
             } label: {
                 Image(systemName: "plus")
             }
             .accessibilityLabel("追加")
         } else {
             Button {
-                isAddingItem = true
+                activeSheet = .item
             } label: {
                 Image(systemName: "plus")
             }
