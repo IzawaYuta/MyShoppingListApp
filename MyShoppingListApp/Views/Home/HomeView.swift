@@ -124,7 +124,7 @@ struct FolderImageView: View {
     var body: some View {
         Group {
             if let customIcon = node.customIcon {
-                customIcon.image.resizable().scaledToFill()
+                customIcon.image.resizable().scaledToFit()
             } else {
                 // imageName がないときは、今までの頭文字タイル
                 Text(node.initial)

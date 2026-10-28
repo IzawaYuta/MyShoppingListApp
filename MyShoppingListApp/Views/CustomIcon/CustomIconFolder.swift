@@ -18,7 +18,6 @@ enum CustomIconFolder: String, CaseIterable, Identifiable {
     case bike10
     case bike11
     case bike12
-    case bike13
     case book1
     case boy1
     case boy2
