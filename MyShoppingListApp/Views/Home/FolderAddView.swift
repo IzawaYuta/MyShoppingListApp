@@ -28,7 +28,7 @@ struct FolderAddView: View {
     private let parentLevel: Int
     
     @State private var name = ""
-    @State private var imageName: String?   // nil = 画像なし（頭文字タイル）
+    @State private var customIcon: String?   // nil = 画像なし（頭文字タイル）
     
     init(parent: FolderNode? = nil, level parentLevel: Int = 0) {
         self.parent = parent
@@ -50,7 +50,7 @@ struct FolderAddView: View {
     
     /// プレビュー表示用の仮フォルダ（名前の頭文字と選択中のイメージを反映）
     private var previewNode: FolderNode {
-        FolderNode(name: trimmedName.isEmpty ? "新" : trimmedName, tint: tint, imageName: imageName)
+        FolderNode(name: trimmedName.isEmpty ? "新" : trimmedName, tint: tint, customIcon: customIcon)
     }
     
     var body: some View {
@@ -92,9 +92,9 @@ struct FolderAddView: View {
     
     /// name が nil のセルは「画像なし」（頭文字タイル）
     private func imageCell(_ name: String?) -> some View {
-        let isSelected = imageName == name
+        let isSelected = customIcon == name
         return Button {
-            imageName = name
+            customIcon = name
         } label: {
             Group {
                 if let name {
@@ -123,7 +123,7 @@ struct FolderAddView: View {
     
     private func add() {
         guard !trimmedName.isEmpty, canCreate else { return }
-        let folder = FolderNode(name: trimmedName, tint: tint, imageName: imageName)
+        let folder = FolderNode(name: trimmedName, tint: tint, customIcon: customIcon)
         if let parent {
             parent.children.append(folder)
         } else {

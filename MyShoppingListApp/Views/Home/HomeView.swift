@@ -35,14 +35,14 @@ final class FolderNode: Identifiable, Hashable {
     let id = UUID()
     var name: String
     var tint: FolderTint
-    var imageName: String?
+    var customIcon: String?
     var children: [FolderNode]
     var items: [ShoppingItem]
     
-    init(name: String, tint: FolderTint, imageName: String? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
+    init(name: String, tint: FolderTint, customIcon: String? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
         self.name = name
         self.tint = tint
-        self.imageName = imageName
+        self.customIcon = customIcon
         self.children = children
         self.items = items
     }
@@ -95,7 +95,7 @@ final class FolderStore {
         )
         
         let food = FolderNode(
-            name: "食品", tint: p[0], imageName: "apple",
+            name: "食品", tint: p[0], customIcon: "apple",
             children: [
                 vegetables,
                 FolderNode(name: "肉・魚", tint: p[3], items: [
@@ -123,7 +123,7 @@ struct FolderImageView: View {
     
     var body: some View {
         Group {
-            if let name = node.imageName {
+            if let name = node.customIcon {
                 Image(name).resizable().scaledToFill()
             } else {
                 // imageName がないときは、今までの頭文字タイル
