@@ -130,7 +130,6 @@ struct ItemInfoView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
     
     // MARK: Actions

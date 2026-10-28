@@ -93,7 +93,6 @@ struct RegularItemListView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .accessibilityLabel("定期アイテムを追加")
             }
         }
         .sheet(isPresented: $isShowingForm) {

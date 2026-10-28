@@ -85,7 +85,6 @@ struct ItemRow: View {
                     .foregroundStyle(item.isDone ? Color.accentColor : Color.secondary)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(item.isDone ? "購入済み" : "未購入")
             
             Text(item.name)
                 .strikethrough(item.isDone)
@@ -133,7 +132,6 @@ struct FolderItemView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .accessibilityLabel("追加")
             }
         }
     }

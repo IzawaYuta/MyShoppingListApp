@@ -4,7 +4,7 @@ import SwiftUI
 /// フォルダに使えるアイコンの一覧。
 /// アイコンを増やすときは、Assets に画像を追加して、ここに case を1行足すだけ。
 /// case の名前は、Assets の画像名と同じにする（rawValue が画像名になる）。
-enum FolderIcon: String, CaseIterable, Identifiable {
+enum CustomIconFolder: String, CaseIterable, Identifiable {
     case apple
     case bike1
     case bike2
@@ -51,4 +51,6 @@ enum FolderIcon: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
+    /// 表示用の Image
+    var image: Image { Image(rawValue) }
 }

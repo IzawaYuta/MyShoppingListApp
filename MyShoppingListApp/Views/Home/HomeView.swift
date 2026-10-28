@@ -35,11 +35,11 @@ final class FolderNode: Identifiable, Hashable {
     let id = UUID()
     var name: String
     var tint: FolderTint
-    var customIcon: String?
+    var customIcon: CustomIconFolder?
     var children: [FolderNode]
     var items: [ShoppingItem]
     
-    init(name: String, tint: FolderTint, customIcon: String? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
+    init(name: String, tint: FolderTint, customIcon: CustomIconFolder? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
         self.name = name
         self.tint = tint
         self.customIcon = customIcon
@@ -95,7 +95,7 @@ final class FolderStore {
         )
         
         let food = FolderNode(
-            name: "食品", tint: p[0], customIcon: "apple",
+            name: "食品", tint: p[0], customIcon: .apple,
             children: [
                 vegetables,
                 FolderNode(name: "肉・魚", tint: p[3], items: [
@@ -123,8 +123,8 @@ struct FolderImageView: View {
     
     var body: some View {
         Group {
-            if let name = node.customIcon {
-                Image(name).resizable().scaledToFill()
+            if let customIcon = node.customIcon {
+                customIcon.image.resizable().scaledToFill()
             } else {
                 // imageName がないときは、今までの頭文字タイル
                 Text(node.initial)
@@ -189,7 +189,6 @@ struct HomeView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .accessibilityLabel("フォルダを追加")
                 }
             }
             .sheet(isPresented: $isAddingFolder) {
@@ -268,14 +267,12 @@ struct FolderDetailView: View {
             } label: {
                 Image(systemName: "plus")
             }
-            .accessibilityLabel("追加")
         } else {
             Button {
                 activeSheet = .item
             } label: {
                 Image(systemName: "plus")
             }
-            .accessibilityLabel("アイテムを追加")
         }
     }
     

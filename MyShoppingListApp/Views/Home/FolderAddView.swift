@@ -28,7 +28,7 @@ struct FolderAddView: View {
     private let parentLevel: Int
     
     @State private var name = ""
-    @State private var customIcon: String?   // nil = 画像なし（頭文字タイル）
+    @State private var customIcon: CustomIconFolder?
     
     init(parent: FolderNode? = nil, level parentLevel: Int = 0) {
         self.parent = parent
@@ -67,8 +67,8 @@ struct FolderAddView: View {
                 // イメージ選択
                 Section("イメージ") {
                     LazyVGrid(columns: columns, spacing: 12) {
-                        imageCell(nil)
-                        ForEach(FolderImageCatalog.names, id: \.self) { imageCell($0) }
+                        iconCell(nil)
+                        ForEach(CustomIconFolder.allCases) { iconCell($0) }
                     }
                     .padding(.vertical, 6)
                 }
@@ -91,14 +91,14 @@ struct FolderAddView: View {
     // MARK: Image cell
     
     /// name が nil のセルは「画像なし」（頭文字タイル）
-    private func imageCell(_ name: String?) -> some View {
-        let isSelected = customIcon == name
+    private func iconCell(_ cellIcon: CustomIconFolder?) -> some View {
+        let isSelected = customIcon == cellIcon
         return Button {
-            customIcon = name
+            customIcon = cellIcon
         } label: {
             Group {
-                if let name {
-                    Image(name).resizable().scaledToFill()
+                if let cellIcon {
+                    cellIcon.image.resizable().scaledToFill()
                 } else {
                     Text("Aa")
                         .font(.system(size: 18, weight: .bold))
@@ -115,8 +115,6 @@ struct FolderAddView: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(name ?? "画像なし")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
     
     // MARK: Action
