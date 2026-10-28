@@ -139,7 +139,7 @@ struct ItemInfoView: View {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         for option in options where selectedFolderIDs.contains(option.id) {
             option.node.items.append(
-                ShoppingItem(name: trimmed, quantity: quantity, isPriority: isPriority)
+                ShoppingItem(name: trimmed, isPriority: isPriority)
             )
         }
         dismiss()

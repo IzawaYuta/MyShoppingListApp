@@ -81,17 +81,17 @@ final class FolderStore {
             name: "野菜・果物", tint: p[0],
             children: [
                 FolderNode(name: "葉物野菜", tint: p[0], items: [
-                    ShoppingItem(name: "ほうれん草", quantity: "1束", isDone: true),
-                    ShoppingItem(name: "キャベツ", quantity: "1玉")
+                       ShoppingItem(name: "ほうれん草", isDone: true),
+                       ShoppingItem(name: "キャベツ")
                 ]),
                 FolderNode(name: "根菜", tint: p[2], items: [
-                    ShoppingItem(name: "にんじん", quantity: "3本")
+                    ShoppingItem(name: "にんじん")
                 ]),
                 FolderNode(name: "果物", tint: p[3], items: [
-                    ShoppingItem(name: "バナナ", quantity: "1房")
+                    ShoppingItem(name: "バナナ")
                 ])
             ],
-            items: [ShoppingItem(name: "ミニトマト", quantity: "1パック")]
+            items: [ShoppingItem(name: "ミニトマト")]
         )
         
         let food = FolderNode(
@@ -99,19 +99,19 @@ final class FolderStore {
             children: [
                 vegetables,
                 FolderNode(name: "肉・魚", tint: p[3], items: [
-                    ShoppingItem(name: "鶏むね肉", quantity: "300g")
+                    ShoppingItem(name: "鶏むね肉")
                 ]),
                 FolderNode(name: "乳製品・卵", tint: p[4], items: [
-                    ShoppingItem(name: "牛乳", quantity: "1本"),
-                    ShoppingItem(name: "卵", quantity: "10個", isDone: true)
+                    ShoppingItem(name: "牛乳"),
+                    ShoppingItem(name: "卵", isDone: true)
                 ])
             ],
-            items: [ShoppingItem(name: "食パン", quantity: "1袋")]
+            items: [ShoppingItem(name: "食パン")]
         )
         
         return [
             food,
-            FolderNode(name: "日用品", tint: p[1], items: [ShoppingItem(name: "洗剤", quantity: "1個")]),
+            FolderNode(name: "日用品", tint: p[1], items: [ShoppingItem(name: "洗剤")]),
             FolderNode(name: "飲み物", tint: p[2]),
             FolderNode(name: "調味料", tint: p[3])
         ]
@@ -151,9 +151,6 @@ struct FolderNodeRow: View {
             Text(node.name)
             
             Spacer()
-            
-            Text("\(node.totalItemCount)")
-                .foregroundStyle(.secondary)
         }
     }
 }
@@ -288,7 +285,7 @@ struct FolderDetailView: View {
         let name = newName.trimmingCharacters(in: .whitespaces)
         newName = ""
         guard !name.isEmpty else { return }
-        node.items.append(ShoppingItem(name: name, quantity: "1"))
+        node.items.append(ShoppingItem(name: name))
     }
 }
 

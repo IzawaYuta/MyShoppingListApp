@@ -15,7 +15,6 @@ struct Folder: Identifiable {
 struct ShoppingItem: Identifiable {
     let id = UUID()
     var name: String
-    var quantity: String
     var isPriority: Bool = false
     var isDone: Bool = false
 }
@@ -38,14 +37,14 @@ extension Folder {
 
 extension ShoppingItem {
     static let samples: [ShoppingItem] = [
-        ShoppingItem(name: "牛乳", quantity: "1本"),
-        ShoppingItem(name: "食パン", quantity: "1袋"),
-        ShoppingItem(name: "卵", quantity: "10個", isDone: true),
-        ShoppingItem(name: "ヨーグルト", quantity: "2個"),
-        ShoppingItem(name: "ほうれん草", quantity: "1束", isDone: true),
-        ShoppingItem(name: "にんじん", quantity: "3本"),
-        ShoppingItem(name: "鶏むね肉", quantity: "300g"),
-        ShoppingItem(name: "バナナ", quantity: "1房")
+        ShoppingItem(name: "牛乳"),
+        ShoppingItem(name: "食パン"),
+        ShoppingItem(name: "卵", isDone: true),
+        ShoppingItem(name: "ヨーグルト"),
+        ShoppingItem(name: "ほうれん草", isDone: true),
+        ShoppingItem(name: "にんじん"),
+        ShoppingItem(name: "鶏むね肉"),
+        ShoppingItem(name: "バナナ")
     ]
 }
 
@@ -65,9 +64,6 @@ struct FolderRow: View {
             Text(folder.name)
             
             Spacer()
-            
-            Text("\(folder.count)")
-                .foregroundStyle(.secondary)
         }
     }
 }
@@ -91,9 +87,6 @@ struct ItemRow: View {
                 .foregroundStyle(item.isDone ? .secondary : .primary)
             
             Spacer()
-            
-            Text(item.quantity)
-                .foregroundStyle(.secondary)
         }
     }
 }
@@ -109,7 +102,7 @@ struct FolderItemView: View {
             Section("フォルダ") {
                 ForEach(folders) { folder in
                     NavigationLink {
-                        Text(folder.name) // 遷移先（ダミー）
+                        Text(folder.name)
                     } label: {
                         FolderRow(folder: folder)
                     }
