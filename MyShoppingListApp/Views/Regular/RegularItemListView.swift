@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - Model
 
+/// 定期アイテムモデル
 struct RecurringItem: Identifiable {
     let id = UUID()
     var name: String
@@ -19,6 +20,7 @@ struct RecurringItem: Identifiable {
 
 // MARK: - Dummy Data
 
+/// ダミーデータ
 extension RecurringItem {
     static let samples: [RecurringItem] = [
         RecurringItem(name: "牛乳", quantity: "1本", frequencyLabel: "毎週", isPriority: true),
@@ -32,6 +34,7 @@ extension RecurringItem {
 
 // MARK: - Row
 
+/// 定期アイテム１つの行の見た目
 struct RecurringItemRow: View {
     let item: RecurringItem
     
@@ -54,6 +57,7 @@ struct RecurringItemRow: View {
 
 // MARK: - Screen
 
+/// メインビュー（定期アイテム一覧リスト）
 struct RegularItemListView: View {
     @State private var items = RecurringItem.samples
     @State private var isShowingForm = false

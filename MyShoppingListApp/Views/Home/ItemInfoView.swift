@@ -4,12 +4,14 @@ import SwiftUI
 // MARK: - Folder options (階層付きの一覧)
 
 /// 追加先フォルダの選択肢。level はフォルダの階層（1〜）
+/// アイテム追加画面の、追加先フォルダの表示の見た目
 struct FolderOption: Identifiable {
     let node: FolderNode
     let level: Int
     var id: UUID { node.id }
 }
 
+/// 追加先フォルダの選択肢を作成
 extension FolderStore {
     /// 全フォルダを、階層順（親 → 子）に並べた一覧にする
     var flattenedOptions: [FolderOption] {
@@ -22,6 +24,7 @@ extension FolderStore {
 
 // MARK: - Screen
 
+/// メインビュー（アイテム追加画面）
 struct ItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(FolderStore.self) private var store
@@ -37,14 +40,17 @@ struct ItemInfoView: View {
         _selectedFolderIDs = State(initialValue: currentFolder.map { [$0.id] } ?? [])
     }
     
+    /// 追加先フォルダの選択肢一覧
     private var options: [FolderOption] { store.flattenedOptions }
     
+    /// 選択肢のフォルダ名
     private var selectedNames: String {
         options.filter { selectedFolderIDs.contains($0.id) }
             .map(\.node.name)
             .joined(separator: "、")
     }
     
+    /// アイテム追加ボタンを押せるか
     private var canAdd: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty && !selectedFolderIDs.isEmpty
     }
@@ -109,6 +115,7 @@ struct ItemInfoView: View {
     
     // MARK: Folder row
     
+    /// 「追加先フォルダ」を開いた時に表示される、フォルダ1行分の見た目と、タップした時の動きを作る関数
     private func folderRow(_ option: FolderOption) -> some View {
         let isSelected = selectedFolderIDs.contains(option.id)
         return Button {

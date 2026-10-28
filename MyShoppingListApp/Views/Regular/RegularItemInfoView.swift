@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - Model
 
+/// 頻度の種類
 enum RecurrenceFrequency: String, CaseIterable, Identifiable {
     case daily = "毎日"
     case weekly = "毎週"
@@ -24,6 +25,7 @@ enum RecurrenceFrequency: String, CaseIterable, Identifiable {
     }
 }
 
+/// 下書きダミーデータ
 struct RecurringItemDraft {
     var name = "牛乳"
     var quantity = "1本"
@@ -44,7 +46,7 @@ private let sampleFolders = ["野菜・果物", "肉・魚", "乳製品・卵", 
 
 // MARK: - Components
 
-/// 丸型のチェックボックス行
+/// 丸型のチェックボックス行（再利用）
 struct CheckRow: View {
     let title: String
     @Binding var isOn: Bool
@@ -69,6 +71,7 @@ struct CheckRow: View {
 
 // MARK: - Screen
 
+/// メインビュー（定期アイテム追加画面）
 struct RegularItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var draft: RecurringItemDraft

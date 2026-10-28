@@ -1,21 +1,6 @@
 
 import SwiftUI
 
-// MARK: - Image catalog
-
-/// フォルダに選べるイメージの一覧（Assets.xcassets に入れた画像の名前）
-/// ※ 実際に追加した画像の名前に置き換えてください
-enum FolderImageCatalog {
-    static let names: [String] = [
-        "apple",
-        // "folder_meat",
-        // "folder_dairy",
-        // "folder_daily",
-        // "folder_drink",
-        // "folder_seasoning",
-    ]
-}
-
 // MARK: - Screen
 
 struct FolderAddView: View {

@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - Models
 
+/// フォルダモデル
 struct Folder: Identifiable {
     let id = UUID()
     let name: String
@@ -12,6 +13,7 @@ struct Folder: Identifiable {
     let foreground: Color
 }
 
+/// アイテムモデル
 struct ShoppingItem: Identifiable {
     let id = UUID()
     var name: String
@@ -21,6 +23,7 @@ struct ShoppingItem: Identifiable {
 
 // MARK: - Dummy Data
 
+/// フォルダダミーデータ
 extension Folder {
     static let samples: [Folder] = [
         Folder(name: "野菜・果物", initial: "菜", count: 19,
@@ -35,6 +38,7 @@ extension Folder {
     ]
 }
 
+/// アイテムダミーデータ
 extension ShoppingItem {
     static let samples: [ShoppingItem] = [
         ShoppingItem(name: "牛乳"),
@@ -50,6 +54,7 @@ extension ShoppingItem {
 
 // MARK: - Rows
 
+/// フォルダの見た目
 struct FolderRow: View {
     let folder: Folder
     
@@ -68,6 +73,7 @@ struct FolderRow: View {
     }
 }
 
+/// アイテムの見た目
 struct ItemRow: View {
     @Binding var item: ShoppingItem
     
@@ -93,6 +99,7 @@ struct ItemRow: View {
 
 // MARK: - Screen
 
+/// メインビュー
 struct FolderItemView: View {
     @State private var folders = Folder.samples
     @State private var items = ShoppingItem.samples

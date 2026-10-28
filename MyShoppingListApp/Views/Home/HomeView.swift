@@ -3,11 +3,14 @@ import SwiftUI
 
 // MARK: - Limit
 
+/// フォルダの階層制限
 enum FolderLimit {
     /// フォルダの最大階層。将来は無制限にする予定のため、判定はこの定数だけに集約している
     static let maxDepth = 3
 }
 
+/// 開くシートの判定
+/// 複数のsheetを開く場合は、enumで判定するのが簡単
 enum ActiveSheet: Identifiable {
     case folder, item
     var id: Self { self }
@@ -15,6 +18,7 @@ enum ActiveSheet: Identifiable {
 
 // MARK: - Model
 
+/// フォルダのアイコンの色
 struct FolderTint {
     let background: Color
     let foreground: Color
@@ -30,6 +34,7 @@ struct FolderTint {
 
 /// フォルダ。子フォルダと、そのフォルダ直下の買うものアイテムを持つ
 /// （ShoppingItem は ShoppingListView.swift のものを使用）
+/// フォルダ（子フォルダ・アイテム含む）データ
 @Observable
 final class FolderNode: Identifiable, Hashable {
     let id = UUID()
@@ -70,6 +75,7 @@ struct FolderRoute: Hashable {
 
 // MARK: - Dummy Data
 
+/// ダミーデータ
 @Observable
 final class FolderStore {
     var roots: [FolderNode] = FolderStore.sample()
@@ -118,6 +124,7 @@ final class FolderStore {
     }
 }
 
+/// フォルダのアイコンの見た目
 struct FolderImageView: View {
     let node: FolderNode
     
@@ -142,6 +149,7 @@ struct FolderImageView: View {
 
 // MARK: - Row
 
+/// フォルダの一つのリストの見た目
 struct FolderNodeRow: View {
     let node: FolderNode
     
@@ -157,6 +165,7 @@ struct FolderNodeRow: View {
 
 // MARK: - 最初の画面（フォルダのみ）
 
+/// メインビュー（ホーム画面）
 struct HomeView: View {
     @State private var store = FolderStore()
     @State private var isAddingFolder = false
@@ -198,6 +207,7 @@ struct HomeView: View {
 
 // MARK: - 2・3階層目（フォルダ＋買うもの）
 
+/// 子フォルダとアイテムのビュー
 struct FolderDetailView: View {
     let route: FolderRoute
     @Bindable private var node: FolderNode
@@ -254,6 +264,7 @@ struct FolderDetailView: View {
     }
     
     /// 最大階層より下には「フォルダを追加」を出さない
+    /// フォルダまたはアイテムの追加用plusボタン
     @ViewBuilder
     private var addMenu: some View {
         if route.canAddFolder {
@@ -273,6 +284,7 @@ struct FolderDetailView: View {
         }
     }
     
+    /// フォルダ追加用ボタン
     private func addFolder() {
         let name = newName.trimmingCharacters(in: .whitespaces)
         newName = ""
@@ -281,6 +293,7 @@ struct FolderDetailView: View {
         node.children.append(FolderNode(name: name, tint: tint))
     }
     
+    /// アイテム追加用ボタン
     private func addItem() {
         let name = newName.trimmingCharacters(in: .whitespaces)
         newName = ""
