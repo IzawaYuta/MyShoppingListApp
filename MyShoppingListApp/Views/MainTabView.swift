@@ -12,6 +12,11 @@ struct MainTabView: View {
                     Image(systemName: "square.and.pencil")
                 }
                 .tag(0)
+            PurchaseRecordView()
+                .tabItem {
+                    Image(systemName: "square.and.pencil")
+                }
+                .tag(0)
         }
     }
 }
