@@ -65,68 +65,13 @@ struct CheckRow: View {
     }
 }
 
-// MARK: - 追加先フォルダの選択
-
-/// 追加先フォルダを複数選択する行（開くとフォルダ一覧が出る）
-//struct FolderMultiSelectGroup: View {
-//    @Environment(FolderStore.self) private var store
-//    @Binding var selectedIDs: Set<UUID>
-//    @State private var isExpanded = false
-//    
-//    private var options: [FolderOption] { store.flattenedOptions }
-//    
-//    private var selectedNames: String {
-//        options.filter { selectedIDs.contains($0.id) }
-//            .map(\.node.name)
-//            .joined(separator: "、")
-//    }
-//    
-//    var body: some View {
-//        DisclosureGroup(isExpanded: $isExpanded) {
-//            ForEach(options) { option in
-//                folderRow(option)
-//            }
-//        } label: {
-//            HStack {
-//                Text("追加先フォルダ")
-//                Spacer()
-//                Text(selectedNames)
-//                    .foregroundStyle(.secondary)
-//                    .lineLimit(1)
-//            }
-//        }
-//    }
-//    
-//    private func folderRow(_ option: FolderOption) -> some View {
-//        let isSelected = selectedIDs.contains(option.id)
-//        return Button {
-//            if isSelected {
-//                selectedIDs.remove(option.id)
-//            } else {
-//                selectedIDs.insert(option.id)
-//            }
-//        } label: {
-//            HStack(spacing: 12) {
-//                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-//                    .font(.title3)
-//                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-//                Text(option.node.name)
-//                    .foregroundStyle(.primary)
-//                Spacer()
-//            }
-//            .padding(.leading, CGFloat(option.level - 1) * 20)
-//            .contentShape(Rectangle())
-//        }
-//        .buttonStyle(.plain)
-//    }
-//}
-
 // MARK: - Screen
 
 /// メインビュー（定期アイテム追加画面）
 struct RegularItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var draft: RecurringItemDraft
+    @State private var showCancelAlert = false
     
     var onSave: (RecurringItemDraft) -> Void
     
@@ -154,13 +99,13 @@ struct RegularItemInfoView: View {
                 // 日付・頻度・終了日
                 Section {
                     DatePicker("開始日", selection: $draft.startDate, displayedComponents: .date)
-                    Picker("頻度", selection: $draft.frequency) {
-                        ForEach(RecurrenceFrequency.allCases) { Text($0.rawValue).tag($0) }
-                    }
                     Toggle("終了日を設定", isOn: $draft.hasEndDate)
                     if draft.hasEndDate {
                         DatePicker("終了日", selection: $draft.endDate,
                                    in: draft.startDate..., displayedComponents: .date)
+                    }
+                    Picker("頻度", selection: $draft.frequency) {
+                        ForEach(RecurrenceFrequency.allCases) { Text($0.rawValue).tag($0) }
                     }
                 } footer: {
                     Text(nextDatesText)
@@ -168,36 +113,55 @@ struct RegularItemInfoView: View {
                 
                 // 重複・優先
                 Section {
-                    CheckRow(title: "重複して追加", isOn: $draft.allowsDuplicate)
+                    VStack(alignment: .leading, spacing: 4) {
+                        CheckRow(title: "重複して追加", isOn: $draft.allowsDuplicate)
+                        Text("オフの場合、同じアイテムがすでにあると追加されません。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, 34)
+                    }
+                    .padding(.vertical, 2)
+                    
                     CheckRow(title: "優先", isOn: $draft.isPriority)
-                } footer: {
-                    Text("「重複して追加」がオフの場合、未購入の同じアイテムがリストに残っていれば追加しません。")
                 }
                 
                 // 通知・有効
-                Section {
-                    Toggle("追加時に通知", isOn: $draft.notifiesOnAdd)
-                    Toggle("有効", isOn: $draft.isActive)
-                } footer: {
-                    Text("「有効」をオフにすると、削除せずに一時停止できます。")
-                }
+                // TODO: 将来の新規機能
+//                Section {
+//                    Toggle("追加時に通知", isOn: $draft.notifiesOnAdd)
+//                }
             }
-            .navigationTitle("新規定期アイテム")
+            .navigationTitle("定期アイテム登録")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button(action: {
+                        showCancelAlert = true
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.red)
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button(action: {
                         onSave(draft)
                         dismiss()
+                    }) {
+                        Image(systemName: "checkmark")
                     }
                     .disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty || draft.folderIDs.isEmpty)
                 }
             }
         }
         .environment(\.locale, Locale(identifier: "ja_JP"))
+        .alert("入力内容を破棄しますか？", isPresented: $showCancelAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("破棄", role: .destructive) {
+                dismiss()
+            }
+        } message: {
+            Text("入力した内容は保存されません。")
+        }
     }
     
     // MARK: Next dates
@@ -221,7 +185,7 @@ struct RegularItemInfoView: View {
                                      locale: Locale(identifier: "ja_JP"))
             .month(.defaultDigits).day(.defaultDigits)
         let text = dates.map { $0.formatted(style) }.joined(separator: "、")
-        return "次回の追加予定：\(text)"
+        return "追加予定：\(text)"
     }
 }
 
