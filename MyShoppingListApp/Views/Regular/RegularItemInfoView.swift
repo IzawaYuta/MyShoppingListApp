@@ -29,7 +29,7 @@ enum RecurrenceFrequency: String, CaseIterable, Identifiable {
 struct RecurringItemDraft {
     var name = "牛乳"
     var quantity = "1本"
-    var folder = "乳製品・卵"
+    var folderIDs: Set<UUID> = []
     var startDate = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 1)) ?? .now
     var frequency: RecurrenceFrequency = .weekly
     var hasEndDate = false
@@ -39,10 +39,6 @@ struct RecurringItemDraft {
     var notifiesOnAdd = true
     var isActive = true
 }
-
-// MARK: - Dummy Data
-
-private let sampleFolders = ["野菜・果物", "肉・魚", "乳製品・卵", "日用品", "飲み物", "調味料"]
 
 // MARK: - Components
 
@@ -69,6 +65,62 @@ struct CheckRow: View {
     }
 }
 
+// MARK: - 追加先フォルダの選択
+
+/// 追加先フォルダを複数選択する行（開くとフォルダ一覧が出る）
+//struct FolderMultiSelectGroup: View {
+//    @Environment(FolderStore.self) private var store
+//    @Binding var selectedIDs: Set<UUID>
+//    @State private var isExpanded = false
+//    
+//    private var options: [FolderOption] { store.flattenedOptions }
+//    
+//    private var selectedNames: String {
+//        options.filter { selectedIDs.contains($0.id) }
+//            .map(\.node.name)
+//            .joined(separator: "、")
+//    }
+//    
+//    var body: some View {
+//        DisclosureGroup(isExpanded: $isExpanded) {
+//            ForEach(options) { option in
+//                folderRow(option)
+//            }
+//        } label: {
+//            HStack {
+//                Text("追加先フォルダ")
+//                Spacer()
+//                Text(selectedNames)
+//                    .foregroundStyle(.secondary)
+//                    .lineLimit(1)
+//            }
+//        }
+//    }
+//    
+//    private func folderRow(_ option: FolderOption) -> some View {
+//        let isSelected = selectedIDs.contains(option.id)
+//        return Button {
+//            if isSelected {
+//                selectedIDs.remove(option.id)
+//            } else {
+//                selectedIDs.insert(option.id)
+//            }
+//        } label: {
+//            HStack(spacing: 12) {
+//                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+//                    .font(.title3)
+//                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+//                Text(option.node.name)
+//                    .foregroundStyle(.primary)
+//                Spacer()
+//            }
+//            .padding(.leading, CGFloat(option.level - 1) * 20)
+//            .contentShape(Rectangle())
+//        }
+//        .buttonStyle(.plain)
+//    }
+//}
+
 // MARK: - Screen
 
 /// メインビュー（定期アイテム追加画面）
@@ -91,19 +143,17 @@ struct RegularItemInfoView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $draft.name)
-                        TextField("数量", text: $draft.quantity)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: 80)
+//                        TextField("数量", text: $draft.quantity)
+//                            .multilineTextAlignment(.trailing)
+//                            .foregroundStyle(.secondary)
+//                            .frame(maxWidth: 80)
                     }
-                    Picker("追加先フォルダ", selection: $draft.folder) {
-                        ForEach(sampleFolders, id: \.self) { Text($0) }
-                    }
+                    FolderMultiSelectGroup(selectedIDs: $draft.folderIDs)
                 }
                 
                 // 日付・頻度・終了日
                 Section {
-                    DatePicker("追加する日付", selection: $draft.startDate, displayedComponents: .date)
+                    DatePicker("開始日", selection: $draft.startDate, displayedComponents: .date)
                     Picker("頻度", selection: $draft.frequency) {
                         ForEach(RecurrenceFrequency.allCases) { Text($0.rawValue).tag($0) }
                     }
@@ -143,7 +193,7 @@ struct RegularItemInfoView: View {
                         onSave(draft)
                         dismiss()
                     }
-                    .disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty || draft.folderIDs.isEmpty)
                 }
             }
         }
@@ -181,5 +231,6 @@ struct RegularItemInfoView: View {
     NavigationStack {
         RegularItemInfoView()
     }
+    .environment(FolderStore())
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

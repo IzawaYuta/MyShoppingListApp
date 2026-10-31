@@ -5,8 +5,9 @@ import SwiftUI
 
 /// フォルダの階層制限
 enum FolderLimit {
-    /// フォルダの最大階層。将来は無制限にする予定のため、判定はこの定数だけに集約している
     static let maxDepth = 3
+    /// アイテムを入れられる最小の階層（1階層目にはアイテムを入れない）
+    static let itemMinLevel = 2
 }
 
 /// 開くシートの判定
@@ -71,6 +72,7 @@ struct FolderRoute: Hashable {
     
     /// このフォルダの中に、さらにフォルダを作成できるか
     var canAddFolder: Bool { level < FolderLimit.maxDepth }
+    var canHoldItems: Bool { level >= FolderLimit.itemMinLevel }
 }
 
 // MARK: - Dummy Data
@@ -111,15 +113,17 @@ final class FolderStore {
                     ShoppingItem(name: "牛乳"),
                     ShoppingItem(name: "卵", isDone: true)
                 ])
-            ],
-            items: [ShoppingItem(name: "食パン")]
+            ]
         )
         
         return [
             food,
-            FolderNode(name: "日用品", tint: p[1], items: [ShoppingItem(name: "洗剤")]),
-            FolderNode(name: "飲み物", tint: p[2]),
-            FolderNode(name: "調味料", tint: p[3])
+            FolderNode(name: "日用品", tint: p[1], children: [
+                FolderNode(name: "洗剤・掃除", tint: p[1], items: [ShoppingItem(name: "洗剤")]),
+                FolderNode(name: "紙類", tint: p[1])
+            ]),
+            FolderNode(name: "飲み物", tint: p[2], children: [FolderNode(name: "水・お茶", tint: p[2])]),
+            FolderNode(name: "調味料", tint: p[3], children: [FolderNode(name: "基本調味料", tint: p[3])])
         ]
     }
 }
@@ -167,7 +171,7 @@ struct FolderNodeRow: View {
 
 /// メインビュー（ホーム画面）
 struct HomeView: View {
-    @State private var store = FolderStore()
+    @Environment(FolderStore.self) private var store
     @State private var isAddingFolder = false
     @State private var newFolderName = ""
     
@@ -201,7 +205,6 @@ struct HomeView: View {
                 FolderAddView()
             }
         }
-        .environment(store)
     }
 }
 
@@ -236,16 +239,18 @@ struct FolderDetailView: View {
                 }
             }
             
-            Section {
-                ForEach($node.items) { $item in
-                    ItemRow(item: $item)   // ShoppingListView.swift のものを使用
-                }
-                .onDelete { node.items.remove(atOffsets: $0) }
-            } header: {
-                Text("買うもの")
-            } footer: {
-                if !route.canAddFolder {
-                    Text("フォルダは\(FolderLimit.maxDepth)階層までです。")
+            if route.canHoldItems {
+                Section {
+                    ForEach($node.items) { $item in
+                        ItemRow(item: $item)
+                    }
+                    .onDelete { node.items.remove(atOffsets: $0) }
+                } header: {
+                    Text("買うもの")
+                } footer: {
+                    if !route.canAddFolder {
+                        Text("フォルダは\(FolderLimit.maxDepth)階層までです。")
+                    }
                 }
             }
         }
@@ -267,20 +272,20 @@ struct FolderDetailView: View {
     /// フォルダまたはアイテムの追加用plusボタン
     @ViewBuilder
     private var addMenu: some View {
-        if route.canAddFolder {
+        if route.canAddFolder && route.canHoldItems {
+            // 2階層目：フォルダもアイテムも追加できる
             Menu {
                 Button("フォルダを追加", systemImage: "folder.badge.plus") { activeSheet = .folder }
                 Button("アイテムを追加", systemImage: "plus") { activeSheet = .item }
-                // 最大階層の「＋」ボタンは activeSheet = .item
             } label: {
                 Image(systemName: "plus")
             }
+        } else if route.canAddFolder {
+            // 1階層目：フォルダだけ
+            Button { activeSheet = .folder } label: { Image(systemName: "plus") }
         } else {
-            Button {
-                activeSheet = .item
-            } label: {
-                Image(systemName: "plus")
-            }
+            // 3階層目：アイテムだけ
+            Button { activeSheet = .item } label: { Image(systemName: "plus") }
         }
     }
     
