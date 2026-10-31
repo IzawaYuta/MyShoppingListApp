@@ -42,13 +42,27 @@ struct FolderMultiSelectGroup: View {
     @Environment(FolderStore.self) private var store
     @Binding var selectedIDs: Set<UUID>
     @State private var isExpanded = false
+    /// 開いている（子フォルダを表示している）フォルダ。最初はすべて畳んでおく
+    @State private var expandedFolderIDs: Set<UUID> = []
     
-    private enum CheckState { case on, partial, off }
+    private var allOptions: [FolderOption] { store.flattenedOptions }
     
-    private var options: [FolderOption] { store.flattenedOptions }
+    /// 画面に表示するフォルダ。畳んでいる親フォルダの配下は含めない
+    private var visibleOptions: [FolderOption] {
+        func walk(_ nodes: [FolderNode], level: Int) -> [FolderOption] {
+            nodes.flatMap { node -> [FolderOption] in
+                var result = [FolderOption(node: node, level: level)]
+                if expandedFolderIDs.contains(node.id) {
+                    result += walk(node.children, level: level + 1)
+                }
+                return result
+            }
+        }
+        return walk(store.roots, level: 1)
+    }
     
     private var selectedOptions: [FolderOption] {
-        options.filter { $0.canHoldItems && selectedIDs.contains($0.id) }
+        allOptions.filter { $0.canHoldItems && selectedIDs.contains($0.id) }
     }
     
     /// 閉じている時に右側へ表示する文字（2件まで名前、それ以上は件数）
@@ -60,12 +74,9 @@ struct FolderMultiSelectGroup: View {
     
     var body: some View {
         DisclosureGroup(isExpanded: $isExpanded) {
-            ForEach(options) { option in
+            ForEach(visibleOptions) { option in
                 folderRow(option)
             }
-            Text("1階層目のフォルダを選ぶと、配下のフォルダがすべて選択されます。")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
         } label: {
             HStack {
                 Text("追加先フォルダ")
@@ -79,18 +90,16 @@ struct FolderMultiSelectGroup: View {
     
     // MARK: State / action
     
-    private func state(of option: FolderOption) -> CheckState {
+    /// チェックの状態。1階層目は、配下がすべて選ばれている時だけチェック（一部選択の表示はしない）
+    private func isChecked(_ option: FolderOption) -> Bool {
         if option.canHoldItems {
-            return selectedIDs.contains(option.id) ? .on : .off
+            return selectedIDs.contains(option.id)
         }
-        // 1階層目：配下の選択状況から決める
         let ids = option.descendantDestinationIDs
-        let count = ids.filter { selectedIDs.contains($0) }.count
-        if count == 0 { return .off }
-        return count == ids.count ? .on : .partial
+        return !ids.isEmpty && ids.allSatisfy { selectedIDs.contains($0) }
     }
     
-    private func toggle(_ option: FolderOption) {
+    private func toggleSelection(_ option: FolderOption) {
         if option.canHoldItems {
             if selectedIDs.contains(option.id) {
                 // 外すのは自分だけ（配下のチェックはそのまま残る）
@@ -103,7 +112,7 @@ struct FolderMultiSelectGroup: View {
         } else {
             // 1階層目：すべて選択済みなら全部外し、それ以外は全部選ぶ
             let ids = option.descendantDestinationIDs
-            if state(of: option) == .on {
+            if isChecked(option) {
                 selectedIDs.subtract(ids)
             } else {
                 selectedIDs.formUnion(ids)
@@ -111,36 +120,56 @@ struct FolderMultiSelectGroup: View {
         }
     }
     
+    private func toggleExpansion(_ option: FolderOption) {
+        if expandedFolderIDs.contains(option.id) {
+            expandedFolderIDs.remove(option.id)
+        } else {
+            expandedFolderIDs.insert(option.id)
+        }
+    }
+    
     // MARK: Row
     
     private func folderRow(_ option: FolderOption) -> some View {
-        let state = state(of: option)
-        let imageName: String = {
-            switch state {
-            case .on:      return "checkmark.circle.fill"
-            case .partial: return "minus.circle.fill"
-            case .off:     return "circle"
-            }
-        }()
+        let checked = isChecked(option)
+        let hasChildren = !option.node.children.isEmpty
+        let isOpen = expandedFolderIDs.contains(option.id)
         // 配下にアイテムを入れられるフォルダがない1階層目は選べない
         let isDisabled = !option.canHoldItems && option.descendantDestinationIDs.isEmpty
         
-        return Button {
-            toggle(option)
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: imageName)
-                    .font(.title3)
-                    .foregroundStyle(state == .off ? Color.secondary : Color.accentColor)
-                Text(option.node.name)
-                    .fontWeight(option.canHoldItems ? .regular : .semibold)
-                    .foregroundStyle(.primary)
-                Spacer()
+        return HStack(spacing: 12) {
+            // チェックと名前：タップで選択
+            Button {
+                toggleSelection(option)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: checked ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(checked ? Color.accentColor : Color.secondary)
+                    Text(option.node.name)
+                        .fontWeight(option.canHoldItems ? .regular : .semibold)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                }
+                .contentShape(Rectangle())
             }
-            .padding(.leading, CGFloat(option.level - 1) * 20)   // 階層ごとにインデント
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .disabled(isDisabled)
+            
+            // 矢印：タップで子フォルダを開閉
+            if hasChildren {
+                Button {
+                    withAnimation { toggleExpansion(option) }
+                } label: {
+                    Image(systemName: isOpen ? "chevron.down" : "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
+        .padding(.leading, CGFloat(option.level - 1) * 20)   // 階層ごとにインデント
     }
 }
