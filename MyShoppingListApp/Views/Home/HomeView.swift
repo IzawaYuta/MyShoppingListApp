@@ -14,7 +14,15 @@ enum FolderLimit {
 /// 複数のsheetを開く場合は、enumで判定するのが簡単
 enum ActiveSheet: Identifiable {
     case folder, item
-    var id: Self { self }
+    case editFolder(FolderNode)
+    
+    var id: String {
+        switch self {
+        case .folder: return "folder"
+        case .item: return "item"
+        case .editFolder(let node): return "edit-\(node.id)"
+        }
+    }
 }
 
 // MARK: - Model
@@ -170,42 +178,76 @@ struct FolderNodeRow: View {
     }
 }
 
+/// フォルダの行。通常は画面を開き、編集モード中は編集画面を開く
+struct FolderListRow: View {
+    let node: FolderNode
+    let level: Int
+    let onEdit: () -> Void
+    @Environment(\.editMode) private var editMode
+    
+    var body: some View {
+        if editMode?.wrappedValue.isEditing == true {
+            Button(action: onEdit) {
+                HStack {
+                    FolderNodeRow(node: node)
+                    Image(systemName: "pencil")
+                        .foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        } else {
+            NavigationLink(value: FolderRoute(node: node, level: level)) {
+                FolderNodeRow(node: node)
+            }
+        }
+    }
+}
+
 // MARK: - 最初の画面（フォルダのみ）
 
 /// メインビュー（ホーム画面）
 struct HomeView: View {
     @Environment(FolderStore.self) private var store
-    @State private var isAddingFolder = false
-    @State private var newFolderName = ""
+    @State private var activeSheet: ActiveSheet?
+    @State private var editMode: EditMode = .inactive
     
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     ForEach(store.roots) { folder in
-                        NavigationLink(value: FolderRoute(node: folder, level: 1)) {
-                            FolderNodeRow(node: folder)
+                        FolderListRow(node: folder, level: 1) {
+                            activeSheet = .editFolder(folder)
                         }
                     }
                     .onDelete { store.roots.remove(atOffsets: $0) }
                 }
             }
             .listStyle(.insetGrouped)
+            .environment(\.editMode, $editMode)
             .navigationTitle("カテゴリー")
             .navigationDestination(for: FolderRoute.self) { route in
                 FolderDetailView(route: route)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button(editMode.isEditing ? "完了" : "編集") {
+                        withAnimation { editMode = editMode.isEditing ? .inactive : .active }
+                    }
                     Button {
-                        isAddingFolder = true
+                        activeSheet = .folder
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $isAddingFolder) {
-                FolderAddView()
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .folder: FolderFormView(mode: .add(parent: nil, level: 0))
+                case .editFolder(let folder): FolderFormView(mode: .edit(folder))
+                case .item: EmptyView()
+                }
             }
         }
     }
@@ -217,6 +259,7 @@ struct HomeView: View {
 struct FolderDetailView: View {
     let route: FolderRoute
     @Bindable private var node: FolderNode
+    @State private var editMode: EditMode = .inactive
     
 //    @State private var isAddingFolder = false
 //    @State private var isAddingItem = false
@@ -234,8 +277,8 @@ struct FolderDetailView: View {
             if route.canAddFolder && !node.children.isEmpty {
                 Section("フォルダ") {
                     ForEach(node.children) { child in
-                        NavigationLink(value: FolderRoute(node: child, level: route.level + 1)) {
-                            FolderNodeRow(node: child)
+                        FolderListRow(node: child, level: route.level + 1) {
+                            activeSheet = .editFolder(child)
                         }
                     }
                     .onDelete { node.children.remove(atOffsets: $0) }
@@ -258,15 +301,22 @@ struct FolderDetailView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .environment(\.editMode, $editMode)
         .navigationTitle(node.name)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { addMenu }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(editMode.isEditing ? "完了" : "編集") {
+                    withAnimation { editMode = editMode.isEditing ? .inactive : .active }
+                }
+                addMenu
+            }
         }
         .sheet(item: $activeSheet) { sheet in
             switch sheet {
-            case .folder: FolderAddView(parent: node, level: route.level)
+            case .folder: FolderFormView(mode: .add(parent: node, level: route.level))
             case .item:   ItemInfoView(currentFolder: node)
+            case .editFolder(let folder): FolderFormView(mode: .edit(folder))
             }
         }
     }
