@@ -27,17 +27,17 @@ enum RecurrenceFrequency: String, CaseIterable, Identifiable {
 
 /// 下書きダミーデータ
 struct RecurringItemDraft {
-    var name = "牛乳"
-    var quantity = "1本"
+    var name = ""
+    var quantity = ""
     var folderIDs: Set<UUID> = []
-    var startDate = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 1)) ?? .now
+    var startDate = Calendar.current.startOfDay(for: .now)
     var frequency: RecurrenceFrequency = .weekly
     var hasEndDate = false
-    var endDate = Calendar.current.date(from: DateComponents(year: 2027, month: 3, day: 31)) ?? .now
+    var endDate = Calendar.current.startOfDay(for: .now)
     var allowsDuplicate = false
-    var isPriority = true
+    var isPriority = false
     var notifiesOnAdd = true
-    var isActive = true
+    var isActive = false
 }
 
 // MARK: - Components
@@ -49,7 +49,11 @@ struct CheckRow: View {
     
     var body: some View {
         Button {
-            isOn.toggle()
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                isOn.toggle()
+            }
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
@@ -72,12 +76,20 @@ struct RegularItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var draft: RecurringItemDraft
     @State private var showCancelAlert = false
+    @State private var pendingActive: Bool?
+    @State private var showActiveAlert = false
     
+    let title: String
+    let isEditing: Bool
     var onSave: (RecurringItemDraft) -> Void
     
     init(draft: RecurringItemDraft = RecurringItemDraft(),
+         title: String = "定期アイテム登録",
+         isEditing: Bool = false,
          onSave: @escaping (RecurringItemDraft) -> Void = { _ in }) {
         _draft = State(initialValue: draft)
+        self.title = title
+        self.isEditing = isEditing
         self.onSave = onSave
     }
     
@@ -131,8 +143,35 @@ struct RegularItemInfoView: View {
 //                Section {
 //                    Toggle("追加時に通知", isOn: $draft.notifiesOnAdd)
 //                }
+                // 有効（編集の時だけ）
+                Section {
+                    Toggle("無効にする", isOn: Binding(
+                        get: { draft.isActive },
+                        set: { newValue in
+                            // すぐには変えず、確認のアラートを出す
+                            pendingActive = newValue
+                            showActiveAlert = true
+                        }
+                    ))
+                    .alert(
+                        pendingActive == false ? "有効にしますか？" : "無効にしますか？",
+                        isPresented: $showActiveAlert
+                    ) {
+                        Button("キャンセル", role: .cancel) { pendingActive = nil }
+                        Button(pendingActive == false ? "有効にする" : "無効にする") {
+                            if let newValue = pendingActive {
+                                draft.isActive = newValue
+                            }
+                            pendingActive = nil
+                        }
+                    } message: {
+                        Text(pendingActive == false
+                             ? "指定した日に、自動で追加されます。"
+                             : "削除はされません。\n自動追加が無効になります。")
+                    }
+                }
             }
-            .navigationTitle("定期アイテム登録")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

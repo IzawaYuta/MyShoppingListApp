@@ -3,17 +3,25 @@ import SwiftUI
 
 // MARK: - Model
 
-/// 定期アイテムモデル
+/// 定期アイテムモデル（登録画面の入力内容 RecurringItemDraft をそのまま持つ）
 struct RecurringItem: Identifiable {
     let id = UUID()
-    var name: String
-    var frequencyLabel: String   // 例：毎週 / 隔週 / 毎月1日
-    var isPriority: Bool = false
-    var isActive: Bool = true
+    var draft: RecurringItemDraft
     
-    /// 名前の下に表示する文字（頻度と、優先の場合は「優先」）
+    var name: String { draft.name }
+    var isPriority: Bool { draft.isPriority }
+    var isActive: Bool { draft.isActive }
+    
+    /// 名前の下に表示する頻度（例：毎週 / 隔週 / 毎月1日）
     var subtitle: String {
-        frequencyLabel
+        let calendar = Calendar.current
+        let day = calendar.component(.day, from: draft.startDate)
+        let month = calendar.component(.month, from: draft.startDate)
+        switch draft.frequency {
+        case .monthly: return "毎月\(day)日"
+        case .yearly:  return "毎年\(month)月\(day)日"
+        default:       return draft.frequency.rawValue
+        }
     }
 }
 
@@ -21,13 +29,28 @@ struct RecurringItem: Identifiable {
 
 /// ダミーデータ
 extension RecurringItem {
+    private static func make(_ name: String,
+                             _ frequency: RecurrenceFrequency,
+                             day: Int = 1,
+                             priority: Bool = false,
+                             active: Bool = true) -> RecurringItem {
+        var draft = RecurringItemDraft()
+        draft.name = name
+        draft.quantity = ""
+        draft.frequency = frequency
+        draft.startDate = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: day)) ?? .now
+        draft.isPriority = priority
+        draft.isActive = active
+        return RecurringItem(draft: draft)
+    }
+    
     static let samples: [RecurringItem] = [
-        RecurringItem(name: "牛乳", frequencyLabel: "毎週", isPriority: true),
-        RecurringItem(name: "卵", frequencyLabel: "毎週"),
-        RecurringItem(name: "トイレットペーパー", frequencyLabel: "毎月1日"),
-        RecurringItem(name: "ヨーグルト", frequencyLabel: "隔週"),
-        RecurringItem(name: "洗剤", frequencyLabel: "毎月15日"),
-        RecurringItem(name: "ミネラルウォーター", frequencyLabel: "毎週", isActive: false)
+        make("牛乳", .weekly, priority: true),
+        make("卵", .weekly),
+        make("トイレットペーパー", .monthly, day: 1),
+        make("ヨーグルト", .biweekly),
+        make("洗剤", .monthly, day: 15),
+        make("ミネラルウォーター", .weekly, active: false)
     ]
 }
 
@@ -57,6 +80,22 @@ struct RecurringItemRow: View {
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 8)
+        .contentShape(Rectangle())   // 空白の部分もタップに反応させる
+    }
+}
+
+// MARK: - Sheet
+
+/// 開くシートの判定（追加 or 編集）
+enum RegularItemSheet: Identifiable {
+    case add
+    case edit(RecurringItem)
+    
+    var id: String {
+        switch self {
+        case .add: return "add"
+        case .edit(let item): return "edit-\(item.id)"
+        }
     }
 }
 
@@ -65,7 +104,7 @@ struct RecurringItemRow: View {
 /// メインビュー（定期アイテム一覧リスト）
 struct RegularItemListView: View {
     @State private var items = RecurringItem.samples
-    @State private var isShowingForm = false
+    @State private var activeSheet: RegularItemSheet?
     
     private var activeItems: [RecurringItem] { items.filter { $0.isActive } }
     private var pausedItems: [RecurringItem] { items.filter { !$0.isActive } }
@@ -74,7 +113,7 @@ struct RegularItemListView: View {
         List {
             Section {
                 ForEach(activeItems) { item in
-                    RecurringItemRow(item: item)
+                    row(item)
                 }
                 .onDelete { delete(from: activeItems, at: $0) }
             }
@@ -82,7 +121,7 @@ struct RegularItemListView: View {
             if !pausedItems.isEmpty {
                 Section("一時停止中") {
                     ForEach(pausedItems) { item in
-                        RecurringItemRow(item: item)
+                        row(item)
                     }
                     .onDelete { delete(from: pausedItems, at: $0) }
                 }
@@ -94,17 +133,41 @@ struct RegularItemListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    isShowingForm = true
+                    activeSheet = .add
                 } label: {
                     Image(systemName: "plus")
                 }
             }
         }
-        .sheet(isPresented: $isShowingForm) {
-            NavigationStack {
-                RegularItemInfoView()
+        .sheet(item: $activeSheet) { sheet in
+            // RegularItemInfoView が自分で NavigationStack を持っているため、ここでは包まない
+            switch sheet {
+            case .add:
+                RegularItemInfoView { saved in
+                    items.append(RecurringItem(draft: saved))
+                }
+            case .edit(let item):
+                RegularItemInfoView(draft: item.draft, title: "定期アイテム編集", isEditing: true) { saved in
+                    update(item, with: saved)
+                }
             }
         }
+    }
+    
+    /// タップで編集画面を開く行
+    private func row(_ item: RecurringItem) -> some View {
+        Button {
+            activeSheet = .edit(item)
+        } label: {
+            RecurringItemRow(item: item)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    /// 編集内容を、元の定期アイテムに反映する
+    private func update(_ item: RecurringItem, with draft: RecurringItemDraft) {
+        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
+        items[index].draft = draft
     }
     
     /// セクション内の行番号から、元の配列の項目を削除する
@@ -120,5 +183,6 @@ struct RegularItemListView: View {
     NavigationStack {
         RegularItemListView()
     }
+    .environment(FolderStore())
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
