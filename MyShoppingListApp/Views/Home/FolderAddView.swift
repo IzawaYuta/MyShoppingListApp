@@ -51,11 +51,16 @@ struct FolderAddView: View {
                 
                 // イメージ選択
                 Section("イメージ") {
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        iconCell(nil)
-                        ForEach(CustomIconFolder.allCases) { iconCell($0) }
+                    iconCell(nil)
+                    
+                    ForEach(FolderIconCategory.allCases) { category in
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(category.icons) { icon in
+                                iconCell(icon)
+                            }
+                        }
+                        .padding(.top, 12)
                     }
-                    .padding(.vertical, 6)
                 }
             }
             .navigationTitle("新規フォルダ")

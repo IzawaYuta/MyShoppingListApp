@@ -311,5 +311,6 @@ struct FolderDetailView: View {
 
 #Preview {
     HomeView()
+        .environment(FolderStore())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
