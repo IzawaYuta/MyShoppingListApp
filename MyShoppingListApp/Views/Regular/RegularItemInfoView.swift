@@ -88,10 +88,11 @@ struct RegularItemInfoView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $draft.name)
-//                        TextField("数量", text: $draft.quantity)
-//                            .multilineTextAlignment(.trailing)
-//                            .foregroundStyle(.secondary)
-//                            .frame(maxWidth: 80)
+                        if draft.isPriority {
+                            Image(systemName: "exclamationmark")
+                                .bold()
+                                .foregroundStyle(Color.red)
+                        }
                     }
                     FolderMultiSelectGroup(selectedIDs: $draft.folderIDs)
                 }

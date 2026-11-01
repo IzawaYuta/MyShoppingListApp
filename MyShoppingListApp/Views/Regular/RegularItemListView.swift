@@ -7,14 +7,13 @@ import SwiftUI
 struct RecurringItem: Identifiable {
     let id = UUID()
     var name: String
-    var quantity: String
     var frequencyLabel: String   // 例：毎週 / 隔週 / 毎月1日
     var isPriority: Bool = false
     var isActive: Bool = true
     
     /// 名前の下に表示する文字（頻度と、優先の場合は「優先」）
     var subtitle: String {
-        isPriority ? "\(frequencyLabel) ・ 優先" : frequencyLabel
+        frequencyLabel
     }
 }
 
@@ -23,12 +22,12 @@ struct RecurringItem: Identifiable {
 /// ダミーデータ
 extension RecurringItem {
     static let samples: [RecurringItem] = [
-        RecurringItem(name: "牛乳", quantity: "1本", frequencyLabel: "毎週", isPriority: true),
-        RecurringItem(name: "卵", quantity: "10個", frequencyLabel: "毎週"),
-        RecurringItem(name: "トイレットペーパー", quantity: "1パック", frequencyLabel: "毎月1日"),
-        RecurringItem(name: "ヨーグルト", quantity: "2個", frequencyLabel: "隔週"),
-        RecurringItem(name: "洗剤", quantity: "1個", frequencyLabel: "毎月15日"),
-        RecurringItem(name: "ミネラルウォーター", quantity: "1箱", frequencyLabel: "毎週", isActive: false)
+        RecurringItem(name: "牛乳", frequencyLabel: "毎週", isPriority: true),
+        RecurringItem(name: "卵", frequencyLabel: "毎週"),
+        RecurringItem(name: "トイレットペーパー", frequencyLabel: "毎月1日"),
+        RecurringItem(name: "ヨーグルト", frequencyLabel: "隔週"),
+        RecurringItem(name: "洗剤", frequencyLabel: "毎月15日"),
+        RecurringItem(name: "ミネラルウォーター", frequencyLabel: "毎週", isActive: false)
     ]
 }
 
@@ -39,19 +38,25 @@ struct RecurringItemRow: View {
     let item: RecurringItem
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 8) {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(item.name)
                     .foregroundStyle(item.isActive ? .primary : .secondary)
-                Text(item.quantity)
-                    .font(.subheadline)
+                Text(item.subtitle)
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            Text(item.subtitle)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            
+            Spacer()
+            
+            if item.isPriority {
+                Image(systemName: "exclamationmark")
+                    .bold()
+                    .foregroundStyle(Color.red)
+            }
         }
         .padding(.vertical, 2)
+        .padding(.horizontal, 8)
     }
 }
 
@@ -72,10 +77,6 @@ struct RegularItemListView: View {
                     RecurringItemRow(item: item)
                 }
                 .onDelete { delete(from: activeItems, at: $0) }
-            } header: {
-                Text("有効")
-            } footer: {
-                Text("有効なアイテムは、指定した日に自動でリストへ追加されます。")
             }
             
             if !pausedItems.isEmpty {
