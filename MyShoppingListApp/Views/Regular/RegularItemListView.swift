@@ -33,7 +33,7 @@ extension RecurringItem {
                              _ frequency: RecurrenceFrequency,
                              day: Int = 1,
                              priority: Bool = false,
-                             active: Bool = true) -> RecurringItem {
+                             active: Bool = false) -> RecurringItem {
         var draft = RecurringItemDraft()
         draft.name = name
         draft.quantity = ""
@@ -110,45 +110,47 @@ struct RegularItemListView: View {
     private var pausedItems: [RecurringItem] { items.filter { !$0.isActive } }
     
     var body: some View {
-        List {
-            Section {
-                ForEach(activeItems) { item in
-                    row(item)
-                }
-                .onDelete { delete(from: activeItems, at: $0) }
-            }
-            
-            if !pausedItems.isEmpty {
-                Section("一時停止中") {
-                    ForEach(pausedItems) { item in
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(activeItems) { item in
                         row(item)
                     }
-                    .onDelete { delete(from: pausedItems, at: $0) }
+                    .onDelete { delete(from: activeItems, at: $0) }
+                }
+                
+                if !pausedItems.isEmpty {
+                    Section("一時停止中") {
+                        ForEach(pausedItems) { item in
+                            row(item)
+                        }
+                        .onDelete { delete(from: pausedItems, at: $0) }
+                    }
                 }
             }
-        }
-        .listStyle(.insetGrouped)
-        .navigationTitle("定期アイテム")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    activeSheet = .add
-                } label: {
-                    Image(systemName: "plus")
+            .listStyle(.insetGrouped)
+            .navigationTitle("定期アイテム")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        activeSheet = .add
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
             }
-        }
-        .sheet(item: $activeSheet) { sheet in
-            // RegularItemInfoView が自分で NavigationStack を持っているため、ここでは包まない
-            switch sheet {
-            case .add:
-                RegularItemInfoView { saved in
-                    items.append(RecurringItem(draft: saved))
-                }
-            case .edit(let item):
-                RegularItemInfoView(draft: item.draft, title: "定期アイテム編集", isEditing: true) { saved in
-                    update(item, with: saved)
+            .sheet(item: $activeSheet) { sheet in
+                // RegularItemInfoView が自分で NavigationStack を持っているため、ここでは包まない
+                switch sheet {
+                case .add:
+                    RegularItemInfoView { saved in
+                        items.append(RecurringItem(draft: saved))
+                    }
+                case .edit(let item):
+                    RegularItemInfoView(draft: item.draft, title: "定期アイテム編集", isEditing: true) { saved in
+                        update(item, with: saved)
+                    }
                 }
             }
         }

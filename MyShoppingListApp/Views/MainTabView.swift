@@ -4,7 +4,7 @@ import SwiftUI
 struct MainTabView: View {
     
     @State private var selection: Int = 0
-    @State private var store = FolderStore()     
+    @State private var store = FolderStore()
     
     var body: some View {
         TabView(selection: $selection) {
@@ -13,7 +13,7 @@ struct MainTabView: View {
                     Image(systemName: "square.and.pencil")
                 }
                 .tag(0)
-            RegularItemInfoView()
+            RegularItemListView()
                 .tabItem {
                     Image(systemName: "square.and.pencil")
                 }
