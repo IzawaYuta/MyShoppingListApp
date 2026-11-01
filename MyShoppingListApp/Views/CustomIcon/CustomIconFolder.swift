@@ -6,7 +6,6 @@ import SwiftUI
 /// case の名前は、Assets の画像名と同じにする（rawValue が画像名になる）。
 enum CustomIconFolder: String, CaseIterable, Identifiable {
     case apple
-    case bike1
     case bike2
     case bike3
     case bike4
@@ -14,8 +13,6 @@ enum CustomIconFolder: String, CaseIterable, Identifiable {
     case bike6
     case bike7
     case bike8
-    case bike9
-    case bike10
     case bike11
     case bike12
     case book1
@@ -135,7 +132,7 @@ enum FolderIconCategory: String, CaseIterable, Identifiable {
     var icons: [CustomIconFolder] {
         switch self {
         case .food:
-            return [.fish01, .meat01, .rice01, .tomato01, .bread01,.cabbage01,.carrot01,.eggplant01
+            return [.rice01, .bread01, .meat01, .fish01, .tomato01,.cabbage01,.carrot01,.eggplant01
                     
             ]
         case .fruit:
@@ -147,8 +144,8 @@ enum FolderIconCategory: String, CaseIterable, Identifiable {
             
         case .vehicle:
             return [
-                .bike1, .bike2, .bike3, .bike4, .bike5, .bike6,
-                .bike7, .bike8, .bike9, .bike10, .bike11, .bike12, .vehicle1, .vehicle2, .vehicle3, .vehicle4, .vehicle5, .vehicle6, .vehicle7, .vehicle8
+                .bike2, .bike3, .bike4, .bike5, .bike6,
+                .bike7, .bike8, .bike11, .bike12, .vehicle1, .vehicle2, .vehicle3, .vehicle4, .vehicle5, .vehicle6, .vehicle7, .vehicle8
             ]
             
         case.animal:

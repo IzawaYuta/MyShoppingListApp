@@ -88,7 +88,10 @@ struct FolderAddView: View {
         } label: {
             Group {
                 if let cellIcon {
-                    cellIcon.image.resizable().scaledToFit()
+                    cellIcon.image
+                        .resizable()
+                        .scaledToFit()
+                        .background(Color.white)
                 } else {
                     Text("Aa")
                         .font(.system(size: 18, weight: .bold))
