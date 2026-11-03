@@ -37,7 +37,7 @@ struct RecurringItemDraft {
     var allowsDuplicate = false
     var isPriority = false
     var notifiesOnAdd = true
-    var isActive = false
+    var isActive = true
 }
 
 // MARK: - Components

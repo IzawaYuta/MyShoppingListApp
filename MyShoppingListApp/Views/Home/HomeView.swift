@@ -316,28 +316,11 @@ struct FolderDetailView: View {
                 }
             }
             
-            if route.canHoldItems {
-                Section {
-                    ForEach($node.items.filter { !$0.wrappedValue.isDone }) { $item in
-                        ItemRow(item: $item)
-                    }
-                    .onDelete { delete(at: $0, done: false) }
-                } header: {
-                    Text("買うもの")
-                } footer: {
-                    if !route.canAddFolder {
-                        Text("フォルダは\(FolderLimit.maxDepth)階層までです。")
-                    }
-                }
-                
-                if completedCount > 0 {
-                    Section("完了済み") {
-                        ForEach($node.items.filter { $0.wrappedValue.isDone }) { $item in
-                            ItemRow(item: $item)
-                        }
-                        .onDelete { delete(at: $0, done: true) }
-                    }
-                }
+            ForEach($node.items) { $item in
+                ItemRow(item: $item)
+            }
+            .onDelete {
+                node.items.remove(atOffsets: $0)
             }
         }
         .listStyle(.insetGrouped)
@@ -431,13 +414,6 @@ struct FolderDetailView: View {
             purchaseStore.records.append(contentsOf: records)
             node.items.removeAll { $0.isDone }
         }
-    }
-    
-    /// 表示している行の番号を、元の配列のアイテムに戻して削除する
-    private func delete(at offsets: IndexSet, done: Bool) {
-        let visible = node.items.filter { $0.isDone == done }
-        let ids = offsets.map { visible[$0].id }
-        node.items.removeAll { ids.contains($0.id) }
     }
 }
 

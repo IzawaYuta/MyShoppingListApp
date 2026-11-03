@@ -180,7 +180,7 @@ struct ToastView: View {
                 .multilineTextAlignment(.leading)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 18)
         .frame(maxWidth: 420, alignment: .leading)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: .black.opacity(0.15), radius: 12, y: 4)

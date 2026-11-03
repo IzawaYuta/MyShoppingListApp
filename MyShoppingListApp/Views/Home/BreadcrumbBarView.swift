@@ -26,15 +26,12 @@ struct BreadcrumbBarView: View {
                         
                         if index == routes.count - 1 {
                             Text(route.node.name)
-                                .font(.subheadline.weight(.semibold))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.accentColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
-                                .id("current")          // ← 追加：今いるフォルダの目印
+                                .font(.subheadline)
+                                .id("current")
                         } else {
                             Button(route.node.name) { onSelect(route) }
                                 .font(.subheadline)
-                                .buttonStyle(.borderless)   // ← 追加
+                                .buttonStyle(.borderless)
                         }
                     }
                 }
