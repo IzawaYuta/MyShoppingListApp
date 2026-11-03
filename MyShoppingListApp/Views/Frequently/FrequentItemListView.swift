@@ -83,7 +83,7 @@ struct FrequentItemListView: View {
     
     private func row(_ item: FrequentItem) -> some View {
         let isSelected = selection.contains(item.id)
-        let inList = isInList(item)
+//        let inList = isInList(item)
         
         return Button {
             if editMode.isEditing {
@@ -99,12 +99,12 @@ struct FrequentItemListView: View {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.title3)
                         .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                        .opacity(inList ? 0.35 : 1)
+//                        .opacity(inList ? 0.35 : 1)
                 }
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.name)
-                        .foregroundStyle(inList ? .secondary : .primary)
+//                        .foregroundStyle(inList ? .secondary : .primary)
                     Text(folderNames(for: item))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -112,14 +112,14 @@ struct FrequentItemListView: View {
                 
                 Spacer()
                 
-                if inList {
-                    Text("リストにあります")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
-                }
+//                if inList {
+//                    Text("リストにあります")
+//                        .font(.caption)
+//                        .foregroundStyle(.secondary)
+//                        .padding(.horizontal, 6)
+//                        .padding(.vertical, 2)
+//                        .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
+//                }
                 if item.isPriority {
                     Image(systemName: "exclamationmark")
                         .bold()
@@ -130,7 +130,7 @@ struct FrequentItemListView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(inList && !editMode.isEditing)   // すでにリストにあるものは選べない（編集は可能）
+//        .disabled(inList && !editMode.isEditing)   // すでにリストにあるものは選べない（編集は可能）
     }
     
     // MARK: Floating button / empty / toast
@@ -199,13 +199,13 @@ struct FrequentItemListView: View {
     }
     
     /// 追加先のフォルダに、同じ名前の未完了アイテムがすでにあるか
-    private func isInList(_ item: FrequentItem) -> Bool {
-        item.folderIDs
-            .compactMap { folders.node(withID: $0) }
-            .contains { node in
-                node.items.contains { $0.name == item.name && !$0.isDone }
-            }
-    }
+//    private func isInList(_ item: FrequentItem) -> Bool {
+//        item.folderIDs
+//            .compactMap { folders.node(withID: $0) }
+//            .contains { node in
+//                node.items.contains { $0.name == item.name && !$0.isDone }
+//            }
+//    }
     
     /// 選んだアイテムを、それぞれの追加先フォルダに追加する（フォルダごとに別のアイテムとして作る）
     private func addSelectedToList() {
