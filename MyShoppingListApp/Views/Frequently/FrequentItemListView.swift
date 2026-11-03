@@ -49,7 +49,7 @@ struct FrequentItemListView: View {
         .overlay { if store.items.isEmpty { emptyState } }
         .overlay(alignment: .bottomTrailing) { addButton }
         .overlay(alignment: .top) { toast }
-        .animation(.default, value: selectedItems.isEmpty)
+        .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 EditButton()
@@ -157,7 +157,7 @@ struct FrequentItemListView: View {
                 .shadow(color: .black.opacity(0.28), radius: 8, y: 4)
             }
             .padding(16)
-            .transition(.scale(scale: 0.8).combined(with: .opacity))
+            .transition(.opacity)
         }
     }
     
