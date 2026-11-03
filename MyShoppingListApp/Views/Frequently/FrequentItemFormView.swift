@@ -29,7 +29,14 @@ struct FrequentItemFormView: View {
             Form {
                 // 名前・優先
                 Section {
-                    TextField("アイテム名", text: $name)
+                    HStack {
+                        TextField("アイテム名", text: $name)
+                        if isPriority {
+                            Image(systemName: "exclamationmark")
+                                .bold()
+                                .foregroundStyle(Color.red)
+                        }
+                    }
                     CheckRow(title: "優先", isOn: $isPriority)   // RegularItemInfoView.swift のものを使用
                 }
                 
@@ -44,12 +51,19 @@ struct FrequentItemFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") { save() }
-                        .fontWeight(.semibold)
-                        .disabled(trimmedName.isEmpty || folderIDs.isEmpty)
+                    Button(action: {
+                        save()
+                    }) {
+                        Image(systemName: "checkmark")
+                    }
+                    .disabled(trimmedName.isEmpty || folderIDs.isEmpty)
                 }
             }
         }
