@@ -211,9 +211,10 @@ struct HomeView: View {
     @Environment(FolderStore.self) private var store
     @State private var activeSheet: ActiveSheet?
     @State private var editMode: EditMode = .inactive
+    @State private var path: [FolderRoute] = []
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
                     ForEach(store.roots) { folder in
@@ -228,7 +229,7 @@ struct HomeView: View {
             .environment(\.editMode, $editMode)
             .navigationTitle("カテゴリー")
             .navigationDestination(for: FolderRoute.self) { route in
-                FolderDetailView(route: route)
+                FolderDetailView(route: route, path: $path)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -259,6 +260,7 @@ struct HomeView: View {
 struct FolderDetailView: View {
     let route: FolderRoute
     @Bindable private var node: FolderNode
+    @Binding var path: [FolderRoute]
     @State private var editMode: EditMode = .inactive
     
 //    @State private var isAddingFolder = false
@@ -271,13 +273,35 @@ struct FolderDetailView: View {
     
     private var completedCount: Int { node.items.filter { $0.isDone }.count }
     
-    init(route: FolderRoute) {
+    init(route: FolderRoute, path: Binding<[FolderRoute]>) {
         self.route = route
+        self._path = path
         self._node = Bindable(route.node)
+    }
+    
+    /// ホームから今いるフォルダまでの道筋
+    private var breadcrumb: [FolderRoute] {
+        guard let index = path.firstIndex(of: route) else { return [route] }
+        return Array(path.prefix(through: index))
     }
     
     var body: some View {
         List {
+            // 現在地（パンくず）
+            Section {
+                BreadcrumbBarView(
+                    routes: breadcrumb,
+                    onSelectHome: { path.removeAll() },
+                    onSelect: { target in
+                        if let index = path.firstIndex(of: target) {
+                            path = Array(path.prefix(through: index))
+                        }
+                    }
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
             // 子フォルダ（最大階層のフォルダには子フォルダがないため表示されない）
             if route.canAddFolder && !node.children.isEmpty {
                 Section("フォルダ") {
@@ -417,6 +441,6 @@ struct FolderDetailView: View {
 #Preview {
     HomeView()
         .environment(FolderStore())
-        .environment(PurchaseStore())                
+        .environment(PurchaseStore())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
