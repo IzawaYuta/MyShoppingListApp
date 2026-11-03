@@ -34,7 +34,7 @@ struct MainTabView: View {
                 }
                 .tag(2)
             FrequentItemListView()
-            .tabItem { Image(systemName: "star") }   // アイコンは好みのものに
+            .tabItem { Image(systemName: "star") }   
             .tag(3)
         }
         .environment(store)

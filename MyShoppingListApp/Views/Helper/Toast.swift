@@ -233,3 +233,7 @@ extension View {
 //toast.show("削除しました", kind: .info)
 //toast.show("保存に失敗しました", kind: .error, duration: 4)
 //toast.show("追加しました", animation: .pop)   // この1回だけ、出方を変える
+
+///Preview
+//.toastHost(ToastCenter())
+

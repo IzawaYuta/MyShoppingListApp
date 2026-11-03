@@ -269,6 +269,8 @@ struct FolderDetailView: View {
     @State private var newName = ""
     
     @Environment(PurchaseStore.self) private var purchaseStore
+    @Environment(ToastCenter.self) private var toast
+    
     @State private var showTrashAlert = false
     
     private var completedCount: Int { node.items.filter { $0.isDone }.count }
@@ -367,7 +369,10 @@ struct FolderDetailView: View {
         }
         .alert("完了済みを削除しますか？", isPresented: $showTrashAlert) {
             Button("キャンセル", role: .cancel) { }
-            Button("削除", role: .destructive) { archiveCompleted() }
+            Button("削除", role: .destructive) {
+                archiveCompleted()
+                toast.show("削除しました", kind: .success, animation: .blur)
+            }
         } message: {
             Text("完了済みの\(completedCount)件を、リストから削除して購入履歴に移します。")
         }
@@ -442,5 +447,6 @@ struct FolderDetailView: View {
     HomeView()
         .environment(FolderStore())
         .environment(PurchaseStore())
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

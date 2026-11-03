@@ -30,48 +30,50 @@ struct FrequentItemListView: View {
     }
     
     var body: some View {
-        List {
-            Section {
-                ForEach(store.items) { item in
-                    row(item)
-                }
-                .onDelete { store.items.remove(atOffsets: $0) }
-            } header: {
-                Text("追加したいものを選んでください")
-                    .textCase(nil)
-            }
-        }
-        .listStyle(.insetGrouped)
-        .environment(\.editMode, $editMode)
-        .contentMargins(.bottom, 80, for: .scrollContent)   // 浮かぶボタンと重ならないよう、下に余白を足す
-        .navigationTitle("よく買うもの")
-        .navigationBarTitleDisplayMode(.large)
-        .overlay { if store.items.isEmpty { emptyState } }
-        .overlay(alignment: .bottomTrailing) { addButton }
-        .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
-        .toolbar {
-//            ToolbarItem(placement: .topBarLeading) {
-//                EditButton()
-//            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    activeSheet = .register
-                } label: {
-                    Image(systemName: "plus")
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(store.items) { item in
+                        row(item)
+                    }
+                    .onDelete { store.items.remove(atOffsets: $0) }
+                } header: {
+                    Text("追加したいものを選んでください")
+                        .textCase(nil)
                 }
             }
-        }
-        .onChange(of: editMode) { _, _ in selection.removeAll() }   // 編集モードの切り替え時は、選択をクリア
-        .sheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .register:
-                FrequentItemFormView { saved in
-                    store.items.append(saved)
+            .listStyle(.insetGrouped)
+            .environment(\.editMode, $editMode)
+            .contentMargins(.bottom, 80, for: .scrollContent)   // 浮かぶボタンと重ならないよう、下に余白を足す
+            .navigationTitle("よく買うもの")
+            .navigationBarTitleDisplayMode(.large)
+            .overlay { if store.items.isEmpty { emptyState } }
+            .overlay(alignment: .bottomTrailing) { addButton }
+            .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
+            .toolbar {
+                //            ToolbarItem(placement: .topBarLeading) {
+                //                EditButton()
+                //            }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        activeSheet = .register
+                    } label: {
+                        Image(systemName: "plus")
+                    }
                 }
-            case .edit(let item):
-                FrequentItemFormView(item: item) { saved in
-                    if let index = store.items.firstIndex(where: { $0.id == saved.id }) {
-                        store.items[index] = saved
+            }
+            .onChange(of: editMode) { _, _ in selection.removeAll() }   // 編集モードの切り替え時は、選択をクリア
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .register:
+                    FrequentItemFormView { saved in
+                        store.items.append(saved)
+                    }
+                case .edit(let item):
+                    FrequentItemFormView(item: item) { saved in
+                        if let index = store.items.firstIndex(where: { $0.id == saved.id }) {
+                            store.items[index] = saved
+                        }
                     }
                 }
             }

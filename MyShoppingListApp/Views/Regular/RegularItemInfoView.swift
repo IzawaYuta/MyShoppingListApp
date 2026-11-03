@@ -74,6 +74,8 @@ struct CheckRow: View {
 /// メインビュー（定期アイテム追加画面）
 struct RegularItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(ToastCenter.self) private var toast
+    
     @State private var draft: RecurringItemDraft
     @State private var showCancelAlert = false
     @State private var pendingActive: Bool?
@@ -186,6 +188,7 @@ struct RegularItemInfoView: View {
                     Button(action: {
                         onSave(draft)
                         dismiss()
+                        toast.show("保存しました", animation: .blur)
                     }) {
                         Image(systemName: "checkmark")
                     }
@@ -236,5 +239,6 @@ struct RegularItemInfoView: View {
         RegularItemInfoView()
     }
     .environment(FolderStore())
+    .toastHost(ToastCenter())
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
