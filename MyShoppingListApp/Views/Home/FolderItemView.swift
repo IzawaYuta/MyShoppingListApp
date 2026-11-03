@@ -18,7 +18,11 @@ struct ShoppingItem: Identifiable {
     let id = UUID()
     var name: String
     var isPriority: Bool = false
-    var isDone: Bool = false
+    var isDone: Bool = false {
+        // チェックを入れた日を記録し、外したら消す
+        didSet { purchasedAt = isDone ? Date() : nil }
+    }
+    var purchasedAt: Date?
 }
 
 // MARK: - Dummy Data

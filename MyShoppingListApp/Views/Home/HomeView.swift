@@ -266,6 +266,11 @@ struct FolderDetailView: View {
     @State private var activeSheet: ActiveSheet?
     @State private var newName = ""
     
+    @Environment(PurchaseStore.self) private var purchaseStore
+    @State private var showTrashAlert = false
+    
+    private var completedCount: Int { node.items.filter { $0.isDone }.count }
+    
     init(route: FolderRoute) {
         self.route = route
         self._node = Bindable(route.node)
@@ -287,15 +292,24 @@ struct FolderDetailView: View {
             
             if route.canHoldItems {
                 Section {
-                    ForEach($node.items) { $item in
+                    ForEach($node.items.filter { !$0.wrappedValue.isDone }) { $item in
                         ItemRow(item: $item)
                     }
-                    .onDelete { node.items.remove(atOffsets: $0) }
+                    .onDelete { delete(at: $0, done: false) }
                 } header: {
                     Text("買うもの")
                 } footer: {
                     if !route.canAddFolder {
                         Text("フォルダは\(FolderLimit.maxDepth)階層までです。")
+                    }
+                }
+                
+                if completedCount > 0 {
+                    Section("完了済み") {
+                        ForEach($node.items.filter { $0.wrappedValue.isDone }) { $item in
+                            ItemRow(item: $item)
+                        }
+                        .onDelete { delete(at: $0, done: true) }
                     }
                 }
             }
@@ -309,6 +323,14 @@ struct FolderDetailView: View {
                 Button(editMode.isEditing ? "完了" : "編集") {
                     withAnimation { editMode = editMode.isEditing ? .inactive : .active }
                 }
+                if route.canHoldItems {
+                    Button {
+                        showTrashAlert = true
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .disabled(completedCount == 0)
+                }
                 addMenu
             }
         }
@@ -318,6 +340,12 @@ struct FolderDetailView: View {
             case .item:   ItemInfoView(currentFolder: node)
             case .editFolder(let folder): FolderFormView(mode: .edit(folder))
             }
+        }
+        .alert("完了済みを削除しますか？", isPresented: $showTrashAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("削除", role: .destructive) { archiveCompleted() }
+        } message: {
+            Text("完了済みの\(completedCount)件を、リストから削除して購入履歴に移します。")
         }
     }
     
@@ -358,6 +386,30 @@ struct FolderDetailView: View {
         guard !name.isEmpty else { return }
         node.items.append(ShoppingItem(name: name))
     }
+    
+    /// 完了済みのアイテムを購入履歴に移して、リストから削除する
+    private func archiveCompleted() {
+        let records = node.items.filter { $0.isDone }.map { item in
+            PurchaseRecord(
+                name: item.name,
+                folderName: node.name,
+                purchasedAt: item.purchasedAt ?? .now,
+                folderID: node.id,
+                isPriority: item.isPriority
+            )
+        }
+        withAnimation {
+            purchaseStore.records.append(contentsOf: records)
+            node.items.removeAll { $0.isDone }
+        }
+    }
+    
+    /// 表示している行の番号を、元の配列のアイテムに戻して削除する
+    private func delete(at offsets: IndexSet, done: Bool) {
+        let visible = node.items.filter { $0.isDone == done }
+        let ids = offsets.map { visible[$0].id }
+        node.items.removeAll { ids.contains($0.id) }
+    }
 }
 
 // MARK: - Preview
@@ -365,5 +417,6 @@ struct FolderDetailView: View {
 #Preview {
     HomeView()
         .environment(FolderStore())
+        .environment(PurchaseStore())                
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

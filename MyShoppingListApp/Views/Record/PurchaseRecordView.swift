@@ -6,8 +6,16 @@ import SwiftUI
 struct PurchaseRecord: Identifiable {
     let id = UUID()
     let name: String
-    let folderName: String
+    let folderName: String      // 表示用のコピー（フォルダを削除・改名しても履歴は変わらない）
     let purchasedAt: Date
+    var folderID: UUID? = nil   // 将来「元に戻す」で戻す先のフォルダ
+    var isPriority = false
+}
+
+/// 購入履歴のデータ（複数の画面で共有）
+@Observable
+final class PurchaseStore {
+    var records: [PurchaseRecord] = PurchaseRecord.dummy()
 }
 
 // MARK: - Dummy data
@@ -44,13 +52,13 @@ extension PurchaseRecord {
 
 /// メインビュー（履歴）
 struct PurchaseRecordView: View {
-    @State private var records: [PurchaseRecord] = PurchaseRecord.dummy()
-    
+    @Environment(PurchaseStore.self) private var store
+
     private let calendar = Calendar.current
     
     /// 日付ごとにグループ化し、新しい日付が上、同じ日の中も新しい順
     private var sections: [(day: Date, items: [PurchaseRecord])] {
-        Dictionary(grouping: records) { calendar.startOfDay(for: $0.purchasedAt) }
+        Dictionary(grouping: store.records) { calendar.startOfDay(for: $0.purchasedAt) }
             .map { (day: $0.key, items: $0.value.sorted { $0.purchasedAt > $1.purchasedAt }) }
             .sorted { $0.day > $1.day }
     }
@@ -113,4 +121,5 @@ struct PurchaseRow: View {
 
 #Preview {
     PurchaseRecordView()
+        .environment(PurchaseStore())
 }

@@ -5,7 +5,8 @@ struct MainTabView: View {
     
     @State private var selection: Int = 0
     @State private var store = FolderStore()
-    
+    @State private var purchaseStore = PurchaseStore()
+
     var body: some View {
         TabView(selection: $selection) {
             HomeView()
@@ -25,6 +26,7 @@ struct MainTabView: View {
                 .tag(2)
         }
         .environment(store)
+        .environment(purchaseStore)
     }
 }
 
