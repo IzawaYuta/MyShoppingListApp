@@ -12,32 +12,37 @@ struct BreadcrumbBarView: View {
     let onSelect: (FolderRoute) -> Void
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
-                Button("カテゴリー", action: onSelectHome)
-                    .font(.subheadline)
-                
-                ForEach(Array(routes.enumerated()), id: \.element) { index, route in
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 4) {
+                    Button("カテゴリー", action: onSelectHome)
+                        .font(.subheadline)
+                        .buttonStyle(.borderless)      // ← 追加：行全体に反応しないようにする
                     
-                    if index == routes.count - 1 {
-                        // 今いるフォルダ：押せない。背景色と太字で目立たせる
-                        Text(route.node.name)
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.accentColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
-                    } else {
-                        Button(route.node.name) { onSelect(route) }
-                            .font(.subheadline)
+                    ForEach(Array(routes.enumerated()), id: \.element) { index, route in
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        
+                        if index == routes.count - 1 {
+                            Text(route.node.name)
+                                .font(.subheadline.weight(.semibold))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.accentColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                                .id("current")          // ← 追加：今いるフォルダの目印
+                        } else {
+                            Button(route.node.name) { onSelect(route) }
+                                .font(.subheadline)
+                                .buttonStyle(.borderless)   // ← 追加
+                        }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 4)
+            // 長くて収まらない時だけ、今いるフォルダ（右端）が見える位置までスクロールする
+            .onAppear { proxy.scrollTo("current", anchor: .trailing) }
         }
-        .defaultScrollAnchor(.trailing)   // 長い時は、今いるフォルダ側（右端）から表示する
     }
 }

@@ -18,11 +18,11 @@ enum FrequentItemSheet: Identifiable {
 struct FrequentItemListView: View {
     @Environment(FolderStore.self) private var folders
     @Environment(FrequentItemStore.self) private var store
+    @Environment(ToastCenter.self) private var toast
     
     @State private var selection: Set<UUID> = []
     @State private var activeSheet: FrequentItemSheet?
     @State private var editMode: EditMode = .inactive
-    @State private var toastText: String?
     
     /// 選択中のアイテム（削除などで存在しなくなった id は数えない）
     private var selectedItems: [FrequentItem] {
@@ -48,12 +48,11 @@ struct FrequentItemListView: View {
         .navigationBarTitleDisplayMode(.large)
         .overlay { if store.items.isEmpty { emptyState } }
         .overlay(alignment: .bottomTrailing) { addButton }
-        .overlay(alignment: .top) { toast }
         .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                EditButton()
-            }
+//            ToolbarItem(placement: .topBarLeading) {
+//                EditButton()
+//            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     activeSheet = .register
@@ -172,22 +171,7 @@ struct FrequentItemListView: View {
                 .buttonStyle(.borderedProminent)
         }
     }
-    
-    /// 追加したことを知らせる、短いメッセージ
-    @ViewBuilder
-    private var toast: some View {
-        if let toastText {
-            Text(toastText)
-                .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.thinMaterial, in: Capsule())
-                .shadow(radius: 4)
-                .padding(.top, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-        }
-    }
-    
+        
     // MARK: Logic
     
     /// 追加先のフォルダ名（フォルダが削除されている場合は除く）
@@ -217,14 +201,8 @@ struct FrequentItemListView: View {
             }
         }
         
-        withAnimation {
-            selection.removeAll()
-            toastText = "\(chosen.count)件をリストに追加しました"
-        }
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            withAnimation { toastText = nil }
-        }
+        withAnimation { selection.removeAll() }
+        toast.show("\(chosen.count)件をリストに追加しました")
     }
 }
 
@@ -235,6 +213,7 @@ struct FrequentItemListView: View {
     return NavigationStack { FrequentItemListView() }
         .environment(folders)
         .environment(FrequentItemStore.sample(folders: folders))
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
 
@@ -242,5 +221,6 @@ struct FrequentItemListView: View {
     NavigationStack { FrequentItemListView() }
         .environment(FolderStore())
         .environment(FrequentItemStore())
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

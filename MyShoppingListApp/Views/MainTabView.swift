@@ -7,6 +7,7 @@ struct MainTabView: View {
     @State private var store = FolderStore()
     @State private var purchaseStore = PurchaseStore()
     @State private var frequentStore: FrequentItemStore
+    @State private var toastCenter = ToastCenter()
 
     init() {
         let folders = FolderStore()
@@ -39,6 +40,7 @@ struct MainTabView: View {
         .environment(store)
         .environment(purchaseStore)
         .environment(frequentStore)
+        .toastHost(toastCenter)
     }
 }
 
