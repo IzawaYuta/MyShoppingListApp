@@ -289,38 +289,31 @@ struct FolderDetailView: View {
     
     var body: some View {
         List {
-            // 現在地（パンくず）
-            Section {
-                BreadcrumbBarView(
-                    routes: breadcrumb,
-                    onSelectHome: { path.removeAll() },
-                    onSelect: { target in
-                        if let index = path.firstIndex(of: target) {
-                            path = Array(path.prefix(through: index))
-                        }
-                    }
-                )
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            }
             // 子フォルダ（最大階層のフォルダには子フォルダがないため表示されない）
             if route.canAddFolder && !node.children.isEmpty {
-                Section("フォルダ") {
+                Section {
                     ForEach(node.children) { child in
                         FolderListRow(node: child, level: route.level + 1) {
                             activeSheet = .editFolder(child)
                         }
                     }
                     .onDelete { node.children.remove(atOffsets: $0) }
+                } header: {
+                    breadcrumbHeader
                 }
             }
             
-            ForEach($node.items) { $item in
-                ItemRow(item: $item)
-            }
-            .onDelete {
-                node.items.remove(atOffsets: $0)
+            Section {
+                ForEach($node.items) { $item in
+                    ItemRow(item: $item)
+                }
+                .onDelete {
+                    node.items.remove(atOffsets: $0)
+                }
+            } header: {
+                if !route.canAddFolder || node.children.isEmpty {
+                    breadcrumbHeader
+                }
             }
         }
         .listStyle(.insetGrouped)
@@ -361,10 +354,30 @@ struct FolderDetailView: View {
         }
     }
     
+    ///現在階層のヘッダー表示判定
+    private var breadcrumbHeader: some View {
+        BreadcrumbBarView(
+            routes: breadcrumb,
+            onSelectHome: { path.removeAll() },
+            onSelect: { target in
+                if let index = path.firstIndex(of: target) {
+                    path = Array(path.prefix(through: index))
+                }
+            }
+        )
+        .padding(.leading, -20)
+    }
+    
     /// 最大階層より下には「フォルダを追加」を出さない
     /// フォルダまたはアイテムの追加用plusボタン
     @ViewBuilder
     private var addMenu: some View {
+        let _ = print(
+            "level:", route.level,
+            "canAddFolder:", route.canAddFolder,
+            "canHoldItems:", route.canHoldItems
+        )
+
         if route.canAddFolder && route.canHoldItems {
             // 2階層目：フォルダもアイテムも追加できる
             Menu {

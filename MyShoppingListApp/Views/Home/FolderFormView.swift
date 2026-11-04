@@ -17,6 +17,7 @@ enum FolderFormMode {
 struct FolderFormView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(FolderStore.self) private var store
+    @Environment(ToastCenter.self) private var toast
     
     private let mode: FolderFormMode
     
@@ -94,7 +95,7 @@ struct FolderFormView: View {
                 }
                 
                 // イメージ選択
-                Section("イメージ") {
+                Section {
                     iconCell(nil)
                     
                     ForEach(FolderIconCategory.allCases) { category in
@@ -111,12 +112,21 @@ struct FolderFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(confirmTitle) { submit() }
-                        .fontWeight(.semibold)
-                        .disabled(trimmedName.isEmpty || !canSubmit)
+                    Button(action: {
+                        submit()
+                        toast.show("保存しました", animation: .blur)
+                    }) {
+                        Image(systemName: "checkmark")
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(trimmedName.isEmpty || !canSubmit)
                 }
             }
         }
@@ -179,6 +189,7 @@ struct FolderFormView: View {
 #Preview("追加") {
     FolderFormView(mode: .add(parent: nil, level: 0))
         .environment(FolderStore())
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
 
@@ -186,5 +197,6 @@ struct FolderFormView: View {
     let store = FolderStore()
     return FolderFormView(mode: .edit(store.roots[0]))
         .environment(store)
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

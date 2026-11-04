@@ -14,7 +14,7 @@ struct BreadcrumbBarView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
+                HStack(spacing: 10) {
                     Button("カテゴリー", action: onSelectHome)
                         .font(.subheadline)
                         .buttonStyle(.borderless)      // ← 追加：行全体に反応しないようにする
