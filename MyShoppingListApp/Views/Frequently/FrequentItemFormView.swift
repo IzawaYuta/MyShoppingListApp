@@ -5,22 +5,22 @@ import SwiftData
 /// よく買うものの登録・編集画面
 struct FrequentItemFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     
     /// 編集するアイテム。nil のときは新規登録
     private let item: FrequentItem?
-    private let onSave: (FrequentItem) -> Void
+    //    private let onSave: (FrequentItem) -> Void
     
     // 入力中の内容（「保存」を押すまでは反映しない）
     @State private var name: String
     @State private var isPriority: Bool
     @State private var folderIDs: Set<UUID>
     
-    init(item: FrequentItem? = nil, onSave: @escaping (FrequentItem) -> Void) {
+    init(item: FrequentItem? = nil) {
         self.item = item
-        self.onSave = onSave
         _name = State(initialValue: item?.name ?? "")
         _isPriority = State(initialValue: item?.isPriority ?? false)
-        _folderIDs = State(initialValue: item?.folderIDs ?? [])
+        _folderIDs = State(initialValue: Set(item?.folderIDs ?? []))
     }
     
     private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
@@ -71,11 +71,19 @@ struct FrequentItemFormView: View {
     }
     
     private func save() {
-        var result = item ?? FrequentItem(name: "")
-        result.name = trimmedName
-        result.isPriority = isPriority
-        result.folderIDs = folderIDs
-        onSave(result)
+        if let item {
+            // 編集：元のアイテムに反映する
+            item.name = trimmedName
+            item.isPriority = isPriority
+            item.folderIDs = Array(folderIDs)
+        } else {
+            // 新規登録
+            modelContext.insert(FrequentItem(
+                name: trimmedName,
+                isPriority: isPriority,
+                folderIDs: Array(folderIDs)
+            ))
+        }
         dismiss()
     }
 }
@@ -83,7 +91,7 @@ struct FrequentItemFormView: View {
 // MARK: - Preview
 
 #Preview {
-    FrequentItemFormView { _ in }
+    FrequentItemFormView()
         .modelContainer(PreviewData.container())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

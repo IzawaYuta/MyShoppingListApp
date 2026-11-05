@@ -8,13 +8,14 @@ enum PreviewData {
     /// メモリ上だけのコンテナを作る。withSamples を false にすると空の状態になる
     static func container(withSamples: Bool = true) -> ModelContainer {
         let container = try! ModelContainer(
-            for: FolderNode.self, ShoppingItem.self, PurchaseRecord.self, RecurringItem.self,
+            for: FolderNode.self, ShoppingItem.self, PurchaseRecord.self, RecurringItem.self, FrequentItem.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         if withSamples {
             insertSamples(into: container.mainContext)
             insertPurchaseSamples(into: container.mainContext)
             insertRecurringSamples(into: container.mainContext)
+            insertFrequentSamples(into: container.mainContext)
         }
         return container
     }
@@ -121,5 +122,36 @@ enum PreviewData {
         make("ヨーグルト", .biweekly)
         make("洗剤", .monthly, day: 15)
         make("ミネラルウォーター", .weekly, active: false)
+    }
+    
+    /// よく買うもののダミーデータ。追加先は、フォルダ名から id を探して決める
+    private static func insertFrequentSamples(into context: ModelContext) {
+        // 先に作ったフォルダを、検索で見つけられるように保存しておく
+        try? context.save()
+        let folders = (try? context.fetch(FetchDescriptor<FolderNode>())) ?? []
+        let now = Date()
+        var order = 0
+        
+        func make(_ name: String, in folderName: String, priority: Bool = false) {
+            let folderID = folders.first { $0.name == folderName }?.id
+            let item = FrequentItem(
+                name: name,
+                isPriority: priority,
+                folderIDs: folderID.map { [$0] } ?? []
+            )
+            // 登録した順に並ぶよう、1秒ずつずらす
+            item.createdAt = now.addingTimeInterval(Double(order))
+            order += 1
+            context.insert(item)
+        }
+        
+        make("牛乳", in: "乳製品・卵", priority: true)
+        make("卵", in: "乳製品・卵")
+        make("キャベツ", in: "野菜・果物")
+        make("鶏むね肉", in: "肉・魚")
+        make("洗剤", in: "洗剤・掃除")
+        make("トイレットペーパー", in: "紙類")
+        make("ミネラルウォーター", in: "水・お茶")
+        make("塩", in: "基本調味料")
     }
 }

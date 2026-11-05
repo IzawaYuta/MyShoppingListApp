@@ -5,7 +5,6 @@ import SwiftData
 struct MainTabView: View {
     
     @State private var selection: Int = 0
-    @State private var frequentStore = FrequentItemStore()
     @State private var toastCenter = ToastCenter()
 
     var body: some View {
@@ -29,7 +28,6 @@ struct MainTabView: View {
             .tabItem { Image(systemName: "star") }   
             .tag(3)
         }
-        .environment(frequentStore)
         .toastHost(toastCenter)
     }
 }

@@ -19,7 +19,7 @@ enum FrequentItemSheet: Identifiable {
 struct FrequentItemListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
-    @Environment(FrequentItemStore.self) private var store
+    @Query(sort: \FrequentItem.createdAt) private var items: [FrequentItem]
     @Environment(ToastCenter.self) private var toast
     
     @State private var selection: Set<UUID> = []
@@ -28,17 +28,21 @@ struct FrequentItemListView: View {
     
     /// 選択中のアイテム（削除などで存在しなくなった id は数えない）
     private var selectedItems: [FrequentItem] {
-        store.items.filter { selection.contains($0.id) }
+        items.filter { selection.contains($0.id) }
     }
     
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(store.items) { item in
+                    ForEach(items) { item in
                         row(item)
                     }
-                    .onDelete { store.items.remove(atOffsets: $0) }
+                    .onDelete { offsets in
+                        for index in offsets {
+                            modelContext.delete(items[index])
+                        }
+                    }
                 } header: {
                     Text("追加したいものを選んでください")
                         .textCase(nil)
@@ -49,7 +53,7 @@ struct FrequentItemListView: View {
             .contentMargins(.bottom, 80, for: .scrollContent)   // 浮かぶボタンと重ならないよう、下に余白を足す
             .navigationTitle("よく買うもの")
             .navigationBarTitleDisplayMode(.large)
-            .overlay { if store.items.isEmpty { emptyState } }
+            .overlay { if items.isEmpty { emptyState } }
             .overlay(alignment: .bottomTrailing) { addButton }
             .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
             .toolbar {
@@ -68,15 +72,9 @@ struct FrequentItemListView: View {
             .sheet(item: $activeSheet) { sheet in
                 switch sheet {
                 case .register:
-                    FrequentItemFormView { saved in
-                        store.items.append(saved)
-                    }
+                    FrequentItemFormView()
                 case .edit(let item):
-                    FrequentItemFormView(item: item) { saved in
-                        if let index = store.items.firstIndex(where: { $0.id == saved.id }) {
-                            store.items[index] = saved
-                        }
-                    }
+                    FrequentItemFormView(item: item)
                 }
             }
         }
@@ -210,12 +208,10 @@ struct FrequentItemListView: View {
     }
 }
 
+//MARK: - Preview
 #Preview("一覧") {
-    let container = PreviewData.container()
-    let all = (try? container.mainContext.fetch(FetchDescriptor<FolderNode>())) ?? []
-    return NavigationStack { FrequentItemListView() }
-        .modelContainer(container)
-        .environment(FrequentItemStore.sample(folders: all))
+    NavigationStack { FrequentItemListView() }
+        .modelContainer(PreviewData.container())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
@@ -223,7 +219,6 @@ struct FrequentItemListView: View {
 #Preview("登録なし") {
     NavigationStack { FrequentItemListView() }
         .modelContainer(PreviewData.container(withSamples: false))
-        .environment(FrequentItemStore())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

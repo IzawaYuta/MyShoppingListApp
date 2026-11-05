@@ -384,3 +384,24 @@ final class RecurringItem {
         }
     }
 }
+
+// MARK: - FrequentItem
+
+/// よく買うもの（登録しておいて、あとで選んでリストに追加する）
+@Model
+final class FrequentItem {
+    var id: UUID = UUID()
+    var name: String = ""
+    var isPriority: Bool = false
+    /// 追加先のフォルダ（アイテムを入れられる2階層目以降のフォルダの id）
+    /// 関連づけはせず、id だけを覚える
+    var folderIDs: [UUID] = []
+    /// 一覧の並び順（登録した順）
+    var createdAt: Date = Date()
+    
+    init(name: String, isPriority: Bool = false, folderIDs: [UUID] = []) {
+        self.name = name
+        self.isPriority = isPriority
+        self.folderIDs = folderIDs
+    }
+}

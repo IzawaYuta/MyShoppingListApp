@@ -16,6 +16,7 @@ struct MyShoppingListAppApp: App {
             ShoppingItem.self,
             PurchaseRecord.self,
             RecurringItem.self,
+            FrequentItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
