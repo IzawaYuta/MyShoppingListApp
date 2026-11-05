@@ -1,64 +1,19 @@
 
 import SwiftUI
-
-// MARK: - Model
-
-struct PurchaseRecord: Identifiable {
-    let id = UUID()
-    let name: String
-    let folderName: String      // 表示用のコピー（フォルダを削除・改名しても履歴は変わらない）
-    let purchasedAt: Date
-    var folderID: UUID? = nil   // 将来「元に戻す」で戻す先のフォルダ
-    var isPriority = false
-}
-
-/// 購入履歴のデータ（複数の画面で共有）
-@Observable
-final class PurchaseStore {
-    var records: [PurchaseRecord] = PurchaseRecord.dummy()
-}
-
-// MARK: - Dummy data
-
-extension PurchaseRecord {
-    static func dummy() -> [PurchaseRecord] {
-        let cal = Calendar.current
-        let now = Date()
-        
-        func day(_ offset: Int, hour: Int) -> Date {
-            let base = cal.date(byAdding: .day, value: -offset, to: now) ?? now
-            return cal.date(bySettingHour: hour, minute: 0, second: 0, of: base) ?? base
-        }
-        
-        return [
-            PurchaseRecord(name: "牛乳", folderName: "乳製品", purchasedAt: day(0, hour: 18)),
-            PurchaseRecord(name: "卵", folderName: "卵・納豆", purchasedAt: day(0, hour: 17)),
-            PurchaseRecord(name: "キャベツ", folderName: "野菜", purchasedAt: day(0, hour: 16)),
-            
-            PurchaseRecord(name: "食器用洗剤", folderName: "キッチン用品", purchasedAt: day(1, hour: 19)),
-            PurchaseRecord(name: "ティッシュ", folderName: "日用品", purchasedAt: day(1, hour: 18)),
-            
-            PurchaseRecord(name: "鶏むね肉", folderName: "肉・魚", purchasedAt: day(3, hour: 18)),
-            PurchaseRecord(name: "食パン", folderName: "パン", purchasedAt: day(3, hour: 17)),
-            PurchaseRecord(name: "ヨーグルト", folderName: "乳製品", purchasedAt: day(3, hour: 16)),
-            
-            PurchaseRecord(name: "トイレットペーパー", folderName: "日用品", purchasedAt: day(6, hour: 14)),
-            PurchaseRecord(name: "コーヒー豆", folderName: "飲み物", purchasedAt: day(6, hour: 13)),
-        ]
-    }
-}
+import SwiftData
 
 // MARK: - View
 
 /// メインビュー（履歴）
 struct PurchaseRecordView: View {
-    @Environment(PurchaseStore.self) private var store
-
+    @Query(sort: \PurchaseRecord.purchasedAt, order: .reverse)
+    private var records: [PurchaseRecord]
+    
     private let calendar = Calendar.current
     
     /// 日付ごとにグループ化し、新しい日付が上、同じ日の中も新しい順
     private var sections: [(day: Date, items: [PurchaseRecord])] {
-        Dictionary(grouping: store.records) { calendar.startOfDay(for: $0.purchasedAt) }
+        Dictionary(grouping: records) { calendar.startOfDay(for: $0.purchasedAt) }
             .map { (day: $0.key, items: $0.value.sorted { $0.purchasedAt > $1.purchasedAt }) }
             .sorted { $0.day > $1.day }
     }
@@ -121,5 +76,5 @@ struct PurchaseRow: View {
 
 #Preview {
     PurchaseRecordView()
-        .environment(PurchaseStore())
+        .modelContainer(PreviewData.container())
 }

@@ -252,3 +252,31 @@ final class ShoppingItem {
         setDone(!isDone)
     }
 }
+
+// MARK: - PurchaseRecord
+
+/// 購入履歴
+@Model
+final class PurchaseRecord {
+    var id: UUID
+    var name: String
+    /// 表示用のコピー（フォルダを削除・改名しても履歴は変わらない）
+    var folderName: String
+    var purchasedAt: Date
+    /// 将来「元に戻す」で戻す先のフォルダ。関連づけはせず、id だけを覚える
+    var folderID: UUID?
+    var isPriority: Bool
+    
+    init(name: String,
+         folderName: String,
+         purchasedAt: Date,
+         folderID: UUID? = nil,
+         isPriority: Bool = false) {
+        self.id = UUID()
+        self.name = name
+        self.folderName = folderName
+        self.purchasedAt = purchasedAt
+        self.folderID = folderID
+        self.isPriority = isPriority
+    }
+}

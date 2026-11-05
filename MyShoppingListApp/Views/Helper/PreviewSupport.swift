@@ -8,11 +8,12 @@ enum PreviewData {
     /// メモリ上だけのコンテナを作る。withSamples を false にすると空の状態になる
     static func container(withSamples: Bool = true) -> ModelContainer {
         let container = try! ModelContainer(
-            for: FolderNode.self, ShoppingItem.self,
+            for: FolderNode.self, ShoppingItem.self, PurchaseRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         if withSamples {
             insertSamples(into: container.mainContext)
+            insertPurchaseSamples(into: container.mainContext)
         }
         return container
     }
@@ -60,5 +61,40 @@ enum PreviewData {
         
         let seasoning = make("調味料", tint: 3, order: 3)
         make("基本調味料", tint: 3, order: 0, parent: seasoning)
+    }
+    
+    /// 購入履歴のダミーデータ
+    private static func insertPurchaseSamples(into context: ModelContext) {
+        let cal = Calendar.current
+        let now = Date()
+        
+        func day(_ offset: Int, hour: Int) -> Date {
+            let base = cal.date(byAdding: .day, value: -offset, to: now) ?? now
+            return cal.date(bySettingHour: hour, minute: 0, second: 0, of: base) ?? base
+        }
+        
+        let records: [(name: String, folder: String, date: Date)] = [
+            ("牛乳", "乳製品", day(0, hour: 18)),
+            ("卵", "卵・納豆", day(0, hour: 17)),
+            ("キャベツ", "野菜", day(0, hour: 16)),
+            
+            ("食器用洗剤", "キッチン用品", day(1, hour: 19)),
+            ("ティッシュ", "日用品", day(1, hour: 18)),
+            
+            ("鶏むね肉", "肉・魚", day(3, hour: 18)),
+            ("食パン", "パン", day(3, hour: 17)),
+            ("ヨーグルト", "乳製品", day(3, hour: 16)),
+            
+            ("トイレットペーパー", "日用品", day(6, hour: 14)),
+            ("コーヒー豆", "飲み物", day(6, hour: 13))
+        ]
+        
+        for record in records {
+            context.insert(PurchaseRecord(
+                name: record.name,
+                folderName: record.folder,
+                purchasedAt: record.date
+            ))
+        }
     }
 }

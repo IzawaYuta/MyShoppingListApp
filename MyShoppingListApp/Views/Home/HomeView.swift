@@ -198,7 +198,6 @@ struct FolderDetailView: View {
     @State private var showTrashAlert = false
     
     @Environment(\.modelContext) private var modelContext
-    @Environment(PurchaseStore.self) private var purchaseStore
     @Environment(ToastCenter.self) private var toast
     
     init(route: FolderRoute, path: Binding<[FolderRoute]>) {
@@ -330,18 +329,15 @@ struct FolderDetailView: View {
     /// 完了済みのアイテムを購入履歴に移して、リストから削除する
     private func archiveCompleted() {
         let doneItems = node.items.filter { $0.isDone }
-        let records = doneItems.map { item in
-            PurchaseRecord(
-                name: item.name,
-                folderName: node.name,
-                purchasedAt: item.purchasedAt ?? .now,
-                folderID: node.id,
-                isPriority: item.isPriority
-            )
-        }
         withAnimation {
-            purchaseStore.records.append(contentsOf: records)
             for item in doneItems {
+                modelContext.insert(PurchaseRecord(
+                    name: item.name,
+                    folderName: node.name,
+                    purchasedAt: item.purchasedAt ?? .now,
+                    folderID: node.id,
+                    isPriority: item.isPriority
+                ))
                 modelContext.delete(item)
             }
         }
@@ -353,7 +349,6 @@ struct FolderDetailView: View {
 #Preview {
     HomeView()
         .modelContainer(PreviewData.container())
-        .environment(PurchaseStore())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

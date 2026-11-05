@@ -14,6 +14,7 @@ struct MyShoppingListAppApp: App {
         let schema = Schema([
             FolderNode.self,
             ShoppingItem.self,
+            PurchaseRecord.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
