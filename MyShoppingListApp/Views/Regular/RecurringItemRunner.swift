@@ -5,6 +5,16 @@ import SwiftData
 /// 定期アイテムの自動追加
 enum RecurringItemRunner {
     
+    /// 新しく登録した定期アイテムを保存する
+    /// 開始日が今日のときだけ、その場で自動追加も動かす（過去・未来の日付のときは動かさない）
+    @MainActor
+    static func register(_ draft: RecurringItemDraft, in context: ModelContext) {
+        context.insert(RecurringItem(draft: draft))
+        guard Calendar.current.isDateInToday(draft.startDate) else { return }
+        try? context.save()   // 追加した定期アイテムを、検索で見つけられるように保存しておく
+        addDueItems(in: context)
+    }
+    
     /// アプリを開いたときに呼ぶ。追加日が来ている定期アイテムを、追加先のフォルダに追加する
     /// 何回分たまっていても、追加するのは1回だけ
     @MainActor

@@ -95,7 +95,7 @@ struct RegularItemListView: View {
                 switch sheet {
                 case .add:
                     RegularItemInfoView { saved in
-                        modelContext.insert(RecurringItem(draft: saved))
+                        RecurringItemRunner.register(saved, in: modelContext)
                     }
                 case .edit(let item):
                     RegularItemInfoView(draft: item.draft, title: "定期アイテム編集", isEditing: true) { saved in

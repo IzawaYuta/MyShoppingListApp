@@ -49,7 +49,10 @@ struct ItemInfoView: View {
                 // 定期アイテムとして登録（登録画面へ遷移）
                 Section {
                     NavigationLink {
-                        RegularItemInfoView(draft: recurringDraft)
+                        RegularItemInfoView(draft: recurringDraft) { saved in
+                            RecurringItemRunner.register(saved, in: modelContext)
+                            dismiss()   // 登録したら、新規アイテムの画面も閉じる
+                        }
                     } label: {
                         Text("定期アイテムとして登録")
                             .foregroundStyle(Color.accentColor)
