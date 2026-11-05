@@ -12,7 +12,8 @@ import SwiftData
 struct MyShoppingListAppApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            FolderNode.self,
+            ShoppingItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

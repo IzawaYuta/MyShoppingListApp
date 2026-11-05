@@ -1,5 +1,6 @@
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Mode
 
@@ -16,8 +17,9 @@ enum FolderFormMode {
 /// フォルダの追加・編集画面（共通）
 struct FolderFormView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(FolderStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
     @Environment(ToastCenter.self) private var toast
+    @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     
     private let mode: FolderFormMode
     
@@ -48,13 +50,6 @@ struct FolderFormView: View {
         }
     }
     
-    private var confirmTitle: String {
-        switch mode {
-        case .add:  return "追加"
-        case .edit: return "保存"
-        }
-    }
-    
     /// 追加：最大階層を超えるフォルダは作れない。編集：階層は変わらないので常に可
     private var canSubmit: Bool {
         switch mode {
@@ -63,23 +58,30 @@ struct FolderFormView: View {
         }
     }
     
+    /// 追加先と同じ階層にあるフォルダ（追加のときだけ使う）
+    private var siblings: [FolderNode] {
+        if case .add(let parent, _) = mode {
+            return parent?.children ?? roots
+        }
+        return []
+    }
+    
+    /// 追加する時の色の番号。並び順で自動
+    private var nextTintIndex: Int {
+        siblings.count % FolderTint.palette.count
+    }
+    
     /// アイコンなしのときのタイルの色。追加：並び順で自動、編集：今の色のまま
     private var tint: FolderTint {
         switch mode {
-        case .add(let parent, _):
-            let siblingCount = parent?.children.count ?? store.roots.count
-            return FolderTint.palette[siblingCount % FolderTint.palette.count]
+        case .add:
+            return FolderTint.palette[nextTintIndex]
         case .edit(let node):
             return node.tint
         }
     }
     
     private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
-    
-    /// プレビュー表示用の仮フォルダ（名前の頭文字と選択中のイメージを反映）
-    private var previewNode: FolderNode {
-        FolderNode(name: trimmedName.isEmpty ? "新" : trimmedName, tint: tint, customIcon: customIcon)
-    }
     
     // MARK: Body
     
@@ -89,7 +91,11 @@ struct FolderFormView: View {
                 // 名前（左に選択中のイメージをプレビュー）
                 Section {
                     HStack(spacing: 12) {
-                        FolderImageView(node: previewNode)
+                        FolderImageView(
+                            name: trimmedName.isEmpty ? "新" : trimmedName,
+                            tint: tint,
+                            customIcon: customIcon
+                        )
                         TextField("フォルダ名", text: $name)
                     }
                 }
@@ -170,12 +176,16 @@ struct FolderFormView: View {
         guard !trimmedName.isEmpty, canSubmit else { return }
         switch mode {
         case .add(let parent, _):
-            let folder = FolderNode(name: trimmedName, tint: tint, customIcon: customIcon)
-            if let parent {
-                parent.children.append(folder)
-            } else {
-                store.roots.append(folder)
-            }
+            // 並び順と色は、追加する前の兄弟フォルダの数・最大値から決める
+            let nextOrder = (siblings.map(\.sortOrder).max() ?? -1) + 1
+            let folder = FolderNode(
+                name: trimmedName,
+                tintIndex: nextTintIndex,
+                customIcon: customIcon,
+                sortOrder: nextOrder
+            )
+            modelContext.insert(folder)
+            folder.parent = parent
         case .edit(let node):
             node.name = trimmedName
             node.customIcon = customIcon
@@ -188,15 +198,20 @@ struct FolderFormView: View {
 
 #Preview("追加") {
     FolderFormView(mode: .add(parent: nil, level: 0))
-        .environment(FolderStore())
+        .modelContainer(PreviewData.container())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
 
 #Preview("編集") {
-    let store = FolderStore()
-    return FolderFormView(mode: .edit(store.roots[0]))
-        .environment(store)
-        .toastHost(ToastCenter())
-        .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
+    let container = PreviewData.container()
+    let first = try? container.mainContext.fetch(FolderNode.rootsDescriptor).first
+    return Group {
+        if let first {
+            FolderFormView(mode: .edit(first))
+        }
+    }
+    .modelContainer(container)
+    .toastHost(ToastCenter())
+    .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

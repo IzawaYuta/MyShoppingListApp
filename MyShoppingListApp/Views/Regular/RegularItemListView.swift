@@ -1,5 +1,6 @@
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Model
 
@@ -185,7 +186,7 @@ struct RegularItemListView: View {
     NavigationStack {
         RegularItemListView()
     }
-    .environment(FolderStore())
+    .modelContainer(PreviewData.container())
     .toastHost(ToastCenter())
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

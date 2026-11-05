@@ -1,14 +1,8 @@
 
 import SwiftUI
+import SwiftData
 
-// MARK: - Limit
-
-/// フォルダの階層制限
-enum FolderLimit {
-    static let maxDepth = 3
-    /// アイテムを入れられる最小の階層（1階層目にはアイテムを入れない）
-    static let itemMinLevel = 2
-}
+// MARK: - Sheet
 
 /// 開くシートの判定
 /// 複数のsheetを開く場合は、enumで判定するのが簡単
@@ -25,7 +19,7 @@ enum ActiveSheet: Identifiable {
     }
 }
 
-// MARK: - Model
+// MARK: - Tint
 
 /// フォルダのアイコンの色
 struct FolderTint {
@@ -41,37 +35,7 @@ struct FolderTint {
     ]
 }
 
-/// フォルダ。子フォルダと、そのフォルダ直下の買うものアイテムを持つ
-/// （ShoppingItem は ShoppingListView.swift のものを使用）
-/// フォルダ（子フォルダ・アイテム含む）データ
-@Observable
-final class FolderNode: Identifiable, Hashable {
-    let id = UUID()
-    var name: String
-    var tint: FolderTint
-    var customIcon: CustomIconFolder?
-    var children: [FolderNode]
-    var items: [ShoppingItem]
-    
-    init(name: String, tint: FolderTint, customIcon: CustomIconFolder? = nil, children: [FolderNode] = [], items: [ShoppingItem] = []) {
-        self.name = name
-        self.tint = tint
-        self.customIcon = customIcon
-        self.children = children
-        self.items = items
-    }
-    
-    /// Imageの代わりに表示する頭文字（画像対応時に差し替え）
-    var initial: String { String(name.prefix(1)) }
-    
-    /// 子フォルダ内も含めたアイテム数
-    var totalItemCount: Int {
-        items.count + children.reduce(0) { $0 + $1.totalItemCount }
-    }
-    
-    static func == (lhs: FolderNode, rhs: FolderNode) -> Bool { lhs.id == rhs.id }
-    func hash(into hasher: inout Hasher) { hasher.combine(id) }
-}
+// MARK: - Route
 
 /// 画面遷移用。level はそのフォルダの階層（1〜maxDepth）
 struct FolderRoute: Hashable {
@@ -81,86 +45,48 @@ struct FolderRoute: Hashable {
     /// このフォルダの中に、さらにフォルダを作成できるか
     var canAddFolder: Bool { level < FolderLimit.maxDepth }
     var canHoldItems: Bool { level >= FolderLimit.itemMinLevel }
-}
-
-// MARK: - Dummy Data
-
-/// ダミーデータ
-@Observable
-final class FolderStore {
-    var roots: [FolderNode] = FolderStore.sample()
     
-    private static func sample() -> [FolderNode] {
-        let p = FolderTint.palette
-        
-        let vegetables = FolderNode(
-            name: "野菜・果物", tint: p[0],
-            children: [
-                FolderNode(name: "葉物野菜", tint: p[0], items: [
-                       ShoppingItem(name: "ほうれん草", isDone: true),
-                       ShoppingItem(name: "キャベツ")
-                ]),
-                FolderNode(name: "根菜", tint: p[2], items: [
-                    ShoppingItem(name: "にんじん")
-                ]),
-                FolderNode(name: "果物", tint: p[3], items: [
-                    ShoppingItem(name: "バナナ")
-                ])
-            ],
-            items: [ShoppingItem(name: "ミニトマト")]
-        )
-        
-        let food = FolderNode(
-            name: "食品", tint: p[0], customIcon: .apple,
-            children: [
-                vegetables,
-                FolderNode(name: "肉・魚", tint: p[3], items: [
-                    ShoppingItem(name: "鶏むね肉")
-                ]),
-                FolderNode(name: "乳製品・卵", tint: p[4], items: [
-                    ShoppingItem(name: "牛乳"),
-                    ShoppingItem(name: "卵", isDone: true)
-                ])
-            ]
-        )
-        
-        return [
-            food,
-            FolderNode(name: "日用品", tint: p[1], children: [
-                FolderNode(name: "洗剤・掃除", tint: p[1], items: [ShoppingItem(name: "洗剤")]),
-                FolderNode(name: "紙類", tint: p[1])
-            ]),
-            FolderNode(name: "飲み物", tint: p[2], children: [FolderNode(name: "水・お茶", tint: p[2])]),
-            FolderNode(name: "調味料", tint: p[3], children: [FolderNode(name: "基本調味料", tint: p[3])])
-        ]
+    // 保存前後で SwiftData の内部IDが変わることがあるため、自分で持っている id で比べる
+    static func == (lhs: FolderRoute, rhs: FolderRoute) -> Bool {
+        lhs.node.id == rhs.node.id && lhs.level == rhs.level
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(node.id)
+        hasher.combine(level)
     }
 }
 
+// MARK: - Image
+
 /// フォルダのアイコンの見た目
 struct FolderImageView: View {
-    let node: FolderNode
+    let name: String
+    let tint: FolderTint
+    let customIcon: CustomIconFolder?
+    
+    private var initial: String { String(name.prefix(1)) }
     
     var body: some View {
         Group {
-            if let customIcon = node.customIcon {
+            if let customIcon {
                 customIcon.image
                     .resizable()
                     .scaledToFit()
                     .background(Color.white)
             } else {
                 // imageName がないときは、今までの頭文字タイル
-                Text(node.initial)
+                Text(initial)
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(node.tint.foreground)
+                    .foregroundStyle(tint.foreground)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(node.tint.background)
+                    .background(tint.background)
             }
         }
         .frame(width: 36, height: 36)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
-
 
 // MARK: - Row
 
@@ -170,7 +96,7 @@ struct FolderNodeRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            FolderImageView(node: node)
+            FolderImageView(name: node.name, tint: node.tint, customIcon: node.customIcon)
             Text(node.name)
             
             Spacer()
@@ -208,7 +134,9 @@ struct FolderListRow: View {
 
 /// メインビュー（ホーム画面）
 struct HomeView: View {
-    @Environment(FolderStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
+    @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
+    
     @State private var activeSheet: ActiveSheet?
     @State private var editMode: EditMode = .inactive
     @State private var path: [FolderRoute] = []
@@ -217,12 +145,17 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             List {
                 Section {
-                    ForEach(store.roots) { folder in
+                    ForEach(roots) { folder in
                         FolderListRow(node: folder, level: 1) {
                             activeSheet = .editFolder(folder)
                         }
                     }
-                    .onDelete { store.roots.remove(atOffsets: $0) }
+                    .onDelete { offsets in
+                        // 配下のフォルダとアイテムも一緒に削除される（cascade）
+                        for index in offsets {
+                            modelContext.delete(roots[index])
+                        }
+                    }
                 }
             }
             .listStyle(.insetGrouped)
@@ -259,27 +192,24 @@ struct HomeView: View {
 /// 子フォルダとアイテムのビュー
 struct FolderDetailView: View {
     let route: FolderRoute
-    @Bindable private var node: FolderNode
     @Binding var path: [FolderRoute]
     @State private var editMode: EditMode = .inactive
-    
-//    @State private var isAddingFolder = false
-//    @State private var isAddingItem = false
     @State private var activeSheet: ActiveSheet?
-    @State private var newName = ""
-    
-    @Environment(PurchaseStore.self) private var purchaseStore
-    @Environment(ToastCenter.self) private var toast
-    
     @State private var showTrashAlert = false
     
-    private var completedCount: Int { node.items.filter { $0.isDone }.count }
+    @Environment(\.modelContext) private var modelContext
+    @Environment(PurchaseStore.self) private var purchaseStore
+    @Environment(ToastCenter.self) private var toast
     
     init(route: FolderRoute, path: Binding<[FolderRoute]>) {
         self.route = route
         self._path = path
-        self._node = Bindable(route.node)
     }
+    
+    private var node: FolderNode { route.node }
+    private var children: [FolderNode] { node.sortedChildren }
+    private var items: [ShoppingItem] { node.sortedItems }
+    private var completedCount: Int { node.items.filter { $0.isDone }.count }
     
     /// ホームから今いるフォルダまでの道筋
     private var breadcrumb: [FolderRoute] {
@@ -290,28 +220,36 @@ struct FolderDetailView: View {
     var body: some View {
         List {
             // 子フォルダ（最大階層のフォルダには子フォルダがないため表示されない）
-            if route.canAddFolder && !node.children.isEmpty {
+            if route.canAddFolder && !children.isEmpty {
                 Section {
-                    ForEach(node.children) { child in
+                    ForEach(children) { child in
                         FolderListRow(node: child, level: route.level + 1) {
                             activeSheet = .editFolder(child)
                         }
                     }
-                    .onDelete { node.children.remove(atOffsets: $0) }
+                    .onDelete { offsets in
+                        let targets = offsets.map { children[$0] }
+                        for target in targets {
+                            modelContext.delete(target)
+                        }
+                    }
                 } header: {
                     breadcrumbHeader
                 }
             }
             
             Section {
-                ForEach($node.items) { $item in
-                    ItemRow(item: $item)
+                ForEach(items) { item in
+                    ItemRow(item: item)
                 }
-                .onDelete {
-                    node.items.remove(atOffsets: $0)
+                .onDelete { offsets in
+                    let targets = offsets.map { items[$0] }
+                    for target in targets {
+                        modelContext.delete(target)
+                    }
                 }
             } header: {
-                if !route.canAddFolder || node.children.isEmpty {
+                if !route.canAddFolder || children.isEmpty {
                     breadcrumbHeader
                 }
             }
@@ -372,12 +310,6 @@ struct FolderDetailView: View {
     /// フォルダまたはアイテムの追加用plusボタン
     @ViewBuilder
     private var addMenu: some View {
-        let _ = print(
-            "level:", route.level,
-            "canAddFolder:", route.canAddFolder,
-            "canHoldItems:", route.canHoldItems
-        )
-
         if route.canAddFolder && route.canHoldItems {
             // 2階層目：フォルダもアイテムも追加できる
             Menu {
@@ -395,26 +327,10 @@ struct FolderDetailView: View {
         }
     }
     
-    /// フォルダ追加用ボタン
-    private func addFolder() {
-        let name = newName.trimmingCharacters(in: .whitespaces)
-        newName = ""
-        guard !name.isEmpty, route.canAddFolder else { return }
-        let tint = FolderTint.palette[node.children.count % FolderTint.palette.count]
-        node.children.append(FolderNode(name: name, tint: tint))
-    }
-    
-    /// アイテム追加用ボタン
-    private func addItem() {
-        let name = newName.trimmingCharacters(in: .whitespaces)
-        newName = ""
-        guard !name.isEmpty else { return }
-        node.items.append(ShoppingItem(name: name))
-    }
-    
     /// 完了済みのアイテムを購入履歴に移して、リストから削除する
     private func archiveCompleted() {
-        let records = node.items.filter { $0.isDone }.map { item in
+        let doneItems = node.items.filter { $0.isDone }
+        let records = doneItems.map { item in
             PurchaseRecord(
                 name: item.name,
                 folderName: node.name,
@@ -425,7 +341,9 @@ struct FolderDetailView: View {
         }
         withAnimation {
             purchaseStore.records.append(contentsOf: records)
-            node.items.removeAll { $0.isDone }
+            for item in doneItems {
+                modelContext.delete(item)
+            }
         }
     }
 }
@@ -434,7 +352,7 @@ struct FolderDetailView: View {
 
 #Preview {
     HomeView()
-        .environment(FolderStore())
+        .modelContainer(PreviewData.container())
         .environment(PurchaseStore())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))

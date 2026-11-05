@@ -1,5 +1,6 @@
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Folder options (階層付きの一覧)
 
@@ -24,13 +25,18 @@ struct FolderOption: Identifiable {
     }
 }
 
-extension FolderStore {
-    /// 全フォルダを、階層順（親 → 子）に並べた一覧にする
+extension Array where Element == FolderNode {
+    /// 全フォルダを階層順（親→子）に並べた一覧。配列は最上位フォルダ
     var flattenedOptions: [FolderOption] {
         func walk(_ nodes: [FolderNode], level: Int) -> [FolderOption] {
-            nodes.flatMap { [FolderOption(node: $0, level: level)] + walk($0.children, level: level + 1) }
+            nodes.flatMap { [FolderOption(node: $0, level: level)] + walk($0.sortedChildren, level: level + 1) }
         }
-        return walk(roots, level: 1)
+        return walk(self, level: 1)
+    }
+    
+    /// id からフォルダを探す
+    func node(withID id: UUID) -> FolderNode? {
+        flattenedOptions.first { $0.id == id }?.node
     }
 }
 
@@ -39,13 +45,13 @@ extension FolderStore {
 /// 追加先フォルダを複数選択する行（開くとフォルダ一覧が出る）
 /// selectedIDs には「アイテムを入れられるフォルダ（2階層目以降）」の id だけを入れる
 struct FolderMultiSelectGroup: View {
-    @Environment(FolderStore.self) private var store
+    @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     @Binding var selectedIDs: Set<UUID>
     @State private var isExpanded = false
     /// 開いている（子フォルダを表示している）フォルダ。最初はすべて畳んでおく
     @State private var expandedFolderIDs: Set<UUID> = []
     
-    private var allOptions: [FolderOption] { store.flattenedOptions }
+    private var allOptions: [FolderOption] { roots.flattenedOptions }
     
     /// 画面に表示するフォルダ。畳んでいる親フォルダの配下は含めない
     private var visibleOptions: [FolderOption] {
@@ -53,12 +59,12 @@ struct FolderMultiSelectGroup: View {
             nodes.flatMap { node -> [FolderOption] in
                 var result = [FolderOption(node: node, level: level)]
                 if expandedFolderIDs.contains(node.id) {
-                    result += walk(node.children, level: level + 1)
+                    result += walk(node.sortedChildren, level: level + 1)
                 }
                 return result
             }
         }
-        return walk(store.roots, level: 1)
+        return walk(roots, level: 1)
     }
     
     private var selectedOptions: [FolderOption] {

@@ -1,5 +1,6 @@
 
 import SwiftUI
+import SwiftData
 
 /// よく買うものの登録・編集画面
 struct FrequentItemFormView: View {
@@ -83,6 +84,6 @@ struct FrequentItemFormView: View {
 
 #Preview {
     FrequentItemFormView { _ in }
-        .environment(FolderStore())
+        .modelContainer(PreviewData.container())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }

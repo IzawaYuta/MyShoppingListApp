@@ -24,22 +24,13 @@ final class FrequentItemStore {
     }
 }
 
-// MARK: - Helpers
-
-extension FolderStore {
-    /// id からフォルダを探す（FolderMultiSelectGroup.swift の flattenedOptions を使用）
-    func node(withID id: UUID) -> FolderNode? {
-        flattenedOptions.first { $0.id == id }?.node
-    }
-}
-
 // MARK: - Dummy Data
 
 extension FrequentItemStore {
     /// ダミーデータ。フォルダ名から追加先の id を探して作る
-    static func sample(folders: FolderStore) -> FrequentItemStore {
+    static func sample(folders: [FolderNode]) -> FrequentItemStore {
         func make(_ name: String, in folderName: String, priority: Bool = false) -> FrequentItem {
-            let id = folders.flattenedOptions.first { $0.node.name == folderName }?.id
+            let id = folders.first { $0.name == folderName }?.id
             return FrequentItem(name: name, isPriority: priority, folderIDs: id.map { [$0] } ?? [])
         }
         

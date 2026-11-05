@@ -1,5 +1,6 @@
 
 import SwiftUI
+import SwiftData
 
 /// 開くシートの判定（登録 or 編集）
 enum FrequentItemSheet: Identifiable {
@@ -16,7 +17,8 @@ enum FrequentItemSheet: Identifiable {
 
 /// よく買うもの一覧（選んで、まとめてリストに追加する画面）
 struct FrequentItemListView: View {
-    @Environment(FolderStore.self) private var folders
+    @Environment(\.modelContext) private var modelContext
+    @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     @Environment(FrequentItemStore.self) private var store
     @Environment(ToastCenter.self) private var toast
     
@@ -179,7 +181,7 @@ struct FrequentItemListView: View {
     /// 追加先のフォルダ名（フォルダが削除されている場合は除く）
     private func folderNames(for item: FrequentItem) -> String {
         let names = item.folderIDs
-            .compactMap { folders.node(withID: $0)?.name }
+            .compactMap { roots.node(withID: $0)?.name }
             .sorted()
         return names.isEmpty ? "追加先なし" : names.joined(separator: "、")
     }
@@ -198,8 +200,8 @@ struct FrequentItemListView: View {
         let chosen = selectedItems
         for item in chosen {
             for folderID in item.folderIDs {
-                guard let node = folders.node(withID: folderID) else { continue }
-                node.items.append(ShoppingItem(name: item.name, isPriority: item.isPriority))
+                guard let node = roots.node(withID: folderID) else { continue }
+                node.addItem(name: item.name, isPriority: item.isPriority, in: modelContext)
             }
         }
         
@@ -208,20 +210,19 @@ struct FrequentItemListView: View {
     }
 }
 
-// MARK: - Preview
-
 #Preview("一覧") {
-    let folders = FolderStore()
+    let container = PreviewData.container()
+    let all = (try? container.mainContext.fetch(FetchDescriptor<FolderNode>())) ?? []
     return NavigationStack { FrequentItemListView() }
-        .environment(folders)
-        .environment(FrequentItemStore.sample(folders: folders))
+        .modelContainer(container)
+        .environment(FrequentItemStore.sample(folders: all))
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
 
 #Preview("登録なし") {
     NavigationStack { FrequentItemListView() }
-        .environment(FolderStore())
+        .modelContainer(PreviewData.container(withSamples: false))
         .environment(FrequentItemStore())
         .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))

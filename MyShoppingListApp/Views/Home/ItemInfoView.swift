@@ -1,12 +1,14 @@
 
 import SwiftUI
+import SwiftData
 
 // MARK: - Screen
 
 /// メインビュー（アイテム追加画面）
 struct ItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(FolderStore.self) private var store
+    @Environment(\.modelContext) private var modelContext
+    @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     
     @State private var name = ""
     @State private var quantity = ""
@@ -100,8 +102,9 @@ struct ItemInfoView: View {
     /// 選択したすべてのフォルダに、同じアイテムを追加する
     private func add() {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
-        for option in store.flattenedOptions where option.canHoldItems && selectedFolderIDs.contains(option.id) {
-            
+        for option in roots.flattenedOptions
+        where option.canHoldItems && selectedFolderIDs.contains(option.id) {
+            option.node.addItem(name: trimmed, isPriority: isPriority, in: modelContext)
         }
         dismiss()
     }
@@ -120,8 +123,9 @@ struct ItemInfoView: View {
 // MARK: - Preview
 
 #Preview {
-    let store = FolderStore()
-    return ItemInfoView(currentFolder: store.roots.first)
-        .environment(store)
+    let container = PreviewData.container()
+    let first = try? container.mainContext.fetch(FolderNode.rootsDescriptor).first
+    return ItemInfoView(currentFolder: first)
+        .modelContainer(container)
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
