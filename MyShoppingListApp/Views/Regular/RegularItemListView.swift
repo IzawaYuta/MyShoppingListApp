@@ -71,13 +71,15 @@ struct RegularItemListView: View {
                         row(item)
                     }
                 } header: {
-                    HStack(spacing: 4) {
-                        Text("自動追加されたアイテムには")
-                        AutoAddedBadge()
-                        Text("が表示されます。")
+                    if !items.isEmpty {
+                        HStack(spacing: 4) {
+                            Text("自動追加されたアイテムには")
+                            AutoAddedBadge()
+                            Text("が表示されます。")
+                        }
+                        .font(.footnote)
+                        .textCase(nil)
                     }
-                    .font(.footnote)
-                    .textCase(nil)
                 }
                 
                 if !pausedItems.isEmpty {
@@ -91,6 +93,18 @@ struct RegularItemListView: View {
             .listStyle(.insetGrouped)
             .navigationTitle("定期アイテム")
             .navigationBarTitleDisplayMode(.large)
+            .overlay {
+                if items.isEmpty {
+                    EmptyStateView(
+                        systemImage: "",
+                        title: "アイテムがありません",
+                        message: "「定期アイテム」を追加しましょう",
+                        buttonTitle: "追加"
+                    ) {
+                        activeSheet = .add
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -159,7 +173,7 @@ struct RegularItemListView: View {
 
 // MARK: - Preview
 
-#Preview {
+#Preview("ダミー") {
     NavigationStack {
         RegularItemListView()
     }
@@ -167,3 +181,11 @@ struct RegularItemListView: View {
     .toastHost(ToastCenter())
     .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
+
+#Preview("登録なし") {
+    NavigationStack { RegularItemListView() }
+        .modelContainer(PreviewData.container(withSamples: false))
+        .toastHost(ToastCenter())
+        .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
+}
+
