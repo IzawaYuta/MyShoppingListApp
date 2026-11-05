@@ -141,6 +141,10 @@ struct HomeView: View {
     @State private var editMode: EditMode = .inactive
     @State private var path: [FolderRoute] = []
     
+    @State private var folderToDelete: FolderNode?
+    @State private var deleteMessage = ""
+    @State private var showDeleteAlert = false
+    
     var body: some View {
         NavigationStack(path: $path) {
             List {
@@ -149,11 +153,21 @@ struct HomeView: View {
                         FolderListRow(node: folder, level: 1) {
                             activeSheet = .editFolder(folder)
                         }
-                    }
-                    .onDelete { offsets in
-                        // 配下のフォルダとアイテムも一緒に削除される（cascade）
-                        for index in offsets {
-                            modelContext.delete(roots[index])
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            // 先に書いたものが、画面の端に出る
+                            Button {
+                                requestDelete(folder)
+                            } label: {
+                                Label("削除", systemImage: "trash")
+                            }
+                            .tint(.red)
+                            
+                            Button {
+                                activeSheet = .editFolder(folder)
+                            } label: {
+                                Label("編集", systemImage: "pencil")
+                            }
+                            .tint(.blue)
                         }
                     }
                 }
@@ -183,7 +197,29 @@ struct HomeView: View {
                 case .item: EmptyView()
                 }
             }
+            .alert("フォルダを削除しますか？", isPresented: $showDeleteAlert) {
+                Button("キャンセル", role: .cancel) {
+                    folderToDelete = nil
+                }
+                Button("削除", role: .destructive) {
+                    // 配下のフォルダとアイテムも一緒に削除される（cascade）
+                    if let folder = folderToDelete {
+                        modelContext.delete(folder)
+                    }
+                    folderToDelete = nil
+                }
+            } message: {
+                Text(deleteMessage)
+            }
         }
+    }
+    
+    /// 削除の確認アラートを出す
+    /// 本文は、先に文字にして持っておく（削除したあとの画面の更新で、消えたフォルダを読まないため）
+    private func requestDelete(_ folder: FolderNode) {
+        folderToDelete = folder
+        deleteMessage = "「\(folder.name)」と、その中のフォルダ・アイテムがすべて削除されます。この操作は取り消せません。"
+        showDeleteAlert = true
     }
 }
 
@@ -196,6 +232,10 @@ struct FolderDetailView: View {
     @State private var editMode: EditMode = .inactive
     @State private var activeSheet: ActiveSheet?
     @State private var showTrashAlert = false
+    
+    @State private var folderToDelete: FolderNode?
+    @State private var deleteMessage = ""
+    @State private var showDeleteAlert = false
     
     @Environment(\.modelContext) private var modelContext
     @Environment(ToastCenter.self) private var toast
@@ -225,11 +265,21 @@ struct FolderDetailView: View {
                         FolderListRow(node: child, level: route.level + 1) {
                             activeSheet = .editFolder(child)
                         }
-                    }
-                    .onDelete { offsets in
-                        let targets = offsets.map { children[$0] }
-                        for target in targets {
-                            modelContext.delete(target)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            // 先に書いたものが、画面の端に出る
+                            Button {
+                                requestDelete(child)
+                            } label: {
+                                Label("削除", systemImage: "trash")
+                            }
+                            .tint(.red)
+                            
+                            Button {
+                                activeSheet = .editFolder(child)
+                            } label: {
+                                Label("編集", systemImage: "pencil")
+                            }
+                            .tint(.blue)
                         }
                     }
                 } header: {
@@ -240,12 +290,14 @@ struct FolderDetailView: View {
             Section {
                 ForEach(items) { item in
                     ItemRow(item: item)
-                }
-                .onDelete { offsets in
-                    let targets = offsets.map { items[$0] }
-                    for target in targets {
-                        modelContext.delete(target)
-                    }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                // 確認なしで、すぐ削除する（購入履歴には残らない）
+                                modelContext.delete(item)
+                            } label: {
+                                Label("削除", systemImage: "trash")
+                            }
+                        }
                 }
             } header: {
                 if !route.canAddFolder || children.isEmpty {
@@ -288,6 +340,20 @@ struct FolderDetailView: View {
             }
         } message: {
             Text("完了済みの\(completedCount)件を、リストから削除して購入履歴に移します。")
+        }
+        .alert("フォルダを削除しますか？", isPresented: $showDeleteAlert) {
+            Button("キャンセル", role: .cancel) {
+                folderToDelete = nil
+            }
+            Button("削除", role: .destructive) {
+                // 配下のフォルダとアイテムも一緒に削除される（cascade）
+                if let folder = folderToDelete {
+                    modelContext.delete(folder)
+                }
+                folderToDelete = nil
+            }
+        } message: {
+            Text(deleteMessage)
         }
     }
     
@@ -341,6 +407,14 @@ struct FolderDetailView: View {
                 modelContext.delete(item)
             }
         }
+    }
+    
+    /// 削除の確認アラートを出す
+    /// 本文は、先に文字にして持っておく（削除したあとの画面の更新で、消えたフォルダを読まないため）
+    private func requestDelete(_ folder: FolderNode) {
+        folderToDelete = folder
+        deleteMessage = "「\(folder.name)」と、その中のフォルダ・アイテムがすべて削除されます。この操作は取り消せません。"
+        showDeleteAlert = true
     }
 }
 

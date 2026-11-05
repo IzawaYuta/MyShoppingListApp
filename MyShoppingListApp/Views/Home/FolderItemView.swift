@@ -57,19 +57,32 @@ struct ItemRow: View {
             Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
                 .font(.title3)
                 .foregroundStyle(item.isDone ? Color.accentColor : Color.secondary)
+                .layoutPriority(1)
             
+            // 名前は1行まで。入りきらないときは、最後を「…」で省略する
             Text(item.name)
                 .foregroundStyle(item.isDone ? .secondary : .primary)
+                .lineLimit(1)
+                .truncationMode(.tail)
                 .overlay {
                     AnimatedStrikethrough(isDone: item.isDone)
                 }
             
-            // 定期アイテムの自動追加で入ったもの
+            Spacer()
+            
+            // 定期アイテムの自動追加で入ったもの（名前より優先して表示）
             if item.isAutoAdded {
                 AutoAddedBadge()
+                    .layoutPriority(1)
             }
             
-            Spacer()
+            // 優先のしるし（名前より優先して表示）
+            if item.isPriority {
+                Image(systemName: "exclamationmark")
+                    .bold()
+                    .foregroundStyle(Color.red)
+                    .layoutPriority(1)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
