@@ -26,6 +26,10 @@ struct FrequentItemListView: View {
     @State private var activeSheet: FrequentItemSheet?
     @State private var editMode: EditMode = .inactive
     
+    @State private var itemToDelete: FrequentItem?
+    @State private var deleteMessage = ""
+    @State private var showDeleteAlert = false
+    
     /// 選択中のアイテム（削除などで存在しなくなった id は数えない）
     private var selectedItems: [FrequentItem] {
         items.filter { selection.contains($0.id) }
@@ -37,11 +41,6 @@ struct FrequentItemListView: View {
                 Section {
                     ForEach(items) { item in
                         row(item)
-                    }
-                    .onDelete { offsets in
-                        for index in offsets {
-                            modelContext.delete(items[index])
-                        }
                     }
                 } header: {
                     Text("追加したいものを選んでください")
@@ -76,6 +75,20 @@ struct FrequentItemListView: View {
                 case .edit(let item):
                     FrequentItemFormView(item: item)
                 }
+            }
+            .alert("よく買うものを削除しますか？", isPresented: $showDeleteAlert) {
+                Button("キャンセル", role: .cancel) {
+                    itemToDelete = nil
+                }
+                Button("削除", role: .destructive) {
+                    if let item = itemToDelete {
+                        selection.remove(item.id)   // 選択中だった場合は、選択からも外す
+                        modelContext.delete(item)
+                    }
+                    itemToDelete = nil
+                }
+            } message: {
+                Text(deleteMessage)
             }
         }
     }
@@ -131,6 +144,14 @@ struct FrequentItemListView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button {
+                requestDelete(item)
+            } label: {
+                Label("削除", systemImage: "trash")
+            }
+            .tint(.red)
+        }
 //        .disabled(inList && !editMode.isEditing)   // すでにリストにあるものは選べない（編集は可能）
     }
     
@@ -205,6 +226,14 @@ struct FrequentItemListView: View {
         
         withAnimation { selection.removeAll() }
         toast.show("\(chosen.count)件をリストに追加しました")
+    }
+    
+    /// 削除の確認アラートを出す
+    /// 本文は、先に文字にして持っておく（削除したあとの画面の更新で、消えたアイテムを読まないため）
+    private func requestDelete(_ item: FrequentItem) {
+        itemToDelete = item
+        deleteMessage = "「\(item.name)」を、よく買うものから削除します。すでにリストに追加されたアイテムは、そのまま残ります。"
+        showDeleteAlert = true
     }
 }
 
