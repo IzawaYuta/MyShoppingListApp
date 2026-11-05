@@ -178,6 +178,18 @@ struct HomeView: View {
             .navigationDestination(for: FolderRoute.self) { route in
                 FolderDetailView(route: route, path: $path)
             }
+            .overlay{
+                if roots.isEmpty {
+                    EmptyStateView(
+                        systemImage: "folder.badge.plus",
+                        title: "フォルダがありません",
+                        message: "フォルダを追加して、買うものを整理しましょう。",
+                        buttonTitle: "フォルダを追加"
+                    ) {
+                        activeSheet = .folder
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button(editMode.isEditing ? "完了" : "編集") {
@@ -236,6 +248,10 @@ struct FolderDetailView: View {
     @State private var folderToDelete: FolderNode?
     @State private var deleteMessage = ""
     @State private var showDeleteAlert = false
+    
+//    @State private var showAddChoice = false
+    /// 子フォルダもアイテムもない状態
+    private var isEmpty: Bool { node.children.isEmpty && node.items.isEmpty }
     
     @Environment(\.modelContext) private var modelContext
     @Environment(ToastCenter.self) private var toast
@@ -309,6 +325,11 @@ struct FolderDetailView: View {
         .environment(\.editMode, $editMode)
         .navigationTitle(node.name)
         .navigationBarTitleDisplayMode(.large)
+        .overlay { if isEmpty { emptyState } }
+//        .confirmationDialog("追加するもの", isPresented: $showAddChoice, titleVisibility: .visible) {
+//            Button("フォルダを追加") { activeSheet = .folder }
+//            Button("アイテムを追加") { activeSheet = .item }
+//        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button(editMode.isEditing ? "完了" : "編集") {
@@ -369,6 +390,41 @@ struct FolderDetailView: View {
             }
         )
         .padding(.leading, -20)
+    }
+    
+    /// データがない時の表示（階層ごとに、追加できるものに合わせる）
+    @ViewBuilder
+    private var emptyState: some View {
+        if route.canAddFolder && route.canHoldItems {
+            EmptyStateView(
+                systemImage: "folder.badge.plus",
+                title: "まだ何もありません",
+                message: "フォルダやアイテムを追加しましょう。",
+                buttonTitle: "追加",
+                buttonMenu: {
+                    Button("フォルダを追加", systemImage: "folder.badge.plus") { activeSheet = .folder }
+                    Button("アイテムを追加", systemImage: "plus") { activeSheet = .item }
+                }
+            )
+        } else if route.canAddFolder {
+            EmptyStateView(
+                systemImage: "folder.badge.plus",
+                title: "フォルダがありません",
+                message: "フォルダを追加しましょう。",
+                buttonTitle: "フォルダを追加"
+            ) {
+                activeSheet = .folder
+            }
+        } else {
+            EmptyStateView(
+                systemImage: "cart",
+                title: "買うものがありません",
+                message: "アイテムを追加しましょう。",
+                buttonTitle: "アイテムを追加"
+            ) {
+                activeSheet = .item
+            }
+        }
     }
     
     /// 最大階層より下には「フォルダを追加」を出さない
