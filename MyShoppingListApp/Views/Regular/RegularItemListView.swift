@@ -56,6 +56,10 @@ struct RegularItemListView: View {
     
     @State private var activeSheet: RegularItemSheet?
     
+    @State private var itemToDelete: RecurringItem?
+    @State private var deleteMessage = ""
+    @State private var showDeleteAlert = false
+    
     private var activeItems: [RecurringItem] { items.filter { $0.isActive } }
     private var pausedItems: [RecurringItem] { items.filter { !$0.isActive } }
     
@@ -66,7 +70,6 @@ struct RegularItemListView: View {
                     ForEach(activeItems) { item in
                         row(item)
                     }
-                    .onDelete { delete(from: activeItems, at: $0) }
                 } header: {
                     HStack(spacing: 4) {
                         Text("自動追加されたアイテムには")
@@ -82,7 +85,6 @@ struct RegularItemListView: View {
                         ForEach(pausedItems) { item in
                             row(item)
                         }
-                        .onDelete { delete(from: pausedItems, at: $0) }
                     }
                 }
             }
@@ -111,6 +113,19 @@ struct RegularItemListView: View {
                     }
                 }
             }
+            .alert("定期アイテムを削除しますか？", isPresented: $showDeleteAlert) {
+                Button("キャンセル", role: .cancel) {
+                    itemToDelete = nil
+                }
+                Button("削除", role: .destructive) {
+                    if let item = itemToDelete {
+                        modelContext.delete(item)
+                    }
+                    itemToDelete = nil
+                }
+            } message: {
+                Text(deleteMessage)
+            }
         }
     }
     
@@ -122,14 +137,23 @@ struct RegularItemListView: View {
             RecurringItemRow(item: item)
         }
         .buttonStyle(.plain)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button {
+                requestDelete(item)
+            } label: {
+                Label("削除", systemImage: "trash")
+            }
+            .tint(.red)
+        }
     }
     
     /// セクション内の行番号から、元のデータを削除する
-    private func delete(from section: [RecurringItem], at offsets: IndexSet) {
-        let targets = offsets.map { section[$0] }
-        for target in targets {
-            modelContext.delete(target)
-        }
+    /// 削除の確認アラートを出す
+    /// 本文は、先に文字にして持っておく（削除したあとの画面の更新で、消えたアイテムを読まないため）
+    private func requestDelete(_ item: RecurringItem) {
+        itemToDelete = item
+        deleteMessage = "「\(item.name)」を削除すると、自動追加されなくなります。すでにリストに追加されたアイテムは、そのまま残ります。"
+        showDeleteAlert = true
     }
 }
 
