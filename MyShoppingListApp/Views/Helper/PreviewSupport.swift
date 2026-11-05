@@ -8,12 +8,13 @@ enum PreviewData {
     /// メモリ上だけのコンテナを作る。withSamples を false にすると空の状態になる
     static func container(withSamples: Bool = true) -> ModelContainer {
         let container = try! ModelContainer(
-            for: FolderNode.self, ShoppingItem.self, PurchaseRecord.self,
+            for: FolderNode.self, ShoppingItem.self, PurchaseRecord.self, RecurringItem.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         if withSamples {
             insertSamples(into: container.mainContext)
             insertPurchaseSamples(into: container.mainContext)
+            insertRecurringSamples(into: container.mainContext)
         }
         return container
     }
@@ -96,5 +97,29 @@ enum PreviewData {
                 purchasedAt: record.date
             ))
         }
+    }
+    
+    /// 定期アイテムのダミーデータ
+    private static func insertRecurringSamples(into context: ModelContext) {
+        func make(_ name: String,
+                  _ frequency: RecurrenceFrequency,
+                  day: Int = 1,
+                  priority: Bool = false,
+                  active: Bool = true) {
+            var draft = RecurringItemDraft()
+            draft.name = name
+            draft.frequency = frequency
+            draft.startDate = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: day)) ?? .now
+            draft.isPriority = priority
+            draft.isActive = active
+            context.insert(RecurringItem(draft: draft))
+        }
+        
+        make("牛乳", .weekly, priority: true)
+        make("卵", .weekly)
+        make("トイレットペーパー", .monthly, day: 1)
+        make("ヨーグルト", .biweekly)
+        make("洗剤", .monthly, day: 15)
+        make("ミネラルウォーター", .weekly, active: false)
     }
 }

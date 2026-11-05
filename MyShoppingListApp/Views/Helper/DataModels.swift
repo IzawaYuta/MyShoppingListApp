@@ -280,3 +280,107 @@ final class PurchaseRecord {
         self.isPriority = isPriority
     }
 }
+
+// MARK: - RecurringItem
+
+/// 頻度の種類
+/// rawValue は保存用の固定の名前。画面に出す文言は title で持つ
+enum RecurrenceFrequency: String, CaseIterable, Identifiable, Codable {
+    case daily
+    case weekly
+    case biweekly
+    case monthly
+    case yearly
+    
+    var id: String { rawValue }
+    
+    /// 画面に表示する名前
+    var title: String {
+        switch self {
+        case .daily:    return "毎日"
+        case .weekly:   return "毎週"
+        case .biweekly: return "隔週"
+        case .monthly:  return "毎月"
+        case .yearly:   return "毎年"
+        }
+    }
+    
+    /// 次の日付を求めるための Calendar 単位と間隔
+    var step: (component: Calendar.Component, value: Int) {
+        switch self {
+        case .daily:    return (.day, 1)
+        case .weekly:   return (.weekOfYear, 1)
+        case .biweekly: return (.weekOfYear, 2)
+        case .monthly:  return (.month, 1)
+        case .yearly:   return (.year, 1)
+        }
+    }
+}
+
+/// 定期アイテム
+@Model
+final class RecurringItem {
+    var id: UUID = UUID()
+    var name: String = ""
+    var quantity: String = ""
+    /// 追加先のフォルダ。関連づけはせず、id だけを覚える
+    var folderIDs: [UUID] = []
+    var startDate: Date = Date()
+    var frequency: RecurrenceFrequency = RecurrenceFrequency.weekly
+    var hasEndDate: Bool = false
+    var endDate: Date = Date()
+    var allowsDuplicate: Bool = false
+    var isPriority: Bool = false
+    var notifiesOnAdd: Bool = true
+    var isActive: Bool = true
+    /// 一覧の並び順（作成した順）
+    var createdAt: Date = Date()
+    
+    init(draft: RecurringItemDraft) {
+        apply(draft)
+    }
+    
+    /// 入力画面の内容をこのアイテムに反映する（RecurringItemDraft は RegularItemInfoView.swift のもの）
+    func apply(_ draft: RecurringItemDraft) {
+        name = draft.name
+        quantity = draft.quantity
+        folderIDs = Array(draft.folderIDs)
+        startDate = draft.startDate
+        frequency = draft.frequency
+        hasEndDate = draft.hasEndDate
+        endDate = draft.endDate
+        allowsDuplicate = draft.allowsDuplicate
+        isPriority = draft.isPriority
+        notifiesOnAdd = draft.notifiesOnAdd
+        isActive = draft.isActive
+    }
+    
+    /// 入力画面に渡す、今の内容
+    var draft: RecurringItemDraft {
+        var draft = RecurringItemDraft()
+        draft.name = name
+        draft.quantity = quantity
+        draft.folderIDs = Set(folderIDs)
+        draft.startDate = startDate
+        draft.frequency = frequency
+        draft.hasEndDate = hasEndDate
+        draft.endDate = endDate
+        draft.allowsDuplicate = allowsDuplicate
+        draft.isPriority = isPriority
+        draft.notifiesOnAdd = notifiesOnAdd
+        draft.isActive = isActive
+        return draft
+    }
+    
+    /// 名前の下に表示する頻度（例：毎週 / 隔週 / 毎月1日）
+    var subtitle: String {
+        let calendar = Calendar.current
+        let day = calendar.component(.day, from: startDate)
+        let month = calendar.component(.month, from: startDate)
+        switch frequency {
+        case .monthly: return "毎月\(day)日"
+        case .yearly:  return "毎年\(month)月\(day)日"
+        default:       return frequency.title
+        }
+    }
+}

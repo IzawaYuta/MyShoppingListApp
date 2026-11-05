@@ -4,28 +4,6 @@ import SwiftData
 
 // MARK: - Model
 
-/// 頻度の種類
-enum RecurrenceFrequency: String, CaseIterable, Identifiable {
-    case daily = "毎日"
-    case weekly = "毎週"
-    case biweekly = "隔週"
-    case monthly = "毎月"
-    case yearly = "毎年"
-    
-    var id: String { rawValue }
-    
-    /// 次の日付を求めるための Calendar 単位と間隔
-    var step: (component: Calendar.Component, value: Int) {
-        switch self {
-        case .daily:    return (.day, 1)
-        case .weekly:   return (.weekOfYear, 1)
-        case .biweekly: return (.weekOfYear, 2)
-        case .monthly:  return (.month, 1)
-        case .yearly:   return (.year, 1)
-        }
-    }
-}
-
 /// 下書きダミーデータ
 struct RecurringItemDraft {
     var name = ""
@@ -121,7 +99,7 @@ struct RegularItemInfoView: View {
                                    in: draft.startDate..., displayedComponents: .date)
                     }
                     Picker("頻度", selection: $draft.frequency) {
-                        ForEach(RecurrenceFrequency.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(RecurrenceFrequency.allCases) { Text($0.title).tag($0) }
                     }
                 } footer: {
                     Text(nextDatesText)
