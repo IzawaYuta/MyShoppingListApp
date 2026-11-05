@@ -42,9 +42,6 @@ struct FrequentItemListView: View {
                     ForEach(items) { item in
                         row(item)
                     }
-                } header: {
-                    Text("追加したいものを選んでください")
-                        .textCase(nil)
                 }
             }
             .listStyle(.insetGrouped)

@@ -435,7 +435,7 @@ struct FolderDetailView: View {
             // 2階層目：フォルダもアイテムも追加できる
             Menu {
                 Button("フォルダを追加", systemImage: "folder.badge.plus") { activeSheet = .folder }
-                Button("アイテムを追加", systemImage: "plus") { activeSheet = .item }
+                Button("購入アイテムを追加", systemImage: "plus") { activeSheet = .item }
             } label: {
                 Image(systemName: "plus")
             }
