@@ -4,6 +4,8 @@ import SwiftData
 
 struct MainTabView: View {
     
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @State private var selection: Int = 0
     @State private var toastCenter = ToastCenter()
 
@@ -29,6 +31,16 @@ struct MainTabView: View {
             .tag(3)
         }
         .toastHost(toastCenter)
+        .task {
+            // アプリを起動したとき
+            RecurringItemRunner.addDueItems(in: modelContext)
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            // 別のアプリやホーム画面から戻ってきたとき
+            if newPhase == .active {
+                RecurringItemRunner.addDueItems(in: modelContext)
+            }
+        }
     }
 }
 

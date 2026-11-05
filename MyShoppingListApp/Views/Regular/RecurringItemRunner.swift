@@ -1,0 +1,71 @@
+
+import Foundation
+import SwiftData
+
+/// 定期アイテムの自動追加
+enum RecurringItemRunner {
+    
+    /// アプリを開いたときに呼ぶ。追加日が来ている定期アイテムを、追加先のフォルダに追加する
+    /// 何回分たまっていても、追加するのは1回だけ
+    @MainActor
+    static func addDueItems(in context: ModelContext, now: Date = .now) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+        
+        // 有効（一時停止でない）の定期アイテムだけが対象
+        let descriptor = FetchDescriptor<RecurringItem>(
+            predicate: #Predicate<RecurringItem> { $0.isActive }
+        )
+        guard let items = try? context.fetch(descriptor), !items.isEmpty else { return }
+        let folders = (try? context.fetch(FetchDescriptor<FolderNode>())) ?? []
+        
+        for item in items {
+            // 今日以前で一番新しい追加予定日（まだ来ていない、または終了日を過ぎていれば対象外）
+            guard let due = latestDueDate(for: item, today: today, calendar: calendar) else { continue }
+            
+            // この回は、すでに追加済み
+            if let last = item.lastAddedDate, last >= due { continue }
+            
+            for folderID in item.folderIDs {
+                // 削除されたフォルダは飛ばす
+                guard let node = folders.first(where: { $0.id == folderID }) else { continue }
+                
+                // 「重複して追加」がオフのとき、同じ名前の未完了アイテムがあれば追加しない
+                if !item.allowsDuplicate,
+                   node.items.contains(where: { $0.name == item.name && !$0.isDone }) {
+                    continue
+                }
+                
+                node.addItem(name: item.name, isPriority: item.isPriority, in: context)
+            }
+            
+            // 追加しなかった場合も、この回は処理済みとして記録する
+            item.lastAddedDate = due
+        }
+    }
+    
+    /// 今日以前で一番新しい追加予定日
+    /// 予定日は、開始日から「頻度の間隔 × 回数」で数える（月末の日付がずれないように）
+    private static func latestDueDate(for item: RecurringItem,
+                                      today: Date,
+                                      calendar: Calendar) -> Date? {
+        let start = calendar.startOfDay(for: item.startDate)
+        let end: Date? = item.hasEndDate ? calendar.startOfDay(for: item.endDate) : nil
+        let limit = end.map { min($0, today) } ?? today
+        guard limit >= start else { return nil }
+        
+        let step = item.frequency.step
+        let units = calendar.dateComponents([step.component], from: start, to: limit)
+            .value(for: step.component) ?? 0
+        
+        var count = units / step.value
+        while count >= 0 {
+            if let date = calendar.date(byAdding: step.component, value: step.value * count, to: start),
+               date <= limit {
+                return date
+            }
+            count -= 1
+        }
+        return nil
+    }
+}

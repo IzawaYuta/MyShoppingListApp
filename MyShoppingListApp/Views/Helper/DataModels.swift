@@ -335,6 +335,8 @@ final class RecurringItem {
     var isActive: Bool = true
     /// 一覧の並び順（作成した順）
     var createdAt: Date = Date()
+    /// 最後に自動追加した回の日付（同じ回を二重に追加しないための記録）
+    var lastAddedDate: Date? = nil
     
     init(draft: RecurringItemDraft) {
         apply(draft)
