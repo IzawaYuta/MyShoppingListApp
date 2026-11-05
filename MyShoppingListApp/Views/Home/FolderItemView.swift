@@ -2,6 +2,22 @@ import SwiftUI
 
 // MARK: - Rows
 
+/// 「自動追加」の印。説明の文章の中や、アイテム名の横で使う
+struct AutoAddedBadge: View {
+    /// 正方形の一辺。文字の大きさの設定に合わせて変わる
+    @ScaledMetric(relativeTo: .caption2) private var size: CGFloat = 20
+    
+    var body: some View {
+        Text("自")
+            .foregroundStyle(.black)
+            .frame(width: size, height: size)
+            .background(
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(Color.gray.opacity(0.5))
+            )
+    }
+}
+
 /// アイテムの横線のアニメーション
 struct AnimatedStrikethrough: View {
     let isDone: Bool
@@ -45,6 +61,11 @@ struct ItemRow: View {
                 .overlay {
                     AnimatedStrikethrough(isDone: item.isDone)
                 }
+            
+            // 定期アイテムの自動追加で入ったもの
+            if item.isAutoAdded {
+                AutoAddedBadge()
+            }
             
             Spacer()
         }

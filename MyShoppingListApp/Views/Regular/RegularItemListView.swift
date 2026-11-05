@@ -67,6 +67,14 @@ struct RegularItemListView: View {
                         row(item)
                     }
                     .onDelete { delete(from: activeItems, at: $0) }
+                } header: {
+                    HStack(spacing: 4) {
+                        Text("自動追加されたアイテムには")
+                        AutoAddedBadge()
+                        Text("が表示されます。")
+                    }
+                    .font(.footnote)
+                    .textCase(nil)
                 }
                 
                 if !pausedItems.isEmpty {

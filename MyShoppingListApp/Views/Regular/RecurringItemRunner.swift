@@ -46,7 +46,7 @@ enum RecurringItemRunner {
                     continue
                 }
                 
-                node.addItem(name: item.name, isPriority: item.isPriority, in: context)
+                node.addItem(name: item.name, isPriority: item.isPriority, isAutoAdded: true, in: context)
             }
             
             // 追加しなかった場合も、この回は処理済みとして記録する

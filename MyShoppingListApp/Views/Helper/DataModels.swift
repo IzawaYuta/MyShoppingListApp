@@ -194,9 +194,13 @@ final class FolderNode {
     
     /// このフォルダの直下にアイテムを追加する（一番下に並ぶ）
     @discardableResult
-    func addItem(name: String, isPriority: Bool = false, in context: ModelContext) -> ShoppingItem {
+    func addItem(name: String,
+                 isPriority: Bool = false,
+                 isAutoAdded: Bool = false,
+                 in context: ModelContext) -> ShoppingItem {
         let order = (items.map(\.sortOrder).max() ?? -1) + 1
         let item = ShoppingItem(name: name, isPriority: isPriority, sortOrder: order)
+        item.isAutoAdded = isAutoAdded
         context.insert(item)
         item.folder = self
         return item
@@ -226,6 +230,9 @@ final class ShoppingItem {
     var purchasedAt: Date?
     /// 同じフォルダ内での並び順（小さいほど上）
     var sortOrder: Int
+    
+    /// 定期アイテムの自動追加で入ったものか
+    var isAutoAdded: Bool = false
     
     var folder: FolderNode?
     
