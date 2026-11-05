@@ -6,14 +6,16 @@ import SwiftUI
 struct AutoAddedBadge: View {
     /// 正方形の一辺。文字の大きさの設定に合わせて変わる
     @ScaledMetric(relativeTo: .caption2) private var size: CGFloat = 20
+    private let textSize: CGFloat = 11
     
     var body: some View {
         Text("自")
+            .font(.system(size: textSize))
             .foregroundStyle(.black)
             .frame(width: size, height: size)
             .background(
                 RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.gray.opacity(0.5))
+                    .fill(Color.gray.opacity(0.2))
             )
     }
 }
