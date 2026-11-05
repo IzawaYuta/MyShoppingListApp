@@ -52,7 +52,18 @@ struct FrequentItemListView: View {
             .contentMargins(.bottom, 80, for: .scrollContent)   // 浮かぶボタンと重ならないよう、下に余白を足す
             .navigationTitle("よく買うもの")
             .navigationBarTitleDisplayMode(.large)
-            .overlay { if items.isEmpty { emptyState } }
+            .overlay {
+                if items.isEmpty {
+                    EmptyStateView(
+                        systemImage: "",
+                        title: "アイテムがありません",
+                        message: "「よく買うもの」を追加しましょう",
+                        buttonTitle: "追加"
+                    ) {
+                        activeSheet = .register
+                    }
+                }
+            }
             .overlay(alignment: .bottomTrailing) { addButton }
             .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
             .toolbar {
@@ -183,18 +194,6 @@ struct FrequentItemListView: View {
         }
     }
     
-    /// 登録がない時の表示
-    private var emptyState: some View {
-        ContentUnavailableView {
-            Label("まだ登録がありません", systemImage: "plus.circle")
-        } description: {
-            Text("よく買うものを登録すると、ここから選んで、まとめてリストに追加できます。")
-        } actions: {
-            Button("よく買うものを登録") { activeSheet = .register }
-                .buttonStyle(.borderedProminent)
-        }
-    }
-        
     // MARK: Logic
     
     /// 追加先のフォルダ名（フォルダが削除されている場合は除く）
