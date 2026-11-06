@@ -121,6 +121,35 @@ enum CustomIconFolder: String, CaseIterable, Identifiable {
     case music1
     case plane1
     case present1
+    case bousi01
+    case cake01
+    case flawer01
+    case foto01
+    case gear01
+    case hanga01
+    case happa01
+    case kato01
+    case kanmuri01
+    case konpasu01
+    case krakka01
+    case kutu01
+    case kutusita01
+    case mail01
+    case megane01
+    case mike01
+    case movie01
+    case nikukyu01
+    case pepar01
+    case peparminus01
+    case peparplus01
+    case pin01
+    case ribon01
+    case tizu01
+    case torofie01
+    case trash01
+    case tree01
+    case unbrera01
+    case kamihikouki01
 
     var id: String { rawValue }
     
