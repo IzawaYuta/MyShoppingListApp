@@ -365,7 +365,6 @@ final class RecurringItem {
     var frequency: RecurrenceFrequency = RecurrenceFrequency.weekly
     var hasEndDate: Bool = false
     var endDate: Date = Date()
-    var allowsDuplicate: Bool = false
     var isPriority: Bool = false
     var notifiesOnAdd: Bool = true
     var isActive: Bool = true
@@ -387,7 +386,6 @@ final class RecurringItem {
         frequency = draft.frequency
         hasEndDate = draft.hasEndDate
         endDate = draft.endDate
-        allowsDuplicate = draft.allowsDuplicate
         isPriority = draft.isPriority
         notifiesOnAdd = draft.notifiesOnAdd
         isActive = draft.isActive
@@ -403,7 +401,6 @@ final class RecurringItem {
         draft.frequency = frequency
         draft.hasEndDate = hasEndDate
         draft.endDate = endDate
-        draft.allowsDuplicate = allowsDuplicate
         draft.isPriority = isPriority
         draft.notifiesOnAdd = notifiesOnAdd
         draft.isActive = isActive

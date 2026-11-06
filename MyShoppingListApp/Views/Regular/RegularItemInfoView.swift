@@ -13,7 +13,6 @@ struct RecurringItemDraft {
     var frequency: RecurrenceFrequency = .weekly
     var hasEndDate = false
     var endDate = Calendar.current.startOfDay(for: .now)
-    var allowsDuplicate = false
     var isPriority = false
     var notifiesOnAdd = true
     var isActive = true
@@ -105,17 +104,8 @@ struct RegularItemInfoView: View {
                     Text(nextDatesText)
                 }
                 
-                // 重複・優先
+                // 優先
                 Section {
-                    VStack(alignment: .leading, spacing: 4) {
-                        CheckRow(title: "重複して追加", isOn: $draft.allowsDuplicate)
-                        Text("オフの場合、同じアイテムがすでにあると追加されません。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.leading, 34)
-                    }
-                    .padding(.vertical, 2)
-                    
                     CheckRow(title: "優先", isOn: $draft.isPriority)
                 }
                 
@@ -150,6 +140,15 @@ struct RegularItemInfoView: View {
                              ? "指定した日に、自動で追加されます。"
                              : "削除はされません。\n自動追加が無効になります。")
                     }
+                }
+                
+                // 自動追加についての説明（「無効にする」のフッターではなく、独立した文章）
+                Section {
+                    Text("同じ名前の未完了アイテムが、追加先のフォルダにあるときは、そのフォルダには自動追加されません。")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
             }
             .navigationTitle(title)

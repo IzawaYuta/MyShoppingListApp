@@ -40,9 +40,8 @@ enum RecurringItemRunner {
                 // 削除されたフォルダは飛ばす
                 guard let node = folders.first(where: { $0.id == folderID }) else { continue }
                 
-                // 「重複して追加」がオフのとき、同じ名前の未完了アイテムがあれば追加しない
-                if !item.allowsDuplicate,
-                   node.items.contains(where: { $0.name == item.name && !$0.isDone }) {
+                // 同じ名前の未完了アイテムがあれば追加しない
+                if node.items.contains(where: { $0.name == item.name && !$0.isDone }) {
                     continue
                 }
                 
