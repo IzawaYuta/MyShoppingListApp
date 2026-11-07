@@ -138,6 +138,32 @@ struct FolderListRow: View {
     }
 }
 
+/// ホーム画面の表示の切り替え
+enum FolderDisplayMode: String, CaseIterable, Identifiable {
+    case standard         // デフォルト（作成順）
+    case favoritesFirst   // 星が上（お気に入りを上に表示）
+    case favoritesOnly    // 星のみ（お気に入りのみ表示）
+    
+    var id: String { rawValue }
+    
+    /// メニューに出す名前
+    var title: String {
+        switch self {
+        case .standard:       return "デフォルト"
+        case .favoritesFirst: return "お気に入りを上に表示"
+        case .favoritesOnly:  return "お気に入りのみ表示"
+        }
+    }
+    
+    var systemImage: String {
+        switch self {
+        case .standard:       return "list.bullet"
+        case .favoritesFirst: return "arrow.up.to.line"
+        case .favoritesOnly:  return "star"
+        }
+    }
+}
+
 // MARK: - 最初の画面（フォルダのみ）
 
 /// メインビュー（ホーム画面）
@@ -151,19 +177,23 @@ struct HomeView: View {
     @State private var folderToDelete: FolderNode?
     @State private var deleteMessage = ""
     @State private var showDeleteAlert = false
-    @State private var showsFavoritesOnly = false
     
-    /// お気に入りを上にして、それぞれ作成した順に並べる
-    private var sortedRoots: [FolderNode] {
-        roots.sorted { lhs, rhs in
-            if lhs.isFavorite != rhs.isFavorite { return lhs.isFavorite }
-            return lhs.sortOrder < rhs.sortOrder
-        }
-    }
+    @State private var displayMode: FolderDisplayMode = .standard
     
-    /// 画面に出すフォルダ（お気に入りのみ表示のときは、お気に入りだけ）
+    /// 画面に出すフォルダ
+    /// デフォルト：作成順。星が上：お気に入りを上に。星のみ：お気に入りだけ
     private var displayedRoots: [FolderNode] {
-        showsFavoritesOnly ? sortedRoots.filter { $0.isFavorite } : sortedRoots
+        switch displayMode {
+        case .standard:
+            return roots.sorted { $0.sortOrder < $1.sortOrder }
+        case .favoritesFirst:
+            return roots.sorted { lhs, rhs in
+                if lhs.isFavorite != rhs.isFavorite { return lhs.isFavorite }
+                return lhs.sortOrder < rhs.sortOrder
+            }
+        case .favoritesOnly:
+            return roots.filter { $0.isFavorite }.sorted { $0.sortOrder < $1.sortOrder }
+        }
     }
     
     var body: some View {
@@ -211,7 +241,7 @@ struct HomeView: View {
             }
             .overlay {
                 // お気に入りのみ表示で、お気に入りが0件のとき
-                if showsFavoritesOnly && displayedRoots.isEmpty && !roots.isEmpty {
+                if displayMode == .favoritesOnly && displayedRoots.isEmpty && !roots.isEmpty {
                     Text("お気に入りのフォルダがありません")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -232,12 +262,15 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Menu {
-                        Toggle(isOn: $showsFavoritesOnly) {
-                            Label("お気に入りのみ表示", systemImage: "star")
+                        Picker("表示", selection: $displayMode) {
+                            ForEach(FolderDisplayMode.allCases) { mode in
+                                Label(mode.title, systemImage: mode.systemImage).tag(mode)
+                            }
                         }
+                        .pickerStyle(.inline)
                     } label: {
-                        // 絞り込み中は、塗りつぶしのアイコンにして、分かるようにする
-                        Image(systemName: showsFavoritesOnly ? "ellipsis.circle.fill" : "ellipsis.circle")
+                        // デフォルト以外のときは、塗りつぶしのアイコンにして、分かるようにする
+                        Image(systemName: displayMode == .standard ? "ellipsis.circle" : "ellipsis.circle.fill")
                     }
                     
                     Button {
