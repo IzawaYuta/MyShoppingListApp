@@ -157,14 +157,22 @@ struct FrequentItemListView: View {
         }
         .buttonStyle(.plain)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            // 先に書いたものが、画面の端に出る
             Button {
                 requestDelete(item)
             } label: {
                 Label("削除", systemImage: "trash")
             }
             .tint(.red)
+            
+            Button {
+                activeSheet = .edit(item)
+            } label: {
+                Label("編集", systemImage: "pencil")
+            }
+            .tint(.blue)
         }
-//        .disabled(inList && !editMode.isEditing)   // すでにリストにあるものは選べない（編集は可能）
+        //        .disabled(inList && !editMode.isEditing)   // すでにリストにあるものは選べない（編集は可能）
     }
     
     // MARK: Floating button / empty / toast
