@@ -11,22 +11,21 @@ import SwiftData
 @main
 struct MyShoppingListAppApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            FolderNode.self,
-            ShoppingItem.self,
-            PurchaseRecord.self,
-            RecurringItem.self,
-            FrequentItem.self,
-        ])
+        // 公開する最初の形（バージョン1）を使い、移行の計画をつなぐ
+        let schema = Schema(versionedSchema: SchemaV1.self)
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+        
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(
+                for: schema,
+                migrationPlan: AppMigrationPlan.self,
+                configurations: [modelConfiguration]
+            )
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
-
+    
     var body: some Scene {
         WindowGroup {
             MainTabView()
