@@ -2,6 +2,19 @@
 import SwiftUI
 import SwiftData
 
+struct CustomModifier: ViewModifier {
+    let isSelected: Bool
+    
+    func body(content: Content) -> some View {
+        content
+            .environment(
+                \.symbolVariants,
+                 isSelected ? .fill : .none
+            )
+            .foregroundStyle(.black)
+    }
+}
+
 struct MainTabView: View {
     
     @Environment(\.modelContext) private var modelContext
@@ -13,23 +26,31 @@ struct MainTabView: View {
         TabView(selection: $selection) {
             HomeView()
                 .tabItem {
-                    Image(systemName: "square.and.pencil")
+                    Image(systemName: "cart")
+                        .modifier(CustomModifier(isSelected: selection == 0))
+
                 }
                 .tag(0)
-            RegularItemListView()
+            FrequentItemListView()
                 .tabItem {
-                    Image(systemName: "square.and.pencil")
+                    Image(systemName: "star")
+                        .modifier(CustomModifier(isSelected: selection == 1))
                 }
                 .tag(1)
-            PurchaseRecordView()
+            RegularItemListView()
                 .tabItem {
-                    Image(systemName: "square.and.pencil")
+                    Image(systemName: "calendar.badge.clock")
+                        .modifier(CustomModifier(isSelected: selection == 2))
                 }
                 .tag(2)
-            FrequentItemListView()
-            .tabItem { Image(systemName: "star") }   
-            .tag(3)
+            PurchaseRecordView()
+                .tabItem {
+                    Image(systemName: "receipt")
+                        .modifier(CustomModifier(isSelected: selection == 3))
+                }
+                .tag(3)
         }
+        .tint(.black)
         .toastHost(toastCenter)
         .task {
             // アプリを起動したとき

@@ -6,7 +6,7 @@ import SwiftUI
 struct AutoAddedBadge: View {
     /// 正方形の一辺。文字の大きさの設定に合わせて変わる
     @ScaledMetric(relativeTo: .caption2) private var size: CGFloat = 20
-    private let textSize: CGFloat = 11
+    let textSize: CGFloat
     var text: String = "自"
     
     var body: some View {
@@ -74,7 +74,7 @@ struct ItemRow: View {
             
             // 定期アイテムの自動追加で入ったもの（名前より優先して表示）
             if item.isAutoAdded {
-                AutoAddedBadge()
+                AutoAddedBadge(textSize: 11)
                     .layoutPriority(1)
             }
             

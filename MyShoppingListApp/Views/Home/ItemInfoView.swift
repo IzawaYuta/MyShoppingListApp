@@ -63,12 +63,20 @@ struct ItemInfoView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("追加") { add() }
-                        .fontWeight(.semibold)
-                        .disabled(!canAdd)
+                    Button(action: {
+                        add()
+                    }) {
+                        Image(systemName: "checkmark")
+                            .fontWeight(.semibold)
+                    }
+                    .disabled(!canAdd)
                 }
             }
         }

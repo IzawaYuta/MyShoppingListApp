@@ -11,25 +11,19 @@ struct RecurringItemRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 8) {
-                    Text(item.name)
-                        .foregroundStyle(item.isActive ? .primary : .secondary)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                    
-                    // 終了日を過ぎたもの（名前が長くても、バッジは消さない）
-                    if item.isEnded {
-                        AutoAddedBadge(text: "終了")
-                            .layoutPriority(1)
-                    }
-                }
-                HStack(spacing: 6) {
+                Text(item.name)
+                    .foregroundStyle(item.isActive ? .primary : .secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                
+                // 終了日を過ぎたもの（名前が長くても、バッジは消さない）
+                VStack(alignment: .leading, spacing: 5) {
                     Text(item.subtitle)
                         .foregroundStyle(.secondary)
                     
                     // 追加先のフォルダが、すべてなくなったとき
                     if item.folderIDs.isEmpty {
-                        Text("追加先なし")
+                        Text("追加先フォルダが指定されていません")
                             .foregroundStyle(.red)
                     }
                 }
@@ -37,6 +31,11 @@ struct RecurringItemRow: View {
             }
             
             Spacer()
+            
+            if item.isEnded {
+                AutoAddedBadge(textSize: 13, text: "終了")
+                    .layoutPriority(1)
+            }
             
             if item.isPriority {
                 Image(systemName: "exclamationmark")
@@ -92,7 +91,7 @@ struct RegularItemListView: View {
                     if !items.isEmpty {
                         HStack(spacing: 4) {
                             Text("自動追加されたアイテムには")
-                            AutoAddedBadge()
+                            AutoAddedBadge(textSize: 11)
                             Text("が表示されます。")
                         }
                         .font(.footnote)

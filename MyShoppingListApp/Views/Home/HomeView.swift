@@ -99,15 +99,15 @@ struct FolderNodeRow: View {
             FolderImageView(name: node.name, tint: node.tint, customIcon: node.customIcon)
             Text(node.name)
             
+            Spacer()
+            
             // お気に入りのフォルダの目印
             if node.isFavorite {
                 Image(systemName: "star.fill")
-                    .font(.caption)
+                    .font(.title3)
                     .foregroundStyle(.yellow)
                     .layoutPriority(1)
             }
-            
-            Spacer()
         }
     }
 }
@@ -195,7 +195,7 @@ struct HomeView: View {
                                     folder.isFavorite.toggle()
                                 }
                             } label: {
-                                Label(folder.isFavorite ? "解除" : "お気に入り",
+                                Label(folder.isFavorite ? "解除" : "登録",
                                       systemImage: folder.isFavorite ? "star.slash" : "star")
                             }
                             .tint(.yellow)

@@ -28,7 +28,6 @@ enum CustomIconFolder: String, CaseIterable, Identifiable {
     case bike8
     case bike11
     case bike12
-    case book1
     case boy1
     case boy2
     case building1
@@ -64,14 +63,9 @@ enum CustomIconFolder: String, CaseIterable, Identifiable {
     case book2
     case book3
     case book4
-    case book5
     case book6
     case book7
     case book8
-    case book9
-    case book10
-    case book11
-    case book12
     case book13
     case eraser01
     case file01

@@ -61,7 +61,7 @@ struct FrequentItemListView: View {
                     }
                 }
             }
-            .overlay(alignment: .bottomTrailing) { addButton }
+            .overlay(alignment: .bottom) { addButton }
             .animation(.easeOut(duration: 0.12), value: selectedItems.isEmpty)
             .toolbar {
                 //            ToolbarItem(placement: .topBarLeading) {

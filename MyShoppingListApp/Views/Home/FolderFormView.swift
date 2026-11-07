@@ -112,12 +112,17 @@ struct FolderFormView: View {
                             tint: tint,
                             customIcon: customIcon
                         )
-                        TextField("フォルダ名", text: $name)
-                    }
-                } footer: {
-                    if isDuplicateName {
-                        Text("既にあります")
-                            .foregroundStyle(.red)
+                        HStack {
+                            TextField("食品、日用品、ドラッグストア・・・", text: $name)
+                            
+                            Spacer()
+                            
+                            if isDuplicateName {
+                                Text("既にあります")
+                                    .foregroundStyle(.red)
+                            }
+
+                        }
                     }
                 }
                 
