@@ -55,6 +55,7 @@ enum PreviewData {
              items: [("牛乳", false), ("卵", true)])
         
         let daily = make("日用品", tint: 1, order: 1)
+        daily.isFavorite = true   // Preview で、お気に入りの並びを確認するため
         make("洗剤・掃除", tint: 1, order: 0, parent: daily, items: [("洗剤", false)])
         make("紙類", tint: 1, order: 1, parent: daily)
         

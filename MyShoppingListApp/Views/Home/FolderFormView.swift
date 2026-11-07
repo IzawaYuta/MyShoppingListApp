@@ -83,6 +83,22 @@ struct FolderFormView: View {
     
     private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
     
+    /// 同じ親フォルダの中にある、ほかのフォルダ（追加：全員、編集：自分を除く）
+    private var otherFolders: [FolderNode] {
+        switch mode {
+        case .add(let parent, _):
+            return parent?.children ?? roots
+        case .edit(let node):
+            let all = node.parent?.children ?? roots
+            return all.filter { $0.id != node.id }
+        }
+    }
+    
+    /// 同じ名前（完全一致）のフォルダが、すでにあるか
+    private var isDuplicateName: Bool {
+        !trimmedName.isEmpty && otherFolders.contains { $0.name == trimmedName }
+    }
+    
     // MARK: Body
     
     var body: some View {
@@ -97,6 +113,11 @@ struct FolderFormView: View {
                             customIcon: customIcon
                         )
                         TextField("フォルダ名", text: $name)
+                    }
+                } footer: {
+                    if isDuplicateName {
+                        Text("既にあります")
+                            .foregroundStyle(.red)
                     }
                 }
                 
@@ -132,7 +153,7 @@ struct FolderFormView: View {
                         Image(systemName: "checkmark")
                     }
                     .fontWeight(.semibold)
-                    .disabled(trimmedName.isEmpty || !canSubmit)
+                    .disabled(trimmedName.isEmpty || !canSubmit || isDuplicateName)
                 }
             }
         }
@@ -173,7 +194,7 @@ struct FolderFormView: View {
     // MARK: Action
     
     private func submit() {
-        guard !trimmedName.isEmpty, canSubmit else { return }
+        guard !trimmedName.isEmpty, canSubmit, !isDuplicateName else { return }
         switch mode {
         case .add(let parent, _):
             // 並び順と色は、追加する前の兄弟フォルダの数・最大値から決める

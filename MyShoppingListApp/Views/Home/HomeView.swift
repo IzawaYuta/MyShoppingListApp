@@ -99,6 +99,14 @@ struct FolderNodeRow: View {
             FolderImageView(name: node.name, tint: node.tint, customIcon: node.customIcon)
             Text(node.name)
             
+            // お気に入りのフォルダの目印
+            if node.isFavorite {
+                Image(systemName: "star.fill")
+                    .font(.caption)
+                    .foregroundStyle(.yellow)
+                    .layoutPriority(1)
+            }
+            
             Spacer()
         }
     }
@@ -138,18 +146,31 @@ struct HomeView: View {
     @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     
     @State private var activeSheet: ActiveSheet?
-    @State private var editMode: EditMode = .inactive
     @State private var path: [FolderRoute] = []
     
     @State private var folderToDelete: FolderNode?
     @State private var deleteMessage = ""
     @State private var showDeleteAlert = false
+    @State private var showsFavoritesOnly = false
+    
+    /// お気に入りを上にして、それぞれ作成した順に並べる
+    private var sortedRoots: [FolderNode] {
+        roots.sorted { lhs, rhs in
+            if lhs.isFavorite != rhs.isFavorite { return lhs.isFavorite }
+            return lhs.sortOrder < rhs.sortOrder
+        }
+    }
+    
+    /// 画面に出すフォルダ（お気に入りのみ表示のときは、お気に入りだけ）
+    private var displayedRoots: [FolderNode] {
+        showsFavoritesOnly ? sortedRoots.filter { $0.isFavorite } : sortedRoots
+    }
     
     var body: some View {
         NavigationStack(path: $path) {
             List {
                 Section {
-                    ForEach(roots) { folder in
+                    ForEach(displayedRoots) { folder in
                         FolderListRow(node: folder, level: 1) {
                             activeSheet = .editFolder(folder)
                         }
@@ -168,15 +189,33 @@ struct HomeView: View {
                                 Label("編集", systemImage: "pencil")
                             }
                             .tint(.blue)
+                            
+                            Button {
+                                withAnimation {
+                                    folder.isFavorite.toggle()
+                                }
+                            } label: {
+                                Label(folder.isFavorite ? "解除" : "お気に入り",
+                                      systemImage: folder.isFavorite ? "star.slash" : "star")
+                            }
+                            .tint(.yellow)
+
                         }
                     }
                 }
             }
             .listStyle(.insetGrouped)
-            .environment(\.editMode, $editMode)
             .navigationTitle("カテゴリー")
             .navigationDestination(for: FolderRoute.self) { route in
                 FolderDetailView(route: route, path: $path)
+            }
+            .overlay {
+                // お気に入りのみ表示で、お気に入りが0件のとき
+                if showsFavoritesOnly && displayedRoots.isEmpty && !roots.isEmpty {
+                    Text("お気に入りのフォルダがありません")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
             .overlay{
                 if roots.isEmpty {
@@ -192,9 +231,15 @@ struct HomeView: View {
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button(editMode.isEditing ? "完了" : "編集") {
-                        withAnimation { editMode = editMode.isEditing ? .inactive : .active }
+                    Menu {
+                        Toggle(isOn: $showsFavoritesOnly) {
+                            Label("お気に入りのみ表示", systemImage: "star")
+                        }
+                    } label: {
+                        // 絞り込み中は、塗りつぶしのアイコンにして、分かるようにする
+                        Image(systemName: showsFavoritesOnly ? "ellipsis.circle.fill" : "ellipsis.circle")
                     }
+                    
                     Button {
                         activeSheet = .folder
                     } label: {
@@ -215,8 +260,9 @@ struct HomeView: View {
                 }
                 Button("削除", role: .destructive) {
                     // 配下のフォルダとアイテムも一緒に削除される（cascade）
+                    // 定期アイテムとよく買うものの追加先からも、削除したフォルダを取り除く
                     if let folder = folderToDelete {
-                        modelContext.delete(folder)
+                        FolderCleanup.delete(folder, in: modelContext)
                     }
                     folderToDelete = nil
                 }
@@ -241,7 +287,6 @@ struct HomeView: View {
 struct FolderDetailView: View {
     let route: FolderRoute
     @Binding var path: [FolderRoute]
-    @State private var editMode: EditMode = .inactive
     @State private var activeSheet: ActiveSheet?
     @State private var showTrashAlert = false
     
@@ -322,7 +367,6 @@ struct FolderDetailView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .environment(\.editMode, $editMode)
         .navigationTitle(node.name)
         .navigationBarTitleDisplayMode(.large)
         .overlay { if isEmpty { emptyState } }
@@ -332,9 +376,6 @@ struct FolderDetailView: View {
 //        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button(editMode.isEditing ? "完了" : "編集") {
-                    withAnimation { editMode = editMode.isEditing ? .inactive : .active }
-                }
                 if route.canHoldItems {
                     Button {
                         showTrashAlert = true

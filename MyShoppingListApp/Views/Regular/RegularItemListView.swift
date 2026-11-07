@@ -11,11 +11,29 @@ struct RecurringItemRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.name)
-                    .foregroundStyle(item.isActive ? .primary : .secondary)
-                Text(item.subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    Text(item.name)
+                        .foregroundStyle(item.isActive ? .primary : .secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    
+                    // 終了日を過ぎたもの（名前が長くても、バッジは消さない）
+                    if item.isEnded {
+                        AutoAddedBadge(text: "終了")
+                            .layoutPriority(1)
+                    }
+                }
+                HStack(spacing: 6) {
+                    Text(item.subtitle)
+                        .foregroundStyle(.secondary)
+                    
+                    // 追加先のフォルダが、すべてなくなったとき
+                    if item.folderIDs.isEmpty {
+                        Text("追加先なし")
+                            .foregroundStyle(.red)
+                    }
+                }
+                .font(.footnote)
             }
             
             Spacer()
@@ -123,7 +141,18 @@ struct RegularItemListView: View {
                     }
                 case .edit(let item):
                     RegularItemInfoView(draft: item.draft, title: "定期アイテム編集", isEditing: true) { saved in
+                        // 保存する前の内容と比べて、変わったかを調べる
+                        let startChanged = !Calendar.current.isDate(item.startDate, inSameDayAs: saved.startDate)
+                        let frequencyChanged = item.frequency != saved.frequency
+                        let reactivated = !item.isActive && saved.isActive   // 一時停止から有効に戻した
+                        
                         item.apply(saved)
+                        
+                        // 開始日か頻度を変えたとき、有効に戻したときは、今日までの予定日を処理済みにする
+                        // （変更した直後に、意図せず追加されないようにするため）
+                        if startChanged || frequencyChanged || reactivated {
+                            RecurringItemRunner.markProcessedThroughToday(item)
+                        }
                     }
                 }
             }

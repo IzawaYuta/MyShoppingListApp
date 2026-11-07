@@ -32,7 +32,7 @@ struct FrequentItemListView: View {
     
     /// 選択中のアイテム（削除などで存在しなくなった id は数えない）
     private var selectedItems: [FrequentItem] {
-        items.filter { selection.contains($0.id) }
+        items.filter { selection.contains($0.id) && hasDestination($0) }
     }
     
     var body: some View {
@@ -105,11 +105,14 @@ struct FrequentItemListView: View {
     
     private func row(_ item: FrequentItem) -> some View {
         let isSelected = selection.contains(item.id)
+        let canAdd = hasDestination(item)
 //        let inList = isInList(item)
         
         return Button {
             if editMode.isEditing {
                 activeSheet = .edit(item)
+            } else if !canAdd {
+                return   // 追加先がない行は選べない
             } else if isSelected {
                 selection.remove(item.id)
             } else {
@@ -129,7 +132,7 @@ struct FrequentItemListView: View {
 //                        .foregroundStyle(inList ? .secondary : .primary)
                     Text(folderNames(for: item))
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(canAdd ? Color.secondary : Color.red)
                 }
                 
                 Spacer()
@@ -150,6 +153,7 @@ struct FrequentItemListView: View {
             }
             .padding(.vertical, 2)
             .contentShape(Rectangle())
+            .opacity(canAdd || editMode.isEditing ? 1 : 0.4)
         }
         .buttonStyle(.plain)
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -209,6 +213,11 @@ struct FrequentItemListView: View {
 //                node.items.contains { $0.name == item.name && !$0.isDone }
 //            }
 //    }
+    
+    /// 追加先のフォルダが、1つでも残っているか
+    private func hasDestination(_ item: FrequentItem) -> Bool {
+        item.folderIDs.contains { roots.node(withID: $0) != nil }
+    }
     
     /// 選んだアイテムを、それぞれの追加先フォルダに追加する（フォルダごとに別のアイテムとして作る）
     private func addSelectedToList() {

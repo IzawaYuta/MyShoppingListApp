@@ -33,6 +33,8 @@ struct MainTabView: View {
         .toastHost(toastCenter)
         .task {
             // アプリを起動したとき
+            // 先に、存在しないフォルダの id を掃除してから、自動追加する
+            FolderCleanup.removeDanglingIDs(in: modelContext)
             RecurringItemRunner.addDueItems(in: modelContext)
         }
         .onChange(of: scenePhase) { _, newPhase in

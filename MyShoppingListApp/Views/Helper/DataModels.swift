@@ -11,7 +11,7 @@ import SwiftData
 enum FolderLimit {
     static let maxDepth = 3
     /// アイテムを入れられる最小の階層（1階層目にはアイテムを入れない）
-    static let itemMinLevel = 1
+    static let itemMinLevel = 2
 }
 
 /// フォルダに使えるアイコンの一覧。
@@ -169,6 +169,8 @@ final class FolderNode {
     var customIconName: String?
     /// 同じ階層での並び順（小さいほど上）
     var sortOrder: Int
+    /// お気に入りか（1階層目のフォルダだけで使う）
+    var isFavorite: Bool = false
     
     var parent: FolderNode?
     
@@ -262,6 +264,9 @@ final class ShoppingItem {
     
     /// 定期アイテムの自動追加で入ったものか
     var isAutoAdded: Bool = false
+    
+    /// 数量
+    var quantity: String = ""
     
     var folder: FolderNode?
     
@@ -417,6 +422,13 @@ final class RecurringItem {
         case .yearly:  return "毎年\(month)月\(day)日"
         default:       return frequency.title
         }
+    }
+    
+    /// 終了日を過ぎているか（終了日の翌日以降）
+    var isEnded: Bool {
+        guard hasEndDate else { return false }
+        let calendar = Calendar.current
+        return calendar.startOfDay(for: .now) > calendar.startOfDay(for: endDate)
     }
 }
 

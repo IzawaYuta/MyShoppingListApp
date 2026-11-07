@@ -7,12 +7,14 @@ struct AutoAddedBadge: View {
     /// 正方形の一辺。文字の大きさの設定に合わせて変わる
     @ScaledMetric(relativeTo: .caption2) private var size: CGFloat = 20
     private let textSize: CGFloat = 11
+    var text: String = "自"
     
     var body: some View {
-        Text("自")
+        Text(text)
             .font(.system(size: textSize))
             .foregroundStyle(.black)
-            .frame(width: size, height: size)
+            .padding(.horizontal, 4)
+            .frame(minWidth: size, minHeight: size)
             .background(
                 RoundedRectangle(cornerRadius: 5)
                     .fill(Color.gray.opacity(0.2))

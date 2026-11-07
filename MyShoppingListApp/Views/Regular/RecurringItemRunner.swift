@@ -15,6 +15,16 @@ enum RecurringItemRunner {
         addDueItems(in: context)
     }
     
+    /// 今日までの予定日を、処理済みにする
+    /// 開始日や頻度を編集したとき、一時停止から有効に戻したときに呼ぶ
+    /// 変更後の「次の予定日」から追加されるようにするため（その場では追加されない）
+    static func markProcessedThroughToday(_ item: RecurringItem, now: Date = .now) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+        // 今日以前の予定日がなければ（開始日が未来など）、記録は空にする
+        item.lastAddedDate = latestDueDate(for: item, today: today, calendar: calendar)
+    }
+    
     /// アプリを開いたときに呼ぶ。追加日が来ている定期アイテムを、追加先のフォルダに追加する
     /// 何回分たまっていても、追加するのは1回だけ
     @MainActor
@@ -30,9 +40,11 @@ enum RecurringItemRunner {
         let folders = (try? context.fetch(FetchDescriptor<FolderNode>())) ?? []
         
         for item in items {
+            // 終了日の翌日以降は、追加しない（終了日の当日までは追加する）
+            if item.hasEndDate, today > calendar.startOfDay(for: item.endDate) { continue }
+            
             // 今日以前で一番新しい追加予定日（まだ来ていない、または終了日を過ぎていれば対象外）
             guard let due = latestDueDate(for: item, today: today, calendar: calendar) else { continue }
-            
             // この回は、すでに追加済み
             if let last = item.lastAddedDate, last >= due { continue }
             
