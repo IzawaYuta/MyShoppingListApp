@@ -9,7 +9,7 @@ import SwiftData
 enum FolderLimit {
     static let maxDepth = 3
     /// アイテムを入れられる最小の階層（1階層目にはアイテムを入れない）
-    static let itemMinLevel = 2
+    static let itemMinLevel = 1
 }
 
 /// フォルダに使えるアイコンの一覧。

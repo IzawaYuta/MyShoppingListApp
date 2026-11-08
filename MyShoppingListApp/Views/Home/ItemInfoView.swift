@@ -8,12 +8,19 @@ import SwiftData
 struct ItemInfoView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(ToastCenter.self) private var toast
+    
     @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     
     @State private var name = ""
     @State private var quantity = ""
     @State private var isPriority = false
     @State private var selectedFolderIDs: Set<UUID>
+    
+    /// 続けて登録するか（最後に選んだ状態を、アプリを閉じても覚えておく）
+    @AppStorage("continuousAddEnabled") private var continuousAdd = false
+    /// 名前の入力欄に、カーソルを戻すために使う
+    @FocusState private var isNameFocused: Bool
     
     /// currentFolder: 今いるフォルダ。最初から選択状態にする
     init(currentFolder: FolderNode? = nil) {
@@ -32,6 +39,7 @@ struct ItemInfoView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $name)
+                            .focused($isNameFocused)
                         if isPriority {
                             Image(systemName: "exclamationmark")
                                 .bold()
@@ -41,25 +49,32 @@ struct ItemInfoView: View {
                     CheckRow(title: "優先", isOn: $isPriority)   // RecurringItemFormView.swift のものを使用
                 }
                 
+                // 連続登録（オンのとき、追加しても画面を閉じない）
+                Section {
+                    Toggle("続けて登録", isOn: $continuousAdd)
+                } footer: {
+                    Text("オンのとき、追加しても画面を閉じずに、続けて登録できます。")
+                }
+                
                 // 追加先フォルダ（複数選択）
                 Section {
                     FolderMultiSelectGroup(selectedIDs: $selectedFolderIDs)
                 }
                 
                 // 定期アイテムとして登録（登録画面へ遷移）
-                Section {
-                    NavigationLink {
-                        RegularItemInfoView(draft: recurringDraft) { saved in
-                            RecurringItemRunner.register(saved, in: modelContext)
-                            dismiss()   // 登録したら、新規アイテムの画面も閉じる
-                        }
-                    } label: {
-                        Text("定期アイテムとして登録")
-                            .foregroundStyle(Color.accentColor)
-                    }
-                }
+//                Section {
+//                    NavigationLink {
+//                        RegularItemInfoView(draft: recurringDraft) { saved in
+//                            RecurringItemRunner.register(saved, in: modelContext)
+//                            dismiss()   // 登録したら、新規アイテムの画面も閉じる
+//                        }
+//                    } label: {
+//                        Text("定期アイテムとして登録")
+//                            .foregroundStyle(Color.accentColor)
+//                    }
+//                }
             }
-            .navigationTitle("新規アイテム")
+            .navigationTitle("購入アイテム")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -67,6 +82,7 @@ struct ItemInfoView: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
+                            .foregroundColor(.red)
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -80,6 +96,7 @@ struct ItemInfoView: View {
                 }
             }
         }
+        .toastHost(toast)
     }
     
 //    // MARK: Folder row
@@ -117,7 +134,19 @@ struct ItemInfoView: View {
         where option.canHoldItems && selectedFolderIDs.contains(option.id) {
             option.node.addItem(name: trimmed, isPriority: isPriority, in: modelContext)
         }
-        dismiss()
+        
+        if continuousAdd {
+            // 続けて登録：名前と優先を空にして、追加先は残す。キーボードを出したまま、次を入力できる
+            // トーストは、✓ボタンに重ならないよう、画面の下に出す
+            toast.show("追加しました", animation: .bottom)
+            name = ""
+            isPriority = false
+            isNameFocused = true
+        } else {
+            // 単発：追加して閉じる。トーストは、閉じたあとの一覧の画面で出る
+            toast.show("追加しました")
+            dismiss()
+        }
     }
     
     /// 定期アイテム登録画面に引き継ぐ内容
@@ -138,5 +167,6 @@ struct ItemInfoView: View {
     let first = try? container.mainContext.fetch(FolderNode.rootsDescriptor).first
     return ItemInfoView(currentFolder: first)
         .modelContainer(container)
+        .toastHost(ToastCenter())
         .tint(Color(red: 0.18, green: 0.55, blue: 0.37))
 }
