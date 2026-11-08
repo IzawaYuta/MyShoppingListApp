@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Model
 
-struct RecurringIntroPage: Identifiable {
+struct IntroPage: Identifiable {
     let id: Int
     let imageName: String
     let title: String
@@ -12,33 +12,20 @@ struct RecurringIntroPage: Identifiable {
     var descriptionAlignment: TextAlignment = .center
 }
 
-// MARK: - Main View
+// MARK: - Content
 
-struct RecurringItemIntroView: View {
+enum IntroContent {
     
-    @State private var currentPage = 0
-    
-    var onFinish: () -> Void = {}
-    
-    private let accentColor = Color(
-        red: 0.25,
-        green: 0.66,
-        blue: 0.49
-    )
-    
-    private var isLastPage: Bool {
-        currentPage == pages.count - 1
-    }
-    
-    private let pages: [RecurringIntroPage] = [
-        RecurringIntroPage(
+    /// 定期アイテム画面
+    static let recurring: [IntroPage] = [
+        IntroPage(
             id: 0,
             imageName: "RecurringIntro1",
-            title: "定期アイテムで\n買い忘れを防ぎましょう",
+            title: "「定期アイテム」で\n買い忘れを防ぎましょう",
             description: "設定した日付に、\n指定したフォルダへ\n自動で追加されます。",
             highlight: "自動"
         ),
-        RecurringIntroPage(
+        IntroPage(
             id: 1,
             imageName: "RecurringIntro2",
             title: "設定は3ステップだけ",
@@ -46,6 +33,39 @@ struct RecurringItemIntroView: View {
             descriptionAlignment: .leading
         ),
     ]
+    
+    /// よく買うもの画面
+    static let frequent: [IntroPage] = [
+        IntroPage(
+            id: 0,
+            imageName: "FrequentIntro1",
+            title: "「よく買うもの」を\n登録しましょう",
+            description: "食品やや日用品など、\nいつも買うものを登録しておくと、\n毎回入力しなくて済みます。",
+        ),
+        IntroPage(
+            id: 1,
+            imageName: "FrequentIntro2",
+            title: "選んで追加するだけ",
+            description: "① よく買うものを選ぶ\n② 追加ボタンを押す\n→ ワンタップでまとめて追加",
+            descriptionAlignment: .leading
+        ),
+    ]
+}
+
+// MARK: - Main View
+
+struct FeatureIntroView: View {
+    
+    let pages: [IntroPage]
+    var onFinish: () -> Void = {}
+    
+    @State private var currentPage = 0
+    
+    private let accentColor = Color(red: 0.25, green: 0.66, blue: 0.49)
+    
+    private var isLastPage: Bool {
+        currentPage == pages.count - 1
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -68,7 +88,7 @@ struct RecurringItemIntroView: View {
                 // MARK: Page Indicator
                 
                 HStack(spacing: 8) {
-                    ForEach(0..<2, id: \.self) { index in
+                    ForEach(0..<pages.count, id: \.self) { index in
                         Circle()
                             .fill(
                                 currentPage == index
@@ -107,8 +127,9 @@ struct RecurringItemIntroView: View {
                 Button("スキップ") {
                     onFinish()
                 }
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(accentColor)
+                .padding(.bottom, 18)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.white)
@@ -119,7 +140,7 @@ struct RecurringItemIntroView: View {
     // MARK: - Page Content
     
     private func pageContent(
-        _ page: RecurringIntroPage,
+        _ page: IntroPage,
         height: CGFloat
     ) -> some View {
         
@@ -163,7 +184,7 @@ struct RecurringItemIntroView: View {
     }
     
     /// 文字の強調
-    private func descriptionText(_ page: RecurringIntroPage) -> Text {
+    private func descriptionText(_ page: IntroPage) -> Text {
         var attributed = AttributedString(page.description)
         
         if let highlight = page.highlight,
@@ -179,5 +200,9 @@ struct RecurringItemIntroView: View {
 // MARK: - Preview
 
 #Preview {
-    RecurringItemIntroView()
+    FeatureIntroView(pages: IntroContent.recurring)
+}
+
+#Preview {
+    FeatureIntroView(pages: IntroContent.frequent)
 }

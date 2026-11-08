@@ -55,11 +55,13 @@ struct RecurringItemRow: View {
 enum RegularItemSheet: Identifiable {
     case add
     case edit(RecurringItem)
+    case intro
     
     var id: String {
         switch self {
         case .add: return "add"
         case .edit(let item): return "edit-\(item.id)"
+        case .intro: return "intro"
         }
     }
 }
@@ -134,7 +136,7 @@ struct RegularItemListView: View {
                     }
                     
                     Button(action: {
-                        showIntro.toggle()
+                        activeSheet = .intro
                     }) {
                         Image(systemName: "info.circle")
                     }
@@ -142,16 +144,8 @@ struct RegularItemListView: View {
             }
             .onAppear {
                 if !hasSeenIntro {
-                    showIntro = true
+                    activeSheet = .intro
                 }
-            }
-            .sheet(isPresented: $showIntro) {
-                RecurringItemIntroView {
-                    hasSeenIntro = true
-                    showIntro = false
-                }
-                .presentationDetents([.large])
-                .interactiveDismissDisabled(true)
             }
             .sheet(item: $activeSheet) { sheet in
                 // RegularItemInfoView が自分で NavigationStack を持っているため、ここでは包まない
@@ -175,6 +169,16 @@ struct RegularItemListView: View {
                             RecurringItemRunner.markProcessedThroughToday(item)
                         }
                     }
+                case .intro:
+                    FeatureIntroView(pages: IntroContent.recurring) {
+                        hasSeenIntro = true
+                        activeSheet = nil
+                    }
+                    .onDisappear {
+                        hasSeenIntro = true
+                    }
+                    .presentationDetents([.large])
+                    .interactiveDismissDisabled(true)
                 }
             }
             .alert("定期アイテムを削除しますか？", isPresented: $showDeleteAlert) {

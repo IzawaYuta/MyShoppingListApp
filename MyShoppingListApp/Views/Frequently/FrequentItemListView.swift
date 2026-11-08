@@ -6,11 +6,13 @@ import SwiftData
 enum FrequentItemSheet: Identifiable {
     case register
     case edit(FrequentItem)
+    case intro
     
     var id: String {
         switch self {
         case .register: return "register"
         case .edit(let item): return "edit-\(item.id)"
+        case .intro: return "intro"
         }
     }
 }
@@ -21,6 +23,9 @@ struct FrequentItemListView: View {
     @Query(FolderNode.rootsDescriptor) private var roots: [FolderNode]
     @Query(sort: \FrequentItem.createdAt) private var items: [FrequentItem]
     @Environment(ToastCenter.self) private var toast
+    
+    @AppStorage("hasSeenFrequentIntro") private var hasSeenIntro = false
+    @State private var showIntro = false
     
     @State private var selection: Set<UUID> = []
     @State private var activeSheet: FrequentItemSheet?
@@ -67,21 +72,42 @@ struct FrequentItemListView: View {
                 //            ToolbarItem(placement: .topBarLeading) {
                 //                EditButton()
                 //            }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         activeSheet = .register
                     } label: {
                         Image(systemName: "plus")
                     }
+                    
+                    Button {
+                        activeSheet = .intro
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
                 }
             }
             .onChange(of: editMode) { _, _ in selection.removeAll() }   // 編集モードの切り替え時は、選択をクリア
+            .onAppear {
+                if !hasSeenIntro {
+                    activeSheet = .intro
+                }
+            }
             .sheet(item: $activeSheet) { sheet in
                 switch sheet {
                 case .register:
                     FrequentItemFormView()
                 case .edit(let item):
                     FrequentItemFormView(item: item)
+                case .intro:
+                    FeatureIntroView(pages: IntroContent.frequent) {
+                        hasSeenIntro = true
+                        activeSheet = nil
+                    }
+                    .onDisappear {
+                        hasSeenIntro = true
+                    }
+                    .presentationDetents([.large])
+                    .interactiveDismissDisabled(true)
                 }
             }
             .alert("よく買うものを削除しますか？", isPresented: $showDeleteAlert) {
