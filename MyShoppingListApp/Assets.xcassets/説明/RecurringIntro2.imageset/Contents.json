@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "牛乳定期便の買いもの案内.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "牛乳定期便の買いもの案内 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "牛乳定期便の買いもの案内 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

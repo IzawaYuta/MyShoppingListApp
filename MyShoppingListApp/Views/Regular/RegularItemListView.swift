@@ -71,6 +71,9 @@ struct RegularItemListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \RecurringItem.createdAt) private var items: [RecurringItem]
     
+    @AppStorage("hasSeenRecurringIntro") private var hasSeenIntro = false
+    @State private var showIntro = false
+    
     @State private var activeSheet: RegularItemSheet?
     
     @State private var itemToDelete: RecurringItem?
@@ -129,6 +132,17 @@ struct RegularItemListView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                }
+            }
+            .onAppear {
+                if !hasSeenIntro {
+                    showIntro = true
+                }
+            }
+            .fullScreenCover(isPresented: $showIntro) {
+                RecurringItemIntroView {
+                    hasSeenIntro = true
+                    showIntro = false
                 }
             }
             .sheet(item: $activeSheet) { sheet in
