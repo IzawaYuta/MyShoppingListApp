@@ -126,11 +126,17 @@ struct RegularItemListView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         activeSheet = .add
                     } label: {
                         Image(systemName: "plus")
+                    }
+                    
+                    Button(action: {
+                        showIntro.toggle()
+                    }) {
+                        Image(systemName: "info.circle")
                     }
                 }
             }
@@ -139,11 +145,13 @@ struct RegularItemListView: View {
                     showIntro = true
                 }
             }
-            .fullScreenCover(isPresented: $showIntro) {
+            .sheet(isPresented: $showIntro) {
                 RecurringItemIntroView {
                     hasSeenIntro = true
                     showIntro = false
                 }
+                .presentationDetents([.large])
+                .interactiveDismissDisabled(true)
             }
             .sheet(item: $activeSheet) { sheet in
                 // RegularItemInfoView が自分で NavigationStack を持っているため、ここでは包まない
