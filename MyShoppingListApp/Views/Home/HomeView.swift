@@ -277,6 +277,7 @@ struct HomeView: View {
                         activeSheet = .folder
                     } label: {
                         Image(systemName: "plus")
+                            .accessibilityIdentifier("addFolderButton")
                     }
                 }
             }
@@ -513,6 +514,7 @@ struct FolderDetailView: View {
             } label: {
                 Image(systemName: "plus")
             }
+            .accessibilityIdentifier("addMenuButton")
         } else if route.canAddFolder {
             // 1階層目：フォルダだけ
             Button { activeSheet = .folder } label: { Image(systemName: "plus") }

@@ -40,6 +40,7 @@ struct ItemInfoView: View {
                     HStack {
                         TextField("アイテム名", text: $name)
                             .focused($isNameFocused)
+                            .accessibilityIdentifier("itemNameField")  
                         if isPriority {
                             Image(systemName: "exclamationmark")
                                 .bold()
@@ -92,6 +93,7 @@ struct ItemInfoView: View {
                         Image(systemName: "checkmark")
                             .fontWeight(.semibold)
                     }
+                    .accessibilityIdentifier("itemSaveButton")  
                     .disabled(!canAdd)
                 }
             }

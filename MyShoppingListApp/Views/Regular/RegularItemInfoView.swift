@@ -80,6 +80,7 @@ struct RegularItemInfoView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $draft.name)
+                            .accessibilityIdentifier("itemNameField")   
                         if draft.isPriority {
                             Image(systemName: "exclamationmark")
                                 .bold()
@@ -170,6 +171,7 @@ struct RegularItemInfoView: View {
                     }) {
                         Image(systemName: "checkmark")
                     }
+                    .accessibilityIdentifier("itemSaveButton")  
                     .disabled(draft.name.trimmingCharacters(in: .whitespaces).isEmpty || draft.folderIDs.isEmpty)
                 }
             }

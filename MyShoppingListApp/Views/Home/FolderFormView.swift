@@ -114,6 +114,7 @@ struct FolderFormView: View {
                         )
                         HStack {
                             TextField("食品、日用品、ドラッグストア・・・", text: $name)
+                                .accessibilityIdentifier("folderNameField")  
                             
                             Spacer()
                             
@@ -149,6 +150,7 @@ struct FolderFormView: View {
                     }) {
                         Image(systemName: "xmark")
                     }
+                    .accessibilityIdentifier("folderCloseButton")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
@@ -157,6 +159,7 @@ struct FolderFormView: View {
                     }) {
                         Image(systemName: "checkmark")
                     }
+                    .accessibilityIdentifier("folderSaveButton")
                     .fontWeight(.semibold)
                     .disabled(trimmedName.isEmpty || !canSubmit || isDuplicateName)
                 }

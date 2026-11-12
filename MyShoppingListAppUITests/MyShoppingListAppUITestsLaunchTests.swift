@@ -1,32 +1,27 @@
-//
-//  MyShoppingListAppUITestsLaunchTests.swift
-//  MyShoppingListAppUITests
-//
-//  Created by Engineer MacBook Air on 2026/10/27.
-//
 
 import XCTest
 
 final class MyShoppingListAppUITestsLaunchTests: XCTestCase {
-
+    
+    // 設定ごとの繰り返しは不要なので、1回だけ実行する
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
-        true
+        false
     }
-
+    
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
-
+    
     @MainActor
     func testLaunch() throws {
         let app = XCUIApplication()
+        // 空のメモリDBで起動する（本物のデータを使わない）
+        app.launchArguments = ["-UITesting", "-continuousAddEnabled", "NO"]
         app.launch()
-
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
-
+        
+        // 起動して、最初の画面（カテゴリー）が出ることを確認する
+        XCTAssertTrue(app.navigationBars["カテゴリー"].waitForExistence(timeout: 10))
+        
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
         attachment.lifetime = .keepAlways

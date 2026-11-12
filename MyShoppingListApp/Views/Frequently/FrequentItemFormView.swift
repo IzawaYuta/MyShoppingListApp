@@ -32,6 +32,7 @@ struct FrequentItemFormView: View {
                 Section {
                     HStack {
                         TextField("アイテム名", text: $name)
+                            .accessibilityIdentifier("itemNameField")   
                         if isPriority {
                             Image(systemName: "exclamationmark")
                                 .bold()
@@ -64,6 +65,7 @@ struct FrequentItemFormView: View {
                     }) {
                         Image(systemName: "checkmark")
                     }
+                    .accessibilityIdentifier("itemSaveButton")   
                     .disabled(trimmedName.isEmpty || folderIDs.isEmpty)
                 }
             }
