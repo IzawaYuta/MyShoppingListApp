@@ -21,6 +21,8 @@ struct MainTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var selection: Int = 0
     @State private var toastCenter = ToastCenter()
+    
+    @StateObject private var authManager = AuthManager()
 
     var body: some View {
         TabView(selection: $selection) {
@@ -53,6 +55,8 @@ struct MainTabView: View {
         .tint(.black)
         .toastHost(toastCenter)
         .task {
+            await authManager.signInAnonymously()
+            
             // アプリを起動したとき
             // 先に、存在しないフォルダの id を掃除してから、自動追加する
             FolderCleanup.removeDanglingIDs(in: modelContext)
