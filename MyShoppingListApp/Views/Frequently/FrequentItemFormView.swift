@@ -58,6 +58,7 @@ struct FrequentItemFormView: View {
                     }) {
                         Image(systemName: "xmark")
                     }
+                    .accessibilityIdentifier("itemCloseButton")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {

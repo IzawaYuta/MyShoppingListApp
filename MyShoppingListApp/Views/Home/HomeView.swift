@@ -444,7 +444,7 @@ struct FolderDetailView: View {
             Button("削除", role: .destructive) {
                 // 配下のフォルダとアイテムも一緒に削除される（cascade）
                 if let folder = folderToDelete {
-                    modelContext.delete(folder)
+                    FolderCleanup.delete(folder, in: modelContext)
                 }
                 folderToDelete = nil
             }

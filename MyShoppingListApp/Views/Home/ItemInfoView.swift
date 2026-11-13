@@ -85,6 +85,7 @@ struct ItemInfoView: View {
                         Image(systemName: "xmark")
                             .foregroundColor(.red)
                     }
+                    .accessibilityIdentifier("itemCloseButton")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: {
