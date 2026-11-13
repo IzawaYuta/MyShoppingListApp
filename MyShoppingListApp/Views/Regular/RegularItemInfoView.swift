@@ -118,26 +118,26 @@ struct RegularItemInfoView: View {
                 // 有効（編集の時だけ）
                 Section {
                     Toggle("無効にする", isOn: Binding(
-                        get: { draft.isActive },
+                        get: { !draft.isActive },
                         set: { newValue in
                             // すぐには変えず、確認のアラートを出す
-                            pendingActive = newValue
+                            pendingActive = !newValue
                             showActiveAlert = true
                         }
                     ))
                     .alert(
-                        pendingActive == false ? "有効にしますか？" : "無効にしますか？",
+                        pendingActive == true ? "有効にしますか？" : "無効にしますか？",
                         isPresented: $showActiveAlert
                     ) {
                         Button("キャンセル", role: .cancel) { pendingActive = nil }
-                        Button(pendingActive == false ? "有効にする" : "無効にする") {
+                        Button(pendingActive == false ? "無効にする" : "有効にする") {
                             if let newValue = pendingActive {
                                 draft.isActive = newValue
                             }
                             pendingActive = nil
                         }
                     } message: {
-                        Text(pendingActive == false
+                        Text(pendingActive == true
                              ? "指定した日に、自動で追加されます。"
                              : "削除はされません。\n自動追加が無効になります。")
                     }
